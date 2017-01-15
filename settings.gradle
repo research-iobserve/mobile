@@ -1,0 +1,3 @@
+rootProject.name = "thesis.root"
+
+include 'thesis.shared', 'thesis.android.agent', 'thesis-android-instrumenter', 'thesis.inspectit.bridge'

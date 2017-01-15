@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<instrumenter-configuration>
+
+	<cmr-bridge>
+		<helloUrl>http://10.0.2.2:8182/rest/mobile/hello</helloUrl>
+		<beaconUrl>http://10.0.2.2:8182/rest/mobile/beacon</beaconUrl>
+	</cmr-bridge>
+
+	<manifestTransformer>
+		<permissions>
+			<permission>android.permission.INTERNET</permission>
+			<permission>android.permission.ACCESS_NETWORK_STATE</permission>
+			<permission>android.permission.ACCESS_COARSE_LOCATION</permission>
+			<permission>android.permission.ACCESS_WIFI_STATE</permission>
+		</permissions>
+	</manifestTransformer>
+	
+	<instrumentation>
+		<mapping>
+			<point type="onCreate">rocks/inspectit/android/AndroidAgent.initAgent</point>
+			<point type="onDestroy">rocks/inspectit/android/AndroidAgent.destroyAgent</point>
+		</mapping>
+		
+		<sensors>
+			<sensor>
+				<parent>android/os/AsyncTask</parent>
+				<method>doInBackground</method>
+				<signature>(Ljava/lang/Object;)Ljava/lang/Object;</signature>
+				<handler>rocks.inspectit.android.sensor.AsyncTaskSensor</handler>
+			</sensor>
+		</sensors>
+	</instrumentation>
+
+</instrumenter-configuration>

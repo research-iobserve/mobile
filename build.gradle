@@ -1,0 +1,26 @@
+buildscript {
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		jcenter()
+	}
+	
+	dependencies {
+        classpath 'ru.tinkoff.gradle:jarjar:1.1.0'
+    }
+}
+
+apply plugin: 'base'
+apply plugin: 'java'
+
+File dependenciesFile = file("dependencies.gradle")
+
+allprojects {
+	apply from: file(dependenciesFile.absolutePath)
+	
+	repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+}
