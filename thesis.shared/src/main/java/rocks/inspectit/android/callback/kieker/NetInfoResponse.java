@@ -9,68 +9,74 @@ import rocks.inspectit.android.callback.data.MobileDefaultData;
 
 public class NetInfoResponse extends MobileDefaultData implements IKiekerCompatible {
 
-    private boolean wifi;
-    private boolean mobile;
-    private byte security;
-    private String ssid;
-    private String bssid;
+	private boolean wifi;
+	private boolean mobile;
+	private byte security;
+	private String ssid;
+	private String bssid;
 
-    public NetInfoResponse(boolean wifi, boolean mobile, byte security, String wlanSSID, String wlanBSSID) {
-        setWifi(wifi);
-        setMobile(mobile);
-        setSecurity(security);
-        setSsid(wlanSSID);
-        setBssid(wlanBSSID);
-    }
+	public NetInfoResponse(boolean wifi, boolean mobile, byte security, String wlanSSID, String wlanBSSID) {
+		setWifi(wifi);
+		setMobile(mobile);
+		setSecurity(security);
+		setSsid(wlanSSID);
+		setBssid(wlanBSSID);
+	}
 
-    @Override
-    public IMonitoringRecord generateRecord() {
-        if (wifi) {
-            return new MobileNetworkRecord(ssid, bssid, security);
-        } else if (mobile) {
-            return new MobileNetworkRecord(security);
-        } else {
-            return null;
-        }
-    }
+	/**
+	 * To support automatic mapping from Jackson.
+	 */
+	public NetInfoResponse() {
+	}
 
-    public boolean isWifi() {
-        return wifi;
-    }
+	@Override
+	public IMonitoringRecord generateRecord() {
+		if (wifi) {
+			return new MobileNetworkRecord(ssid, bssid, security);
+		} else if (mobile) {
+			return new MobileNetworkRecord(security);
+		} else {
+			return null;
+		}
+	}
 
-    public void setWifi(boolean wifi) {
-        this.wifi = wifi;
-    }
+	public boolean isWifi() {
+		return wifi;
+	}
 
-    public boolean isMobile() {
-        return mobile;
-    }
+	public void setWifi(boolean wifi) {
+		this.wifi = wifi;
+	}
 
-    public void setMobile(boolean mobile) {
-        this.mobile = mobile;
-    }
+	public boolean isMobile() {
+		return mobile;
+	}
 
-    public byte getSecurity() {
-        return security;
-    }
+	public void setMobile(boolean mobile) {
+		this.mobile = mobile;
+	}
 
-    public void setSecurity(byte security) {
-        this.security = security;
-    }
+	public byte getSecurity() {
+		return security;
+	}
 
-    public String getSsid() {
-        return ssid;
-    }
+	public void setSecurity(byte security) {
+		this.security = security;
+	}
 
-    public void setSsid(String ssid) {
-        this.ssid = ssid;
-    }
+	public String getSsid() {
+		return ssid;
+	}
 
-    public String getBssid() {
-        return bssid;
-    }
+	public void setSsid(String ssid) {
+		this.ssid = ssid;
+	}
 
-    public void setBssid(String bssid) {
-        this.bssid = bssid;
-    }
+	public String getBssid() {
+		return bssid;
+	}
+
+	public void setBssid(String bssid) {
+		this.bssid = bssid;
+	}
 }

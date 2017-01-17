@@ -14,7 +14,12 @@ import kieker.common.util.registry.IRegistry;
 
 public class MobileNetworkRequestRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory {
 
-    public static final int SIZE = (2 * TYPE_SIZE_STRING) + TYPE_SIZE_LONG + TYPE_SIZE_INT;
+    /**
+	 * Generated UID.
+	 */
+	private static final long serialVersionUID = 6585030846093961779L;
+	
+	public static final int SIZE = (2 * TYPE_SIZE_STRING) + TYPE_SIZE_LONG + TYPE_SIZE_INT;
     public static final Class<?>[] TYPES = {String.class, String.class, long.class, int.class};
 
     private String url;
