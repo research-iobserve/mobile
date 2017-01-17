@@ -11,8 +11,8 @@ import rocks.inspectit.android.callback.data.MobileDefaultData;
 
 public class PlainKieker extends MobileDefaultData implements IKiekerCompatible {
 
+	@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.PROPERTY, property = "type")
 	@JsonDeserialize(using = PlainKiekerDeserializer.class)
-	@JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 	private IMonitoringRecord record;
 
 	public PlainKieker() {

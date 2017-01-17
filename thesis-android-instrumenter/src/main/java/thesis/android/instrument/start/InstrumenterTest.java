@@ -1,6 +1,4 @@
-package thesis.android.instrument.core;
-
-import static org.junit.Assert.fail;
+package thesis.android.instrument.start;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,19 +11,15 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.io.FilenameUtils;
-import org.junit.Test;
 
 import net.lingala.zip4j.exception.ZipException;
 import thesis.android.instrument.core.APKInstrumenter;
 
 public class InstrumenterTest {
 
-	private boolean selectApk = false;
+	private static final boolean selectApk = true;
 
-	@Test
-	public void test() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
-			ZipException, URISyntaxException {
-
+	public static void main(String[] argv) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, ZipException, URISyntaxException {
 		File toInstrument;
 		if (selectApk) {
 			final JFileChooser fc = new JFileChooser();
@@ -63,7 +57,7 @@ public class InstrumenterTest {
 					"android");
 			instr.instrumentAPK(toInstrument, new File("instr-output.apk"));
 		} else {
-			fail("APK doesn't exist.");
+			System.err.println("APK doesn't exist.");
 		}
 	}
 

@@ -6,12 +6,8 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
 public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {
-
 	private String sensor;
 	private int index;
-
-	// private final Label start = new Label(), end = new Label(), handler = new
-	// Label();
 
 	public SensorBytecodeInstrumenter(String sensClass) {
 		this.sensor = sensClass;
@@ -27,11 +23,6 @@ public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {
 				"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J", false);
 		index = parent.newLocal(Type.LONG_TYPE);
 		mv.visitVarInsn(Opcodes.LSTORE, index);
-
-		/*
-		 * // add try catch block mv.visitTryCatchBlock(start, end, handler,
-		 * "java/lang/Exception"); mv.visitLabel(start);
-		 */
 	}
 
 	@Override
@@ -47,16 +38,4 @@ public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, "rocks/inspectit/android/AndroidAgent", "exitBody", "(J)V", false);
 		}
 	}
-
-	/*
-	 * @Override public void onMethodEnd(String owner, String name, String desc,
-	 * AdviceAdapter parent, MethodVisitor mv) { mv.visitJumpInsn(Opcodes.GOTO,
-	 * end); mv.visitLabel(handler); // CATCH BLOCK mv.visitInsn(Opcodes.DUP);
-	 * mv.visitVarInsn(Opcodes.LLOAD, index);
-	 * mv.visitMethodInsn(Opcodes.INVOKESTATIC,
-	 * "rocks/inspectit/android/AndroidAgent", "exitErrorBody",
-	 * "(Ljava/lang/Exception;J)V", false);
-	 * 
-	 * mv.visitLabel(end); mv.visitInsn(Opcodes.ATHROW); }
-	 */
 }

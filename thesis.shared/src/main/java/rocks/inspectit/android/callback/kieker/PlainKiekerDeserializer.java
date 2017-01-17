@@ -25,6 +25,7 @@ public class PlainKiekerDeserializer extends JsonDeserializer<IMonitoringRecord>
 	@Override
 	public IMonitoringRecord deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
+		
 		String type = node.get("type").asText();
 
 		if (type.equals("BeforeOperationEvent")) {
