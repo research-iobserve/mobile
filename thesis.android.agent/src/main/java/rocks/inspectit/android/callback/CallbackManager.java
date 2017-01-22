@@ -14,7 +14,7 @@ import rocks.inspectit.android.callback.data.MobileCallbackData;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
 import rocks.inspectit.android.callback.kieker.PlainKieker;
 import rocks.inspectit.android.callback.strategies.AbstractCallbackStrategy;
-import rocks.inspectit.android.util.DependencyInjector;
+import rocks.inspectit.android.util.DependencyManager;
 
 /**
  * Created by David on 25.10.16.
@@ -24,7 +24,7 @@ public class CallbackManager {
 
     private static final String LOG_TAG = ExternalConfiguration.getLogTag();
 
-    private AbstractCallbackStrategy strategy = DependencyInjector.getCallbackStrategy();
+    private AbstractCallbackStrategy strategy = DependencyManager.getCallbackStrategy();
     private boolean sessActive;
     private List<MobileDefaultData> sessQueue;
 

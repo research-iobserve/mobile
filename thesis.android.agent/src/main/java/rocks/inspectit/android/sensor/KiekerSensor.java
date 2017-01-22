@@ -12,7 +12,7 @@ import kieker.common.record.flow.trace.operation.BeforeOperationEvent;
 import kieker.monitoring.core.registry.SessionRegistry;
 import rocks.inspectit.android.AndroidAgent;
 import rocks.inspectit.android.callback.CallbackManager;
-import rocks.inspectit.android.util.DependencyInjector;
+import rocks.inspectit.android.util.DependencyManager;
 
 /**
  * Created by DMO on 09.01.2017.
@@ -21,7 +21,7 @@ public class KiekerSensor implements ISensor {
 
 	private static final TraceRegistry TRACEREGISTRY = TraceRegistry.INSTANCE;
 
-	private CallbackManager callbackManager = DependencyInjector.getCallbackManager();
+	private CallbackManager callbackManager = DependencyManager.getCallbackManager();
 	private String clazz;
 	private String signature;
 

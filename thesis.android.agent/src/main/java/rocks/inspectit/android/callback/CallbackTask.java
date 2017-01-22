@@ -14,7 +14,7 @@ import java.net.URL;
 import rocks.fasterxml.jackson.databind.ObjectMapper;
 import rocks.inspectit.android.ExternalConfiguration;
 import rocks.inspectit.android.callback.data.HelloResponse;
-import rocks.inspectit.android.util.DependencyInjector;
+import rocks.inspectit.android.util.DependencyManager;
 
 /**
  * Created by David on 23.10.16.
@@ -24,9 +24,13 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 
     private static final String LOG_TAG = ExternalConfiguration.getLogTag();
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    
+    static {
+    	
+    }
 
     private String callbackUrl;
-    private CallbackManager callbackManager = DependencyInjector.getCallbackManager();
+    private CallbackManager callbackManager = DependencyManager.getCallbackManager();
 
     public CallbackTask(String url) {
         this.callbackUrl = url;

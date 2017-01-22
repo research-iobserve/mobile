@@ -12,7 +12,7 @@ import rocks.inspectit.android.TagCollector;
 import rocks.inspectit.android.callback.CallbackTask;
 import rocks.inspectit.android.callback.data.MobileCallbackData;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
-import rocks.inspectit.android.util.DependencyInjector;
+import rocks.inspectit.android.util.DependencyManager;
 
 /**
  * Created by David on 25.10.16.
@@ -22,7 +22,7 @@ public abstract class AbstractCallbackStrategy {
     private static ObjectMapper mapper = new ObjectMapper();
 
     protected MobileCallbackData data;
-    private TagCollector tagCollector = DependencyInjector.getTagCollector();
+    private TagCollector tagCollector = DependencyManager.getTagCollector();
 
     public AbstractCallbackStrategy() {
         this.data = new MobileCallbackData();

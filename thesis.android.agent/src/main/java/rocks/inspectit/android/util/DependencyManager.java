@@ -9,7 +9,7 @@ import rocks.inspectit.android.callback.strategies.AbstractCallbackStrategy;
  * Created by DMO on 17.12.2016.
  */
 
-public class DependencyInjector {
+public class DependencyManager {
     private static CallbackManager callbackManager;
     private static AndroidDataCollector androidDataCollector;
     private static TagCollector tagCollector;
@@ -20,7 +20,7 @@ public class DependencyInjector {
     }
 
     public static void setCallbackManager(CallbackManager callbackManager) {
-        DependencyInjector.callbackManager = callbackManager;
+        DependencyManager.callbackManager = callbackManager;
     }
 
     public static AndroidDataCollector getAndroidDataCollector() {
@@ -28,7 +28,7 @@ public class DependencyInjector {
     }
 
     public static void setAndroidDataCollector(AndroidDataCollector androidDataCollector) {
-        DependencyInjector.androidDataCollector = androidDataCollector;
+        DependencyManager.androidDataCollector = androidDataCollector;
     }
 
     public static TagCollector getTagCollector() {
@@ -36,7 +36,7 @@ public class DependencyInjector {
     }
 
     public static void setTagCollector(TagCollector tagCollector) {
-        DependencyInjector.tagCollector = tagCollector;
+        DependencyManager.tagCollector = tagCollector;
     }
 
     public static AbstractCallbackStrategy getCallbackStrategy() {
@@ -44,6 +44,6 @@ public class DependencyInjector {
     }
 
     public static void setCallbackStrategy(AbstractCallbackStrategy callbackStrategy) {
-        DependencyInjector.callbackStrategy = callbackStrategy;
+        DependencyManager.callbackStrategy = callbackStrategy;
     }
 }

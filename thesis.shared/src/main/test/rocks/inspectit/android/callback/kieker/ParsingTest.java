@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import kieker.common.record.flow.trace.operation.BeforeOperationEvent;
 import rocks.fasterxml.jackson.core.JsonParseException;
 import rocks.fasterxml.jackson.databind.JsonMappingException;
 import rocks.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +25,10 @@ public class ParsingTest {
 
 	@Test
 	public void test() throws JsonParseException, JsonMappingException, IOException {
-		mapper.readValue(NETINFOJSON, MobileCallbackData.class);
+		BeforeOperationEvent ev = new BeforeOperationEvent(0, 0, 0, "", "");
+		PlainKieker kiek = new PlainKieker(ev);
+		
+		System.out.println(mapper.writeValueAsString(kiek));
 	}
 
 }

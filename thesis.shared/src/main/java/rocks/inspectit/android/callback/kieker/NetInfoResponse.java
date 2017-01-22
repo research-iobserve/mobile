@@ -32,9 +32,9 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 	@Override
 	public IMonitoringRecord generateRecord() {
 		if (wifi) {
-			return new MobileNetworkRecord(ssid, bssid, security);
+			return new MobileNetworkEventRecord(ssid, bssid, security);
 		} else if (mobile) {
-			return new MobileNetworkRecord(security);
+			return new MobileNetworkEventRecord(security);
 		} else {
 			return null;
 		}

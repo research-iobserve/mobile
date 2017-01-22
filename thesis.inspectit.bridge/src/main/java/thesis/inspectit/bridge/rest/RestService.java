@@ -15,6 +15,7 @@ import kieker.common.configuration.Configuration;
 import kieker.monitoring.core.configuration.ConfigurationFactory;
 import kieker.monitoring.core.controller.IMonitoringController;
 import kieker.monitoring.core.controller.MonitoringController;
+import kieker.monitoring.core.registry.SessionRegistry;
 import kieker.monitoring.writer.filesystem.SyncFsWriter;
 import rocks.fasterxml.jackson.databind.ObjectMapper;
 import rocks.inspectit.android.callback.data.HelloRequest;
@@ -22,7 +23,7 @@ import rocks.inspectit.android.callback.data.HelloResponse;
 import rocks.inspectit.android.callback.data.MobileCallbackData;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
 import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
-
+// TODO handle kieker sessions
 @Path("/rest/mobile")
 public class RestService {
 	private static final String BASE_PATH = new File("kieker-logs/").getAbsolutePath();

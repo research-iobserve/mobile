@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import rocks.inspectit.android.util.DependencyInjector;
+import rocks.inspectit.android.util.DependencyManager;
 
 /**
  * Created by David on 24.10.16.
@@ -25,7 +25,7 @@ public class TagCollector {
 
     private long dynamicTimestamp;
 
-    private AndroidDataCollector androidDataCollector = DependencyInjector.getAndroidDataCollector();
+    private AndroidDataCollector androidDataCollector = DependencyManager.getAndroidDataCollector();
 
     protected TagCollector(Context ctx) {
         this.staticTags = new HashSet<Tag>();

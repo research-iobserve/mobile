@@ -32,7 +32,7 @@ import rocks.inspectit.android.module.MemoryModule;
 import rocks.inspectit.android.module.special.NetworkModule;
 import rocks.inspectit.android.module.util.ExecutionProperty;
 import rocks.inspectit.android.sensor.ISensor;
-import rocks.inspectit.android.util.DependencyInjector;
+import rocks.inspectit.android.util.DependencyManager;
 
 /**
  * Created by David on 22.10.16.
@@ -85,19 +85,19 @@ public class AndroidAgent {
 		// INIT ANDROID DATA COLLECTOR
 		AndroidDataCollector androidDataCollector = new AndroidDataCollector();
 		androidDataCollector.initDataCollector(ctx);
-		DependencyInjector.setAndroidDataCollector(androidDataCollector);
+		DependencyManager.setAndroidDataCollector(androidDataCollector);
 
 		// INITING TAG COLLECTOR
 		tagCollector = new TagCollector(ctx);
 		tagCollector.collectStaticTags();
-		DependencyInjector.setTagCollector(tagCollector);
+		DependencyManager.setTagCollector(tagCollector);
 
 		// INITING CALLBACK
 		AbstractCallbackStrategy callbackStrategy = new ImmediatelyStrategy();
-		DependencyInjector.setCallbackStrategy(callbackStrategy);
+		DependencyManager.setCallbackStrategy(callbackStrategy);
 
 		callbackManager = new CallbackManager();
-		DependencyInjector.setCallbackManager(callbackManager);
+		DependencyManager.setCallbackManager(callbackManager);
 
 		// OPEN COMMUNICATION WITH CMR
 		HelloRequest helloRequest = new HelloRequest();
@@ -313,13 +313,13 @@ public class AndroidAgent {
 	}
 
 	private static void injectDependencies(AbstractBroadcastReceiver recv) {
-		recv.setCallbackManager(DependencyInjector.getCallbackManager());
-		recv.setAndroidDataCollector(DependencyInjector.getAndroidDataCollector());
+		recv.setCallbackManager(DependencyManager.getCallbackManager());
+		recv.setAndroidDataCollector(DependencyManager.getAndroidDataCollector());
 	}
 
 	private static void injectDependencies(AbstractAndroidModule androidModule) {
-		androidModule.setCallbackManager(DependencyInjector.getCallbackManager());
-		androidModule.setAndroidDataCollector(DependencyInjector.getAndroidDataCollector());
+		androidModule.setCallbackManager(DependencyManager.getCallbackManager());
+		androidModule.setAndroidDataCollector(DependencyManager.getAndroidDataCollector());
 	}
 
 	// handler listener

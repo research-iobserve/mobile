@@ -8,7 +8,7 @@ public class ExternalConfiguration {
     private static String beaconUrl;
     private static String helloUrl;
 
-    private static final String LOG_TAG = "inspectIT";
+    private static final String LOG_TAG = "Android Agent";
 
     public static String getBeaconUrl() {
         return beaconUrl;

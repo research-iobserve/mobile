@@ -12,7 +12,7 @@ import kieker.common.util.registry.IRegistry;
  * Created by DMO on 10.01.2017.
  */
 
-public class MobileNetworkRequestRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory {
+public class MobileNetworkRequestEventRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory {
 
     /**
 	 * Generated UID.
@@ -27,7 +27,7 @@ public class MobileNetworkRequestRecord extends AbstractMonitoringRecord impleme
     private int responseCode;
     private long duration;
 
-    public MobileNetworkRequestRecord(String url, String method, long duration, int responsecode) {
+    public MobileNetworkRequestEventRecord(String url, String method, long duration, int responsecode) {
         this.url = url;
         this.method = method;
         this.responseCode = responsecode;

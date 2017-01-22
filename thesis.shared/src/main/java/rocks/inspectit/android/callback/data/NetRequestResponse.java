@@ -2,7 +2,7 @@ package rocks.inspectit.android.callback.data;
 
 import kieker.common.record.IMonitoringRecord;
 import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
-import rocks.inspectit.android.callback.kieker.MobileNetworkRequestRecord;
+import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
 
 /**
  * Created by DMO on 10.12.2016.
@@ -52,6 +52,6 @@ public class NetRequestResponse extends MobileDefaultData implements IKiekerComp
 
     @Override
     public IMonitoringRecord generateRecord() {
-        return new MobileNetworkRequestRecord(url, method, duration, responseCode);
+        return new MobileNetworkRequestEventRecord(url, method, duration, responseCode);
     }
 }

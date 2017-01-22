@@ -11,7 +11,7 @@ import kieker.common.util.registry.IRegistry;
 /**
  * @author David Monschein
  */
-public class MobileNetworkRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory {
+public class MobileNetworkEventRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory {
 
     public static final int SIZE = (2 * TYPE_SIZE_STRING) + (TYPE_SIZE_BYTE * 3);
     public static final Class<?>[] TYPES = {boolean.class, boolean.class, byte.class, String.class, String.class};
@@ -32,15 +32,15 @@ public class MobileNetworkRecord extends AbstractMonitoringRecord implements IMo
     private String wSSID;
     private String wBSSID;
 
-    public MobileNetworkRecord(String ssid, String bssid, byte level) {
+    public MobileNetworkEventRecord(String ssid, String bssid, byte level) {
         this(true, false, level, ssid, bssid);
     }
 
-    public MobileNetworkRecord(byte level) {
+    public MobileNetworkEventRecord(byte level) {
         this(false, true, level, "", "");
     }
 
-    private MobileNetworkRecord(boolean wifi, boolean mobile, byte level, String ssid, String bssid) {
+    private MobileNetworkEventRecord(boolean wifi, boolean mobile, byte level, String ssid, String bssid) {
         this.wifi = wifi;
         this.mobile = mobile;
         this.encryptionLevel = level;
