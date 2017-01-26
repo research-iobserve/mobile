@@ -1,17 +1,60 @@
 package thesis.android.instrument.bytecode;
 
+/**
+ * Class which specifies a certain instrumentation point.
+ * 
+ * @author David Monschein
+ *
+ */
 public class InstrumentationPoint {
+	/**
+	 * Name of the class.
+	 */
 	private String className;
+
+	/**
+	 * Name of the method.
+	 */
 	private String methodName;
+
+	/**
+	 * Signature of the method.
+	 */
 	private String description;
 
+	/**
+	 * Whether the class is the super class.
+	 */
 	private boolean isSuper;
+
+	/**
+	 * Whether the class is the interface.
+	 */
 	private boolean isInterface;
 
+	/**
+	 * Creates an instance.
+	 * 
+	 * @param className
+	 *            name of the class
+	 * @param methodName
+	 *            name of the method
+	 * @param description
+	 *            description of the method
+	 */
 	public InstrumentationPoint(String className, String methodName, String description) {
 		this(className, methodName, description, false, false);
 	}
 
+	/**
+	 * Creates a method out of the class name and the full method signature.
+	 * 
+	 * @param className
+	 *            name of the class
+	 * @param methodWithDescription
+	 *            full method signature including method name and method
+	 *            signature
+	 */
 	public InstrumentationPoint(String className, String methodWithDescription) {
 		this(className, methodWithDescription, null);
 

@@ -1,5 +1,8 @@
 package rocks.inspectit.android;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -16,253 +19,277 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
-
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
+import android.telephony.TelephonyManager;
 import rocks.inspectit.android.util.CacheValue;
 
 /**
- * This class is a proxy for accessing Android device informations, because we don't want all modules to collect data on their own.
- * Created by David on 26.10.16.
+ * This class is a proxy for accessing Android device informations, because we
+ * don't want all modules to collect data on their own.
+ * 
+ * @author David Monschein
  */
-
 public class AndroidDataCollector {
 
-    private static final String POWER_PROFILE_CLASS = "com.android.internal.os.PowerProfile";
+	private static final String POWER_PROFILE_CLASS = "com.android.internal.os.PowerProfile";
 
-    private IntentFilter itFilter;
-    private Intent batteryStatus;
-    private LocationManager locationManager;
-    private ConnectivityManager connectivityManager;
-    private ActivityManager activityManager;
-    private WifiManager wifiManager;
-    private Object mPowerProfile;
+	private IntentFilter itFilter;
+	private Intent batteryStatus;
 
-    private Context context;
+	private TelephonyManager telephonyManager;
+	private LocationManager locationManager;
+	private ConnectivityManager connectivityManager;
+	private ActivityManager activityManager;
+	private WifiManager wifiManager;
+	private Object mPowerProfile;
 
-    // CACHE VALUES
-    private CacheValue<Float> batteryCache = new CacheValue<Float>(30000L);
-    private double batteryCapacityCache = -1;
-    private CacheValue<Location> locationCache = new CacheValue<Location>(15000L);
-    private CacheValue<NetworkInfo> networkInfoCache = new CacheValue<NetworkInfo>(30000L);
-    private CacheValue<Boolean> chargingCache = new CacheValue<Boolean>(30000L);
-    private CacheValue<Float> cpuUsage = new CacheValue<Float>(5000L);
-    private CacheValue<Double> ramUsage = new CacheValue<Double>(5000L);
-    private CacheValue<WifiInfo> wifiInfoCache = new CacheValue<WifiInfo>(30000L);
-    private CacheValue<WifiConfiguration> wifiConfigCache = new CacheValue<WifiConfiguration>(60000L);
+	private Context context;
 
-    protected void initDataCollector(Context ctx) {
-        context = ctx;
+	// CACHE VALUES
+	private CacheValue<Float> batteryCache = new CacheValue<Float>(30000L);
+	private double batteryCapacityCache = -1;
+	private CacheValue<Location> locationCache = new CacheValue<Location>(15000L);
+	private CacheValue<NetworkInfo> networkInfoCache = new CacheValue<NetworkInfo>(30000L);
+	private CacheValue<Boolean> chargingCache = new CacheValue<Boolean>(30000L);
+	private CacheValue<Float> cpuUsage = new CacheValue<Float>(5000L);
+	private CacheValue<Double> ramUsage = new CacheValue<Double>(5000L);
+	private CacheValue<WifiInfo> wifiInfoCache = new CacheValue<WifiInfo>(30000L);
+	private CacheValue<WifiConfiguration> wifiConfigCache = new CacheValue<WifiConfiguration>(60000L);
 
-        itFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        batteryStatus = ctx.registerReceiver(null, itFilter);
+	private CacheValue<String> networkOperatorCache = new CacheValue<String>();
+	private CacheValue<String> deviceIdCache = new CacheValue<String>();
 
-        locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-        connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+	protected void initDataCollector(Context ctx) {
+		context = ctx;
 
-        try {
-            mPowerProfile = Class.forName(POWER_PROFILE_CLASS)
-                    .getConstructor(Context.class).newInstance(context);
-        } catch (Exception e) {
-            // TODO log
-        }
-    }
+		itFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+		batteryStatus = ctx.registerReceiver(null, itFilter);
 
-    public String getVersionName() {
-        PackageInfo pInfo = null;
-        try {
-            pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            return pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            return "unknown";
-        }
-    }
+		locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+		connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-    public String resolveAppName() {
-        ApplicationInfo applicationInfo = context.getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
-        return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
-    }
+		try {
+			mPowerProfile = Class.forName(POWER_PROFILE_CLASS).getConstructor(Context.class).newInstance(context);
+		} catch (Exception e) {
+			// TODO log
+		}
+	}
 
-    public boolean isCharging() {
-        return isCharging(false);
-    }
+	public String getVersionName() {
+		PackageInfo pInfo = null;
+		try {
+			pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+			return pInfo.versionName;
+		} catch (PackageManager.NameNotFoundException e) {
+			return "unknown";
+		}
+	}
 
-    public boolean isCharging(boolean force) {
-        if (chargingCache != null && chargingCache.valid() && !force) return chargingCache.value();
+	public String resolveAppName() {
+		ApplicationInfo applicationInfo = context.getApplicationInfo();
+		int stringId = applicationInfo.labelRes;
+		return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
+	}
 
-        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-        boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                status == BatteryManager.BATTERY_STATUS_FULL;
+	public boolean isCharging() {
+		return isCharging(false);
+	}
 
-        return chargingCache.set(isCharging);
-    }
+	public boolean isCharging(boolean force) {
+		if (chargingCache != null && chargingCache.valid() && !force)
+			return chargingCache.value();
 
-    public Location getLastKnownLocation() {
-        return getLastKnownLocation(false);
-    }
+		int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+		boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING
+				|| status == BatteryManager.BATTERY_STATUS_FULL;
 
-    public Location getLastKnownLocation(boolean force) {
-        if (locationCache != null && locationCache.valid() && !force) return locationCache.value();
+		return chargingCache.set(isCharging);
+	}
 
-        return locationCache.set(getLocation());
-    }
+	public Location getLastKnownLocation() {
+		return getLastKnownLocation(false);
+	}
 
-    public float getBatteryPct() {
-        return getBatteryPct(false);
-    }
+	public Location getLastKnownLocation(boolean force) {
+		if (locationCache != null && locationCache.valid() && !force)
+			return locationCache.value();
 
-    public float getBatteryPct(boolean force) {
-        if (batteryCache != null && batteryCache.valid() && !force) return batteryCache.value();
+		return locationCache.set(getLocation());
+	}
 
-        return batteryCache.set(getBatteryLevel() / (float) getBatteryScale());
-    }
+	public float getBatteryPct() {
+		return getBatteryPct(false);
+	}
 
-    public NetworkInfo getNetworkInfo() {
-        return getNetworkInfo(false);
-    }
+	public float getBatteryPct(boolean force) {
+		if (batteryCache != null && batteryCache.valid() && !force)
+			return batteryCache.value();
 
-    public NetworkInfo getNetworkInfo(boolean force) {
-        if (networkInfoCache != null && networkInfoCache.valid() && !force)
-            return networkInfoCache.value();
+		return batteryCache.set(getBatteryLevel() / (float) getBatteryScale());
+	}
 
-        return networkInfoCache.set(_getNetworkInfo());
-    }
+	public NetworkInfo getNetworkInfo() {
+		return getNetworkInfo(false);
+	}
 
-    public float getCpuUsage() {
-        return getCpuUsage(false);
-    }
+	public NetworkInfo getNetworkInfo(boolean force) {
+		if (networkInfoCache != null && networkInfoCache.valid() && !force)
+			return networkInfoCache.value();
 
-    public float getCpuUsage(boolean force) {
-        if (cpuUsage != null && cpuUsage.valid() && !force) return cpuUsage.value();
+		return networkInfoCache.set(_getNetworkInfo());
+	}
 
-        return cpuUsage.set(readCPUUsage());
-    }
+	public float getCpuUsage() {
+		return getCpuUsage(false);
+	}
 
-    public double getRamUsage() {
-        return getRamUsage(false);
-    }
+	public float getCpuUsage(boolean force) {
+		if (cpuUsage != null && cpuUsage.valid() && !force)
+			return cpuUsage.value();
 
-    public double getRamUsage(boolean force) {
-        if (ramUsage != null && ramUsage.valid() && !force) return ramUsage.value();
+		return cpuUsage.set(readCPUUsage());
+	}
 
-        return ramUsage.set(readRamUsage());
-    }
+	public double getRamUsage() {
+		return getRamUsage(false);
+	}
 
-    public WifiInfo getWifiInfo() {
-        return getWifiInfo(false);
-    }
+	public double getRamUsage(boolean force) {
+		if (ramUsage != null && ramUsage.valid() && !force)
+			return ramUsage.value();
 
-    public WifiInfo getWifiInfo(boolean force) {
-        if (wifiInfoCache != null && wifiInfoCache.valid() && !force) return wifiInfoCache.value();
+		return ramUsage.set(readRamUsage());
+	}
 
-        return wifiInfoCache.set(wifiManager.getConnectionInfo());
-    }
+	public WifiInfo getWifiInfo() {
+		return getWifiInfo(false);
+	}
 
-    public WifiConfiguration getWifiConfiguration() {
-        return getWifiConfiguration(true, false);
-    }
+	public WifiInfo getWifiInfo(boolean force) {
+		if (wifiInfoCache != null && wifiInfoCache.valid() && !force)
+			return wifiInfoCache.value();
 
-    public WifiConfiguration getWifiConfiguration(boolean preCheck, boolean force) {
-        if (wifiConfigCache != null && wifiConfigCache.valid() && !force)
-            return wifiConfigCache.value();
+		return wifiInfoCache.set(wifiManager.getConnectionInfo());
+	}
 
-        if (preCheck) {
-            if (getWifiInfo(true) == null) return null;
-        }
-        
-        for (WifiConfiguration conf : wifiManager.getConfiguredNetworks()) {
-            if (conf.status == WifiConfiguration.Status.CURRENT) return wifiConfigCache.set(conf);
-        }
-        return null;
-    }
+	public WifiConfiguration getWifiConfiguration() {
+		return getWifiConfiguration(true, false);
+	}
 
-    public double getBatteryCapacity() {
-        if (batteryCapacityCache == -1) {
-            try {
-                double batteryCapacity = (Double) Class
-                        .forName(POWER_PROFILE_CLASS)
-                        .getMethod("getAveragePower", java.lang.String.class)
-                        .invoke(mPowerProfile, "battery.capacity");
-                batteryCapacityCache = batteryCapacity;
-                return batteryCapacity;
-            } catch (Exception e) {
-                return -1.0D;
-            }
-        } else {
-            return batteryCapacityCache;
-        }
-    }
+	public WifiConfiguration getWifiConfiguration(boolean preCheck, boolean force) {
+		if (wifiConfigCache != null && wifiConfigCache.valid() && !force)
+			return wifiConfigCache.value();
 
-    // HELP FCTS
-    private int getBatteryLevel() {
-        return batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-    }
+		if (preCheck) {
+			if (getWifiInfo(true) == null)
+				return null;
+		}
 
-    private int getBatteryScale() {
-        return batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-    }
+		for (WifiConfiguration conf : wifiManager.getConfiguredNetworks()) {
+			if (conf.status == WifiConfiguration.Status.CURRENT)
+				return wifiConfigCache.set(conf);
+		}
+		return null;
+	}
 
-    private Location getLocation() {
-        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }
-        return null;
-    }
+	public double getBatteryCapacity() {
+		if (batteryCapacityCache == -1) {
+			try {
+				double batteryCapacity = (Double) Class.forName(POWER_PROFILE_CLASS)
+						.getMethod("getAveragePower", java.lang.String.class).invoke(mPowerProfile, "battery.capacity");
+				batteryCapacityCache = batteryCapacity;
+				return batteryCapacity;
+			} catch (Exception e) {
+				return -1.0D;
+			}
+		} else {
+			return batteryCapacityCache;
+		}
+	}
 
-    private NetworkInfo _getNetworkInfo() {
-        if (checkPermission(Manifest.permission.ACCESS_NETWORK_STATE)) {
-            return connectivityManager.getActiveNetworkInfo();
-        }
-        return null;
-    }
+	public String getNetworkOperatorName() {
+		if (networkOperatorCache != null && networkOperatorCache.valid())
+			return networkOperatorCache.value();
 
-    private boolean checkPermission(String perm) {
-        return context.checkCallingOrSelfPermission(perm) == PackageManager.PERMISSION_GRANTED;
-    }
+		return networkOperatorCache.set(telephonyManager.getNetworkOperatorName());
+	}
 
-    private double readRamUsage() {
-        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        activityManager.getMemoryInfo(memoryInfo);
+	public String getDeviceId() {
+		if (deviceIdCache != null && deviceIdCache.valid())
+			return deviceIdCache.value();
 
-        // double availableMegs = memoryInfo.availMem / 1048576L;
-        double percentAvail = (double) memoryInfo.availMem / (double) memoryInfo.totalMem;
+		return deviceIdCache.set(android.os.Build.MODEL + "-" + telephonyManager.getDeviceId());
+	}
 
-        return 1.0D - percentAvail;
-    }
+	// HELP FCTS
+	private int getBatteryLevel() {
+		return batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+	}
 
-    private float readCPUUsage() {
-        try {
-            RandomAccessFile reader = new RandomAccessFile("/proc/stat", "r");
-            String load = reader.readLine();
-            String[] toks = load.split(" +");  // Split on one or more spaces
+	private int getBatteryScale() {
+		return batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+	}
 
-            long idle1 = Long.parseLong(toks[4]);
-            long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[5])
-                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+	private Location getLocation() {
+		if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+			return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		}
+		return null;
+	}
 
-            try {
-                Thread.sleep(360);
-            } catch (Exception e) {}
+	private NetworkInfo _getNetworkInfo() {
+		if (checkPermission(Manifest.permission.ACCESS_NETWORK_STATE)) {
+			return connectivityManager.getActiveNetworkInfo();
+		}
+		return null;
+	}
 
-            reader.seek(0);
-            load = reader.readLine();
-            reader.close();
+	private boolean checkPermission(String perm) {
+		return context.checkCallingOrSelfPermission(perm) == PackageManager.PERMISSION_GRANTED;
+	}
 
-            toks = load.split(" +");
+	private double readRamUsage() {
+		ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+		activityManager.getMemoryInfo(memoryInfo);
 
-            long idle2 = Long.parseLong(toks[4]);
-            long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[5])
-                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+		// double availableMegs = memoryInfo.availMem / 1048576L;
+		double percentAvail = (double) memoryInfo.availMem / (double) memoryInfo.totalMem;
 
-            return (float)(cpu2 - cpu1) / ((cpu2 + idle2) - (cpu1 + idle1));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+		return 1.0D - percentAvail;
+	}
 
-        return 0;
-    }
+	private float readCPUUsage() {
+		try {
+			RandomAccessFile reader = new RandomAccessFile("/proc/stat", "r");
+			String load = reader.readLine();
+			String[] toks = load.split(" +"); // Split on one or more spaces
+
+			long idle1 = Long.parseLong(toks[4]);
+			long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[5])
+					+ Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+
+			try {
+				Thread.sleep(360);
+			} catch (Exception e) {
+			}
+
+			reader.seek(0);
+			load = reader.readLine();
+			reader.close();
+
+			toks = load.split(" +");
+
+			long idle2 = Long.parseLong(toks[4]);
+			long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[5])
+					+ Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+
+			return (float) (cpu2 - cpu1) / ((cpu2 + idle2) - (cpu1 + idle1));
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+
+		return 0;
+	}
 }

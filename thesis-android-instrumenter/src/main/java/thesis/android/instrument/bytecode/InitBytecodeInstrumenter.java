@@ -11,11 +11,34 @@ import thesis.android.instrument.config.ConnectionInfo;
 import thesis.android.instrument.config.InstrumentationConfiguration;
 import thesis.android.instrument.config.InstrumentationPointConfiguration;
 
+/**
+ * Bytecode instrumenter which is responsible for instrumenting Android Activity
+ * classes.
+ * 
+ * @author David Monschein
+ *
+ */
 public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 
+	/**
+	 * Information about the server which persists the monitoring data. -> This
+	 * has to be set at instrumentation time!
+	 */
 	private ConnectionInfo connectionConfig;
+
+	/**
+	 * Mapping between methods of the Activity and methods which should be
+	 * called in the agent.
+	 */
 	private Map<String, String[]> activityPointMapping;
 
+	/**
+	 * Creates a instance of the InitBytecodeInstrumenter.
+	 * 
+	 * @param configuration
+	 *            configuration which specifies the mapping between activity
+	 *            methods and agent methods.
+	 */
 	public InitBytecodeInstrumenter(InstrumentationConfiguration configuration) {
 		this.connectionConfig = configuration.getXmlConfiguration().getConnectionInfo();
 		this.activityPointMapping = new HashMap<String, String[]>();
@@ -26,6 +49,9 @@ public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onMethodEnter(String owner, String name, String desc, AdviceAdapter parent, MethodVisitor mv) {
 		if (name.equals("onCreate")) {
@@ -50,6 +76,9 @@ public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onMethodExit(int opcode, String owner, String name, String desc, AdviceAdapter parent,
 			MethodVisitor mv) {

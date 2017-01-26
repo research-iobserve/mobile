@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright 2016 iObserve Project
+ * Copyright 2017 Kieker Project (http://kieker-monitoring.net)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+
 package org.iobserve.common.record;
 
 import java.nio.BufferOverflowException;
@@ -39,7 +40,7 @@ public class ServletTraceHelper extends AbstractMonitoringRecord implements IMon
 			 + TYPE_SIZE_INT // ITraceHelper.port
 			 + TYPE_SIZE_STRING // ServletTraceHelper.requestURI
 	;
-	private static final long serialVersionUID = 2363353535794190244L;
+	private static final long serialVersionUID = 9195881346892680579L;
 	
 	public static final Class<?>[] TYPES = {
 		long.class, // ITraceHelper.traceId
@@ -50,6 +51,8 @@ public class ServletTraceHelper extends AbstractMonitoringRecord implements IMon
 	
 	/* user-defined constants */
 	/* default constants */
+	public static final String HOST = "";
+	public static final String REQUEST_URI = "";
 	/* property declarations */
 	private final long traceId;
 	private final String host;
@@ -190,24 +193,6 @@ public class ServletTraceHelper extends AbstractMonitoringRecord implements IMon
 	@Deprecated
 	public void initFromBytes(final ByteBuffer buffer, final IRegistry<String> stringRegistry) throws BufferUnderflowException {
 		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) return false;
-		if (obj == this) return true;
-		if (obj.getClass() != this.getClass()) return false;
-		
-		final ServletTraceHelper castedRecord = (ServletTraceHelper) obj;
-		if (this.getLoggingTimestamp() != castedRecord.getLoggingTimestamp()) return false;
-		if (this.getTraceId() != castedRecord.getTraceId()) return false;
-		if (!this.getHost().equals(castedRecord.getHost())) return false;
-		if (this.getPort() != castedRecord.getPort()) return false;
-		if (!this.getRequestURI().equals(castedRecord.getRequestURI())) return false;
-		return true;
 	}
 
 	public final long getTraceId() {

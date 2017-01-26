@@ -30,6 +30,13 @@ public class NetworkBytecodeInstrumenter {
 		return true;
 	}
 
+	/**
+	 * Helping method to determine the return type from a full method signature.
+	 * 
+	 * @param desc
+	 *            full description of a method
+	 * @return return type of that method
+	 */
 	private String descReturnType(String desc) {
 		String[] sp = desc.split("\\)");
 		return sp[1];

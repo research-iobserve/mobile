@@ -11,16 +11,21 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 
 	private boolean wifi;
 	private boolean mobile;
-	private byte security;
+	private String protocolName; // USED BY BOTH
+	private String operatorName;
 	private String ssid;
 	private String bssid;
+	private String deviceId;
 
-	public NetInfoResponse(boolean wifi, boolean mobile, byte security, String wlanSSID, String wlanBSSID) {
+	public NetInfoResponse(String deviceId, boolean wifi, boolean mobile, String protcolName, String operatorName,
+			String wlanSSID, String wlanBSSID) {
 		setWifi(wifi);
 		setMobile(mobile);
-		setSecurity(security);
 		setSsid(wlanSSID);
 		setBssid(wlanBSSID);
+		setDeviceId(deviceId);
+		setOperatorName(operatorName);
+		setProtocolName(protcolName);
 	}
 
 	/**
@@ -31,13 +36,7 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 
 	@Override
 	public IMonitoringRecord generateRecord() {
-		if (wifi) {
-			return new MobileNetworkEventRecord(ssid, bssid, security);
-		} else if (mobile) {
-			return new MobileNetworkEventRecord(security);
-		} else {
-			return null;
-		}
+		return new MobileNetworkEventRecord(deviceId, wifi, mobile, operatorName, protocolName, ssid, bssid);
 	}
 
 	public boolean isWifi() {
@@ -56,14 +55,6 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 		this.mobile = mobile;
 	}
 
-	public byte getSecurity() {
-		return security;
-	}
-
-	public void setSecurity(byte security) {
-		this.security = security;
-	}
-
 	public String getSsid() {
 		return ssid;
 	}
@@ -78,5 +69,29 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 
 	public void setBssid(String bssid) {
 		this.bssid = bssid;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getProtocolName() {
+		return protocolName;
+	}
+
+	public void setProtocolName(String protocolName) {
+		this.protocolName = protocolName;
+	}
+
+	public String getOperatorName() {
+		return operatorName;
+	}
+
+	public void setOperatorName(String operatorName) {
+		this.operatorName = operatorName;
 	}
 }

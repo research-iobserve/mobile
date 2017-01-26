@@ -1,0 +1,25 @@
+package rocks.inspectit.android.callback.kieker
+
+template MobileRecord {
+	string deviceId
+}
+
+entity MobileDeploymentRecord : MobileRecord {
+	string appName
+}
+
+entity MobileNetworkEventRecord : MobileRecord {
+	boolean wifi
+	boolean mobile
+	string mobileOperator
+	string protocol
+	string wSSID
+	string wBSSID
+}
+
+entity MobileNetworkRequestEventRecord : MobileRecord {
+	string url
+	string method
+	int responseCode
+	long duration
+}

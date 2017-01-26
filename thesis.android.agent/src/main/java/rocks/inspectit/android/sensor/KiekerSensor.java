@@ -93,12 +93,22 @@ public class KiekerSensor implements ISensor {
 
 	@Override
 	public void setOwner(String owner) {
-		clazz = owner;
+		clazz = formatClazz(owner);
 	}
 
 	@Override
 	public void setSignature(String methodSignature) {
-		signature = methodSignature;
+		signature = formatOperation(methodSignature);
+	}
+	
+	private String formatClazz(String clazz) {
+		return clazz.replaceAll("/", ".");
+	}
+	
+	private String formatOperation(String operation) {
+		String[] opSplit = operation.split("\\)");
+		if (opSplit.length == 2) operation = opSplit[0] + ")"; // remove return type
+		return operation.replaceAll(";", "").replaceAll("/", ".").replaceAll("L", "");
 	}
 	
 	/***************************************************************************

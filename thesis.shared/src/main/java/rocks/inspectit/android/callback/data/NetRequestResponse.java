@@ -9,7 +9,8 @@ import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
  */
 
 public class NetRequestResponse extends MobileDefaultData implements IKiekerCompatible {
-
+	
+	private String deviceId;
     private String url;
     private String method;
     private long duration;
@@ -49,9 +50,17 @@ public class NetRequestResponse extends MobileDefaultData implements IKiekerComp
     public void setMethod(String method) {
         this.method = method;
     }
+    
+    public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
 
     @Override
     public IMonitoringRecord generateRecord() {
-        return new MobileNetworkRequestEventRecord(url, method, duration, responseCode);
+        return new MobileNetworkRequestEventRecord(deviceId, url, method, responseCode, duration);
     }
 }

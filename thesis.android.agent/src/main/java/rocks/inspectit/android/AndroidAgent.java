@@ -102,6 +102,7 @@ public class AndroidAgent {
 		// OPEN COMMUNICATION WITH CMR
 		HelloRequest helloRequest = new HelloRequest();
 		helloRequest.setAppName(androidDataCollector.resolveAppName());
+		helloRequest.setDeviceId(androidDataCollector.getDeviceId());
 
 		callbackManager.pushHelloMessage(helloRequest, tagCollector.getStaticTags());
 
@@ -247,6 +248,8 @@ public class AndroidAgent {
 
 			// clear
 			sensorMap.remove(enterId);
+			if (sensorMap.isEmpty())
+				currentId = 0;
 		}
 	}
 

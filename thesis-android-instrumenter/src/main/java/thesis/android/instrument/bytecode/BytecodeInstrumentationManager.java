@@ -15,17 +15,48 @@ import org.objectweb.asm.Opcodes;
 import thesis.android.instrument.bytecode.visitors.StandardClassVisitor;
 import thesis.android.instrument.config.InstrumentationConfiguration;
 
+/**
+ * Class, which helps to instrument Java bytecode.s
+ * 
+ * @author David Monschein
+ *
+ */
 public class BytecodeInstrumentationManager {
 
+	/**
+	 * Logger for output.
+	 */
 	private static final Logger LOG = LogManager.getLogger(BytecodeInstrumentationManager.class);
 
+	/**
+	 * Class files which should be instrumented.
+	 */
 	private List<File> classFiles;
+
+	/**
+	 * The configuration which is used in the instrumentation process.
+	 */
 	private InstrumentationConfiguration configuration;
 
+	/**
+	 * Creates a new BytecodeInstrumentionManager instance from a list of class
+	 * files.
+	 * 
+	 * @param classFiles
+	 *            a list of class files which should be instrumented
+	 */
 	public BytecodeInstrumentationManager(List<File> classFiles) {
 		this.classFiles = classFiles;
 	}
 
+	/**
+	 * Executes the instrumentation of the class files.
+	 * 
+	 * @param configuration
+	 *            which should be used
+	 * @throws IOException
+	 *             happens if the reading or writing of class files fails.
+	 */
 	public void executeInstrumentation(InstrumentationConfiguration config) throws IOException {
 		this.configuration = config;
 		// EXECUTE INSTRUMENTATION

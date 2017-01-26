@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright 2016 iObserve Project
+ * Copyright 2017 Kieker Project (http://kieker-monitoring.net)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+
 package org.iobserve.common.record;
 
 import java.nio.BufferOverflowException;
@@ -28,7 +29,7 @@ import org.iobserve.common.record.GeoLocation;
 /**
  * @author Generic Kieker
  * 
- * @since 1.13
+ * @since 1.10
  */
 public class ServerGeoLocation extends AbstractEvent implements GeoLocation {
 	/** Descriptive definition of the serialization size of the record. */
@@ -37,7 +38,7 @@ public class ServerGeoLocation extends AbstractEvent implements GeoLocation {
 			 + TYPE_SIZE_STRING // ServerGeoLocation.hostname
 			 + TYPE_SIZE_STRING // ServerGeoLocation.address
 	;
-	private static final long serialVersionUID = -9109740651531232541L;
+	private static final long serialVersionUID = 2607620721245961693L;
 	
 	public static final Class<?>[] TYPES = {
 		long.class, // AbstractEvent.timestamp
@@ -49,6 +50,8 @@ public class ServerGeoLocation extends AbstractEvent implements GeoLocation {
 	/* user-defined constants */
 	/* default constants */
 	public static final short COUNTRY_CODE = 49;
+	public static final String HOSTNAME = "";
+	public static final String ADDRESS = "";
 	/* property declarations */
 	private final short countryCode;
 	private final String hostname;
@@ -186,24 +189,6 @@ public class ServerGeoLocation extends AbstractEvent implements GeoLocation {
 	@Deprecated
 	public void initFromBytes(final ByteBuffer buffer, final IRegistry<String> stringRegistry) throws BufferUnderflowException {
 		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) return false;
-		if (obj == this) return true;
-		if (obj.getClass() != this.getClass()) return false;
-		
-		final ServerGeoLocation castedRecord = (ServerGeoLocation) obj;
-		if (this.getLoggingTimestamp() != castedRecord.getLoggingTimestamp()) return false;
-		if (this.getTimestamp() != castedRecord.getTimestamp()) return false;
-		if (this.getCountryCode() != castedRecord.getCountryCode()) return false;
-		if (!this.getHostname().equals(castedRecord.getHostname())) return false;
-		if (!this.getAddress().equals(castedRecord.getAddress())) return false;
-		return true;
 	}
 
 	public final short getCountryCode() {

@@ -1,5 +1,5 @@
 /***************************************************************************
- * Copyright 2016 iObserve Project
+ * Copyright 2017 Kieker Project (http://kieker-monitoring.net)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+
 package org.iobserve.common.record;
 
 import java.nio.BufferUnderflowException;
@@ -26,14 +27,17 @@ import kieker.common.record.flow.AbstractEvent;
 /**
  * @author Generic Kieker
  * 
- * @since 1.13
+ * @since 1.10
  */
 public abstract class EJBDeploymentEvent extends AbstractEvent  {
-	private static final long serialVersionUID = 5051017441001857971L;
+		private static final long serialVersionUID = 3746282832198656439L;
 	
 	
 	/* user-defined constants */
 	/* default constants */
+	public static final String SERIVCE = "";
+	public static final String CONTEXT = "";
+	public static final String DEPLOYMENT_ID = "";
 	/* property declarations */
 	private final String serivce;
 	private final String context;
@@ -110,24 +114,6 @@ public abstract class EJBDeploymentEvent extends AbstractEvent  {
 	@Deprecated
 	public void initFromBytes(final ByteBuffer buffer, final IRegistry<String> stringRegistry) throws BufferUnderflowException {
 		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) return false;
-		if (obj == this) return true;
-		if (obj.getClass() != this.getClass()) return false;
-		
-		final EJBDeploymentEvent castedRecord = (EJBDeploymentEvent) obj;
-		if (this.getLoggingTimestamp() != castedRecord.getLoggingTimestamp()) return false;
-		if (this.getTimestamp() != castedRecord.getTimestamp()) return false;
-		if (!this.getSerivce().equals(castedRecord.getSerivce())) return false;
-		if (!this.getContext().equals(castedRecord.getContext())) return false;
-		if (!this.getDeploymentId().equals(castedRecord.getDeploymentId())) return false;
-		return true;
 	}
 
 	public final String getSerivce() {

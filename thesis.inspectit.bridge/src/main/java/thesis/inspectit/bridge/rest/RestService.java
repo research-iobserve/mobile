@@ -15,7 +15,6 @@ import kieker.common.configuration.Configuration;
 import kieker.monitoring.core.configuration.ConfigurationFactory;
 import kieker.monitoring.core.controller.IMonitoringController;
 import kieker.monitoring.core.controller.MonitoringController;
-import kieker.monitoring.core.registry.SessionRegistry;
 import kieker.monitoring.writer.filesystem.SyncFsWriter;
 import rocks.fasterxml.jackson.databind.ObjectMapper;
 import rocks.inspectit.android.callback.data.HelloRequest;
@@ -23,6 +22,8 @@ import rocks.inspectit.android.callback.data.HelloResponse;
 import rocks.inspectit.android.callback.data.MobileCallbackData;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
 import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
+import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
+
 // TODO handle kieker sessions
 @Path("/rest/mobile")
 public class RestService {
@@ -79,6 +80,12 @@ public class RestService {
 			}
 
 			String appName = ((HelloRequest) data.getChildData().get(0)).getAppName();
+			String deviceId = ((HelloRequest) data.getChildData().get(0)).getDeviceId();
+
+			if (!controllerMap.containsKey(appName)) {
+				createController(appName);
+			}
+			createDeploymentRecord(appName, deviceId);
 
 			HelloResponse resp = new HelloResponse();
 			resp.setSessionId(sessionStorage.create(appName));
@@ -96,10 +103,6 @@ public class RestService {
 		if (data.getSessionId() != null && sessionStorage.exists(data.getSessionId())) {
 			String appId = sessionStorage.get(data.getSessionId());
 
-			if (!controllerMap.containsKey(appId)) {
-				createController(appId);
-			}
-
 			for (MobileDefaultData child : data.getChildData()) {
 				if (child instanceof IKiekerCompatible) {
 					// PASS
@@ -110,10 +113,16 @@ public class RestService {
 		return "";
 	}
 
+	private void createDeploymentRecord(String appName, String deviceId) {
+		MobileDeploymentRecord record = new MobileDeploymentRecord(deviceId, appName);
+		controllerMap.get(appName).newMonitoringRecord(record);
+	}
+
 	private void createController(String id) {
 		File outputPath = new File(BASE_PATH + "/" + reformatId(id));
-		if (!outputPath.exists()) outputPath.mkdirs();
-		
+		if (!outputPath.exists())
+			outputPath.mkdirs();
+
 		final Configuration configuration = ConfigurationFactory.createDefaultConfiguration();
 		configuration.setProperty(ConfigurationFactory.METADATA, "true");
 		configuration.setProperty(ConfigurationFactory.AUTO_SET_LOGGINGTSTAMP, "false");
