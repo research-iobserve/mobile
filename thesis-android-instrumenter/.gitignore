@@ -81,3 +81,5 @@ atlassian-ide-plugin.xml
 
 # oh-my-zsh gradle plugin
 .gradletasknamecache
+/app-debug.apk
+/instr-output.apk
