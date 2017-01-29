@@ -18,7 +18,7 @@ public class MobileConnectionState {
 	}
 
 	public MobileConnectionState(MobileNetworkEventRecord record) {
-		this.setConnected(true);
+		this.setConnected(record.isWifi() || record.isMobile());
 
 		// set connection type
 		if (record.isWifi()) {

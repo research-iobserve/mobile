@@ -93,8 +93,8 @@ public abstract class AbstractObservationConfiguration extends Configuration {
 				repositoryModelProvider, varianceOfUserGroups, thinkTime, closedWorkload);
 		final TNetworkLink tNetworkLink = new TNetworkLink(allocationModelProvider, systemModelProvider,
 				resourceEnvironmentModelProvider);
-		final TMobile tMobileNetwork = new TMobile(correspondenceModel, allocationModelProvider,
-				systemModelProvider, resourceEnvironmentModelProvider);
+		final TMobile tMobileNetwork = new TMobile(correspondenceModel, allocationModelProvider, systemModelProvider,
+				resourceEnvironmentModelProvider, repositoryModelProvider);
 
 		/** dispatch different monitoring data. */
 		this.connectPorts(this.recordSwitch.getDeploymentOutputPort(), tAllocation.getInputPort());

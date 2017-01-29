@@ -57,7 +57,8 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 			}
 
 		} else {
-			// not connected anymore
+			// no connection (anymore)
+			this.pushData(new NetInfoResponse(deviceId, false, false, null, null, null, null));
 		}
 	}
 
@@ -91,15 +92,15 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 	private String getProtocolName(int subtype) {
 		switch (subtype) {
 		case TelephonyManager.NETWORK_TYPE_1xRTT:
-			return ""; // ~ 50-100 kbps
+			return "1xrtt"; // ~ 50-100 kbps
 		case TelephonyManager.NETWORK_TYPE_CDMA:
-			return ""; // ~ 14-64 kbps
+			return "cdma"; // ~ 14-64 kbps
 		case TelephonyManager.NETWORK_TYPE_EDGE:
 			return "edge"; // ~ 50-100 kbps
 		case TelephonyManager.NETWORK_TYPE_EVDO_0:
-			return ""; // ~ 400-1000 kbps
+			return "evdo0"; // ~ 400-1000 kbps
 		case TelephonyManager.NETWORK_TYPE_EVDO_A:
-			return ""; // ~ 600-1400 kbps
+			return "evdoa"; // ~ 600-1400 kbps
 		case TelephonyManager.NETWORK_TYPE_GPRS:
 			return "gprs"; // ~ 100 kbps
 		case TelephonyManager.NETWORK_TYPE_HSDPA:
@@ -111,13 +112,13 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 		case TelephonyManager.NETWORK_TYPE_UMTS:
 			return "umts"; // ~ 400-7000 kbps
 		case TelephonyManager.NETWORK_TYPE_EHRPD: // API level 11
-			return ""; // ~ 1-2 Mbps
+			return "ehrpd"; // ~ 1-2 Mbps
 		case TelephonyManager.NETWORK_TYPE_EVDO_B: // API level 9
-			return ""; // ~ 5 Mbps
+			return "evdob"; // ~ 5 Mbps
 		case TelephonyManager.NETWORK_TYPE_HSPAP: // API level 13
 			return "hspap"; // ~ 10-20 Mbps
 		case TelephonyManager.NETWORK_TYPE_IDEN: // API level 8
-			return ""; // ~25 kbps
+			return "iden"; // ~25 kbps
 		case TelephonyManager.NETWORK_TYPE_LTE: // API level 11
 			return "lte"; // ~ 10+ Mbps
 		case TelephonyManager.NETWORK_TYPE_UNKNOWN:

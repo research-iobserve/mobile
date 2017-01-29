@@ -20,7 +20,7 @@ import rocks.inspectit.android.module.util.ExecutionProperty;
 
 public class NetworkModule extends AbstractAndroidModule {
 
-	private static final long COLLECT_AFTER = 60000L;
+	private static final long COLLECT_AFTER = 30000L;
 
 	private Map<HttpURLConnection, ConnectionState> connectionStateMap;
 
