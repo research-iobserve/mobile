@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2014 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.analysis.filter;
 
 import java.net.URI;
@@ -5,6 +20,11 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import kieker.common.logging.Log;
+import kieker.common.logging.LogFactory;
+
+import teetime.framework.AbstractConsumerStage;
 
 import org.iobserve.analysis.mobile.MobileConnectionState;
 import org.iobserve.analysis.mobile.MobileMobileConnectionInfo;
@@ -33,14 +53,19 @@ import org.palladiosimulator.pcm.resourceenvironment.ResourceContainer;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceEnvironment;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceenvironmentFactory;
 
-import kieker.common.logging.Log;
-import kieker.common.logging.LogFactory;
 import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
 import rocks.inspectit.android.callback.kieker.MobileNetworkEventRecord;
 import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
 import rocks.inspectit.android.callback.kieker.MobileRecord;
-import teetime.framework.AbstractConsumerStage;
 
+/**
+ * TMobile is responsible for the processing of monitoring records which belong
+ * to mobile applications. It can handle the following records:
+ * {@link MobileDeploymentRecord}, {@link MobileNetworkEventRecord} and
+ * {@link MobileNetworkRequestEventRecord}
+ * 
+ * @author David Monschein
+ */
 public class TMobile extends AbstractConsumerStage<MobileRecord> {
 	/** logger. */
 	private static final Log LOG = LogFactory.getLog(RecordSwitch.class);
@@ -53,11 +78,25 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 	private final ResourceEnvironmentModelProvider resourceEnvironmentModelProvider;
 	/** reference to repository model provider. */
 	private final RepositoryModelProvider repositoryModelProvider;
-	/** mapping of device to a connection state */
+	/** mapping of device to a connection state. */
 	private final Map<String, MobileConnectionState> connectionMapping;
-	/** correspondence mapping */
+	/** correspondence mapping. */
 	private final ICorrespondence correspondence;
 
+	/**
+	 * Creates a new TMobile filter.
+	 * 
+	 * @param correspondence
+	 *            the correspondence model access
+	 * @param allocationModelProvider
+	 *            allocation model provider
+	 * @param systemModelProvider
+	 *            system model provider
+	 * @param resourceEnvironmentModelProvider
+	 *            the resource environment model provider
+	 * @param repositoryModelProvider
+	 *            provider for the repository model
+	 */
 	public TMobile(final ICorrespondence correspondence, final AllocationModelProvider allocationModelProvider,
 			final SystemModelProvider systemModelProvider,
 			final ResourceEnvironmentModelProvider resourceEnvironmentModelProvider,
@@ -70,8 +109,11 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 		this.connectionMapping = new HashMap<String, MobileConnectionState>();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected void execute(MobileRecord element) {
+	protected void execute(final MobileRecord element) {
 		if (element instanceof MobileNetworkEventRecord) {
 			this.process(element.getDeviceId(), (MobileNetworkEventRecord) element);
 		} else if (element instanceof MobileNetworkRequestEventRecord) {
@@ -81,12 +123,20 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 		}
 	}
 
-	private void process(String deviceId, MobileNetworkEventRecord record) {
+	/**
+	 * Processes a record with the type {@link MobileNetworkEventRecord}.
+	 * 
+	 * @param deviceId
+	 *            the id of the device
+	 * @param record
+	 *            the record
+	 */
+	private void process(final String deviceId, final MobileNetworkEventRecord record) {
 
 		this.resourceEnvironmentModelProvider.loadModel();
 		final ResourceEnvironment resourceEnvironment = this.resourceEnvironmentModelProvider.getModel();
 
-		Optional<ResourceContainer> deviceResourceContainer = ResourceEnvironmentModelBuilder
+		final Optional<ResourceContainer> deviceResourceContainer = ResourceEnvironmentModelBuilder
 				.getResourceContainerByName(resourceEnvironment, deviceId);
 
 		Opt.of(deviceResourceContainer).ifPresent().apply(container -> {
@@ -97,7 +147,15 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 		this.resourceEnvironmentModelProvider.save();
 	}
 
-	private void process(String deviceId, MobileNetworkRequestEventRecord record) {
+	/**
+	 * Processes a record with the type {@link MobileNetworkRequestEventRecord}.
+	 * 
+	 * @param deviceId
+	 *            the id of the device
+	 * @param record
+	 *            the record
+	 */
+	private void process(final String deviceId, final MobileNetworkRequestEventRecord record) {
 		if (!connectionMapping.containsKey(deviceId)) {
 			LOG.warn("No connection info present for device '" + deviceId + "'.");
 			return;
@@ -107,7 +165,7 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 		final String hostname;
 		final String path;
 		try {
-			URI temp = new URI(record.getUrl());
+			final URI temp = new URI(record.getUrl());
 			hostname = temp.getHost();
 			path = temp.getPath();
 		} catch (URISyntaxException e) {
@@ -120,15 +178,15 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 		final ResourceEnvironment resourceEnvironment = this.resourceEnvironmentModelProvider.getModel();
 
 		// look for device container
-		Optional<ResourceContainer> deviceResourceContainer = ResourceEnvironmentModelBuilder
+		final Optional<ResourceContainer> deviceResourceContainer = ResourceEnvironmentModelBuilder
 				.getResourceContainerByName(resourceEnvironment, deviceId);
 
 		// look for server container
-		ResourceContainer serverContainer = this.buildIfNotPresent(resourceEnvironment, hostname).get();
+		final ResourceContainer serverContainer = this.buildIfNotPresent(resourceEnvironment, hostname).get();
 
 		// adjust resource env model
 		Opt.of(deviceResourceContainer).ifPresent().apply(deviceContainer -> {
-			LinkingResource connectionLink = ResourceEnvironmentModelBuilder
+			final LinkingResource connectionLink = ResourceEnvironmentModelBuilder
 					.connectResourceContainer(resourceEnvironment, deviceContainer, serverContainer);
 
 			CommunicationLinkResourceSpecification specification = connectionLink
@@ -138,18 +196,18 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 				specification = ResourceenvironmentFactory.eINSTANCE.createCommunicationLinkResourceSpecification();
 			}
 
-			MobileConnectionState connState = connectionMapping.get(deviceId);
+			final MobileConnectionState connState = connectionMapping.get(deviceId);
 
 			// bring in the info
 			specification.setConnectionType(connState.getConnectionType().getStringExpression());
 			switch (connState.getConnectionType()) {
 			case MOBILE:
-				MobileMobileConnectionInfo info = (MobileMobileConnectionInfo) connState.getConnectionInfo();
+				final MobileMobileConnectionInfo info = (MobileMobileConnectionInfo) connState.getConnectionInfo();
 				specification.setProtocol(info.getProtocol());
 				specification.setOperator(info.getProvider());
 				break;
 			case WLAN:
-				MobileWifiConnectionInfo wifiinfo = (MobileWifiConnectionInfo) connState.getConnectionInfo();
+				final MobileWifiConnectionInfo wifiinfo = (MobileWifiConnectionInfo) connState.getConnectionInfo();
 				specification.setSsid(wifiinfo.getSsid());
 				specification.setBssid(wifiinfo.getBssid());
 				specification.setProtocol(wifiinfo.getProtocol());
@@ -169,7 +227,7 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 		final Repository repo = this.repositoryModelProvider.getModel();
 
 		// adjusting
-		String belongingName = "I" + hostname.replaceAll("\\.", "_");
+		final String belongingName = "I" + hostname.replaceAll("\\.", "_");
 		OperationInterface belonging = null;
 		for (Interface iface : repo.getInterfaces__Repository()) {
 			if (iface.getEntityName().equals(belongingName) && iface instanceof OperationInterface) {
@@ -187,8 +245,8 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 		}
 
 		// search for operation
-		String preparedPath = path.split("\\.")[0];
-		String operationName = record.getMethod().toLowerCase() + preparedPath.replaceAll("\\/", "_");
+		final String preparedPath = path.split("\\.")[0];
+		final String operationName = record.getMethod().toLowerCase() + preparedPath.replaceAll("\\/", "_");
 
 		OperationSignature signature = null;
 		for (OperationSignature sig : belonging.getSignatures__OperationInterface()) {
@@ -203,7 +261,7 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 			signature = RepositoryFactory.eINSTANCE.createOperationSignature();
 			signature.setEntityName(operationName);
 
-			PrimitiveDataType stringDatatype = RepositoryFactory.eINSTANCE.createPrimitiveDataType();
+			final PrimitiveDataType stringDatatype = RepositoryFactory.eINSTANCE.createPrimitiveDataType();
 			stringDatatype.setType(PrimitiveTypeEnum.INT);
 			signature.setReturnType__OperationSignature(stringDatatype);
 
@@ -214,10 +272,10 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 
 		// adjust system model
 		this.systemModelProvider.loadModel();
-		org.palladiosimulator.pcm.system.System systemModel = systemModelProvider.getModel();
+		final org.palladiosimulator.pcm.system.System systemModel = systemModelProvider.getModel();
 
-		String asmContextName = belongingName + "_" + deviceId;
-		AssemblyContext assemblyContext = SystemModelBuilder.createAssemblyContextsIfAbsent(systemModel,
+		final String asmContextName = belongingName + "_" + deviceId;
+		final AssemblyContext assemblyContext = SystemModelBuilder.createAssemblyContextsIfAbsent(systemModel,
 				asmContextName);
 
 		this.systemModelProvider.save();
@@ -231,21 +289,29 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 		this.allocationModelProvider.save();
 	}
 
-	private void updateModel(String devId, MobileDeploymentRecord record) {
+	/**
+	 * Processes a record with the type {@link MobileDeploymentRecord}.
+	 * 
+	 * @param devId
+	 *            the id of the device
+	 * @param record
+	 *            the record
+	 */
+	private void updateModel(final String devId, final MobileDeploymentRecord record) {
 		this.resourceEnvironmentModelProvider.loadModel();
 		final ResourceEnvironment resourceEnvironment = this.resourceEnvironmentModelProvider.getModel();
 
 		this.systemModelProvider.loadModel();
-		org.palladiosimulator.pcm.system.System systemModel = systemModelProvider.getModel();
+		final org.palladiosimulator.pcm.system.System systemModel = systemModelProvider.getModel();
 
 		// create resource container for the device
-		ResourceContainer container = this.buildIfNotPresent(resourceEnvironment, devId).get();
+		final ResourceContainer container = this.buildIfNotPresent(resourceEnvironment, devId).get();
 
 		// update system model
-		Optional<Correspondent> correspondent = correspondence.getCorrespondent(record.getAppName());
+		final Optional<Correspondent> correspondent = correspondence.getCorrespondent(record.getAppName());
 		Opt.of(correspondent).ifPresent().apply(corr -> {
-			String asmContextName = correspondent.get().getPcmEntityName() + "_" + devId;
-			AssemblyContext assemblyContext = SystemModelBuilder.createAssemblyContextsIfAbsent(systemModel,
+			final String asmContextName = correspondent.get().getPcmEntityName() + "_" + devId;
+			final AssemblyContext assemblyContext = SystemModelBuilder.createAssemblyContextsIfAbsent(systemModel,
 					asmContextName);
 
 			this.allocationModelProvider.loadModel();
@@ -259,8 +325,19 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 		this.allocationModelProvider.save();
 	}
 
-	private Optional<ResourceContainer> buildIfNotPresent(ResourceEnvironment env, String name) {
-		Optional<ResourceContainer> deviceResourceContainer = ResourceEnvironmentModelBuilder
+	/**
+	 * Creates a resource container with a specified name in the case it doesn't
+	 * exist already.
+	 * 
+	 * @param env
+	 *            the resource environment model
+	 * @param name
+	 *            the name of the resource container
+	 * @return an optional which either contains the existing resource container
+	 *         or the created one
+	 */
+	private Optional<ResourceContainer> buildIfNotPresent(final ResourceEnvironment env, final String name) {
+		final Optional<ResourceContainer> deviceResourceContainer = ResourceEnvironmentModelBuilder
 				.getResourceContainerByName(env, name);
 
 		if (deviceResourceContainer.isPresent()) {

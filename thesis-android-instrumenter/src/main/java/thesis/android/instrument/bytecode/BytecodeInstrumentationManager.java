@@ -16,7 +16,7 @@ import thesis.android.instrument.bytecode.visitors.StandardClassVisitor;
 import thesis.android.instrument.config.InstrumentationConfiguration;
 
 /**
- * Class, which helps to instrument Java bytecode.s
+ * Class, which helps to instrument Java bytecode.
  * 
  * @author David Monschein
  *
@@ -52,7 +52,7 @@ public class BytecodeInstrumentationManager {
 	/**
 	 * Executes the instrumentation of the class files.
 	 * 
-	 * @param configuration
+	 * @param config
 	 *            which should be used
 	 * @throws IOException
 	 *             happens if the reading or writing of class files fails.
@@ -82,8 +82,9 @@ public class BytecodeInstrumentationManager {
 					StandardClassVisitor classVisitor = new StandardClassVisitor(Opcodes.ASM5, writer, configuration);
 					reader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
 
-					if (classVisitor.isWritten())
+					if (classVisitor.isWritten()) {
 						written = true;
+					}
 				}
 
 				// WRITE BACK TO FILE

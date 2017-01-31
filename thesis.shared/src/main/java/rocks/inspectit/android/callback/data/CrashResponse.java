@@ -1,36 +1,77 @@
 package rocks.inspectit.android.callback.data;
 
 /**
- * Created by DMO on 16.12.2016.
+ * Class for holding information about a crash which occurred on a mobile
+ * device.
+ * 
+ * @author David Monschein
  */
-
 public class CrashResponse extends MobileDefaultData {
 
-    private String exceptionName;
-    private String exceptionMessage;
-    private long exceptionTimestamp;
+	/**
+	 * Name of the exception.
+	 */
+	private String exceptionName;
 
-    public CrashResponse() {
-        this.exceptionTimestamp = System.currentTimeMillis();
-    }
+	/**
+	 * Message of the exception.
+	 */
+	private String exceptionMessage;
 
-    public String getExceptionName() {
-        return exceptionName;
-    }
+	/**
+	 * Timestamp when the exception occurred.
+	 */
+	private long exceptionTimestamp;
 
-    public void setExceptionName(String exceptionName) {
-        this.exceptionName = exceptionName;
-    }
+	/**
+	 * Creates a new instance containing the current time as timestamp.
+	 */
+	public CrashResponse() {
+		this.exceptionTimestamp = System.currentTimeMillis();
+	}
 
-    public String getExceptionMessage() {
-        return exceptionMessage;
-    }
+	/**
+	 * @return the exceptionName
+	 */
+	public String getExceptionName() {
+		return exceptionName;
+	}
 
-    public void setExceptionMessage(String exceptionMessage) {
-        this.exceptionMessage = exceptionMessage;
-    }
+	/**
+	 * @param exceptionName
+	 *            the exceptionName to set
+	 */
+	public void setExceptionName(final String exceptionName) {
+		this.exceptionName = exceptionName;
+	}
 
-    public long getExceptionTimestamp() {
-        return exceptionTimestamp;
-    }
+	/**
+	 * @return the exceptionMessage
+	 */
+	public String getExceptionMessage() {
+		return exceptionMessage;
+	}
+
+	/**
+	 * @param exceptionMessage
+	 *            the exceptionMessage to set
+	 */
+	public void setExceptionMessage(final String exceptionMessage) {
+		this.exceptionMessage = exceptionMessage;
+	}
+
+	/**
+	 * @return the exceptionTimestamp
+	 */
+	public long getExceptionTimestamp() {
+		return exceptionTimestamp;
+	}
+
+	/**
+	 * @param exceptionTimestamp
+	 *            the exceptionTimestamp to set
+	 */
+	public void setExceptionTimestamp(final long exceptionTimestamp) {
+		this.exceptionTimestamp = exceptionTimestamp;
+	}
 }

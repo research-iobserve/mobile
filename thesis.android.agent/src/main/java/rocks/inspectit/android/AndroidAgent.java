@@ -190,9 +190,6 @@ public class AndroidAgent {
 		// SHUTDOWN CALLBACK
 		callbackManager.shutdown();
 
-		// CREATE SESSION DESTRUCTION MESSAGE
-		// TODO
-
 		// SET VALUES
 		inited = false;
 		closed = true;

@@ -26,17 +26,17 @@ import thesis.android.instrument.bytecode.IBytecodeInstrumenter;
 import thesis.android.instrument.config.InstrumentationConfiguration;
 
 public class APKInstrumenter {
-
 	private static final Logger LOG = LogManager.getLogger(APKInstrumenter.class);
 
 	private static final File AGENT_CURRENT = new File("../thesis.android.agent/build/classes/main");
 	private static final File AGENT_SHARED = new File("../thesis.shared/build/classes/main");
 	private static final File AGENT_LIB_CURRENT = new File("../thesis.android.agent/build/libs");
-	private static final File modifManifest = new File("modified_manifest.xml");
+	private static final File MODIFIED_MANIFEST = new File("modified_manifest.xml");
 
 	private static final double MB_FACTOR = 1024d * 1024d;
 
 	private boolean override;
+
 	private IBytecodeInstrumenter instrumenter;
 	private File keystore;
 	private String alias;
@@ -80,23 +80,7 @@ public class APKInstrumenter {
 
 		// CLEAN
 		if (cleanBefore) {
-			LOG.info("Cleaning up all folders.");
-			File tempOutputFolder = new File("tempo");
-			File jarFilesContainer = new File("temp");
-			File tempNewDex = new File("temp-new.dex");
-			File tempJar = new File("temp-jar.jar");
-
-			FileUtils.deleteDirectory(jarFilesContainer);
-			FileUtils.deleteDirectory(tempOutputFolder);
-
-			File tempRezipFile = new File("jar-rezip.jar");
-			File tempDex = new File("temp-dex.dex");
-
-			tempJar.delete();
-			tempNewDex.delete();
-			tempRezipFile.delete();
-			tempDex.delete();
-			modifManifest.delete();
+			cleanUpAll();
 		}
 
 		// ZIP CURRENT AGENT VERSION
@@ -105,9 +89,9 @@ public class APKInstrumenter {
 			File agentZipOld = new File("rocks.zip");
 			agentZipOld.delete();
 			ZipFile agentZipNew = new ZipFile("rocks.zip");
-			
+
 			FileUtils.copyDirectory(AGENT_SHARED, AGENT_CURRENT);
-			
+
 			agentZipNew.addFolder(AGENT_CURRENT, new ZipParameters());
 
 			File[] libs = AGENT_LIB_CURRENT.listFiles();
@@ -164,7 +148,7 @@ public class APKInstrumenter {
 
 			APKToolProxy apkTool = new APKToolProxy(input);
 			boolean b1 = apkTool.decodeAPK("intermediate");
-			boolean b2 = apkTool.adjustManifest(neededRights, modifManifest);
+			boolean b2 = apkTool.adjustManifest(neededRights, MODIFIED_MANIFEST);
 
 			if (!b1 || !b2) {
 				adjustManifest = false;
@@ -233,17 +217,7 @@ public class APKInstrumenter {
 
 		// CREATE ZIP
 		LOG.info("Rebuilding JAR file from modified class files.");
-		File tempRezipFile = new File("jar-rezip.jar");
-		ZipFile nZip = new ZipFile(tempRezipFile);
-		ZipParameters parameters = new ZipParameters();
-
-		for (File fileEntry : jarFilesContainer.listFiles()) {
-			if (fileEntry.isDirectory()) {
-				nZip.addFolder(fileEntry, parameters);
-			} else {
-				nZip.addFile(fileEntry, parameters);
-			}
-		}
+		File tempRezipFile = rebuildJar(jarFilesContainer);
 		LOG.info("Finished building new JAR file.");
 
 		// JAR 2 DEX
@@ -266,11 +240,167 @@ public class APKInstrumenter {
 			LOG.info("Adjusting Android manifest.");
 			File oManifest = new File(tempOutputFolder.getAbsolutePath() + "/AndroidManifest.xml");
 			oManifest.delete();
-			Files.copy(modifManifest.toPath(), oManifest.toPath());
+			Files.copy(MODIFIED_MANIFEST.toPath(), oManifest.toPath());
 		}
 
 		// REZIP
 		LOG.info("Rezip all files to output APK.");
+		rezipOutput(output, tempOutputFolder);
+
+		// RESIGN
+		LOG.info("Resigning the output APK.");
+		JarSigner signer = new JarSigner();
+		signer.signJar(output, getKeystore(), getAlias(), getPass());
+
+		// REMOVE ALL TEMP FILES
+		if (cleanAfter) {
+			cleanUpAll();
+		}
+
+		LOG.info("Instrumentation finished.");
+		LOG.info("Instrumented application is located at '" + output.getAbsolutePath() + "'.");
+
+		return true;
+	}
+
+	/**
+	 * @return the override
+	 */
+	public boolean isOverride() {
+		return override;
+	}
+
+	/**
+	 * @param override
+	 *            the override to set
+	 */
+	public void setOverride(boolean override) {
+		this.override = override;
+	}
+
+	/**
+	 * @return the keystore
+	 */
+	public File getKeystore() {
+		return keystore;
+	}
+
+	/**
+	 * @param keystore
+	 *            the keystore to set
+	 */
+	public void setKeystore(File keystore) {
+		this.keystore = keystore;
+	}
+
+	/**
+	 * @return the alias
+	 */
+	public String getAlias() {
+		return alias;
+	}
+
+	/**
+	 * @param alias
+	 *            the alias to set
+	 */
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
+	/**
+	 * @return the pass
+	 */
+	public String getPass() {
+		return pass;
+	}
+
+	/**
+	 * @param pass
+	 *            the pass to set
+	 */
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+
+	/**
+	 * @return the buildAgent
+	 */
+	public boolean isBuildAgent() {
+		return buildAgent;
+	}
+
+	/**
+	 * @param buildAgent
+	 *            the buildAgent to set
+	 */
+	public void setBuildAgent(boolean buildAgent) {
+		this.buildAgent = buildAgent;
+	}
+
+	/**
+	 * @return the cleanBefore
+	 */
+	public boolean isCleanBefore() {
+		return cleanBefore;
+	}
+
+	/**
+	 * @param cleanBefore
+	 *            the cleanBefore to set
+	 */
+	public void setCleanBefore(boolean cleanBefore) {
+		this.cleanBefore = cleanBefore;
+	}
+
+	/**
+	 * @return the cleanAfter
+	 */
+	public boolean isCleanAfter() {
+		return cleanAfter;
+	}
+
+	/**
+	 * @param cleanAfter
+	 *            the cleanAfter to set
+	 */
+	public void setCleanAfter(boolean cleanAfter) {
+		this.cleanAfter = cleanAfter;
+	}
+
+	/**
+	 * @return the instrumenter
+	 */
+	public IBytecodeInstrumenter getInstrumenter() {
+		return instrumenter;
+	}
+
+	/**
+	 * @param instrumenter
+	 *            the instrumenter to set
+	 */
+	public void setInstrumenter(IBytecodeInstrumenter instrumenter) {
+		this.instrumenter = instrumenter;
+	}
+
+	private File rebuildJar(File jarFilesContainer) throws ZipException {
+		ZipParameters parameters = new ZipParameters();
+		File tempRezipFile = new File("jar-rezip.jar");
+		ZipFile nZip = new ZipFile(tempRezipFile);
+
+		for (File fileEntry : jarFilesContainer.listFiles()) {
+			if (fileEntry.isDirectory()) {
+				nZip.addFolder(fileEntry, parameters);
+			} else {
+				nZip.addFile(fileEntry, parameters);
+			}
+		}
+
+		return tempRezipFile;
+	}
+
+	private void rezipOutput(File output, File tempOutputFolder) throws ZipException {
+		ZipParameters parameters = new ZipParameters();
 		ZipFile zipOutput = new ZipFile(output);
 		File[] fList = tempOutputFolder.listFiles();
 		for (File fInner : fList) {
@@ -280,71 +410,26 @@ public class APKInstrumenter {
 				zipOutput.addFile(fInner, parameters);
 			}
 		}
-
-		// RESIGN
-		LOG.info("Resigning the output APK.");
-		JarSigner signer = new JarSigner();
-		signer.signJar(output, getKeystore(), getAlias(), getPass());
-
-		// REMOVE ALL TEMP FILES
-		if (cleanAfter) {
-			LOG.info("Cleanup of all temporary files and folders.");
-
-			FileUtils.deleteDirectory(jarFilesContainer);
-			FileUtils.deleteDirectory(tempOutputFolder);
-
-			tempJar.delete();
-			tempNewDex.delete();
-			tempRezipFile.delete();
-			tempDex.delete();
-			agentZip.delete();
-			modifManifest.delete();
-		}
-
-		LOG.info("Instrumentation finished.");
-		LOG.info("Instrumented application is located at '" + output.getAbsolutePath() + "'.");
-
-		return true;
 	}
 
-	public boolean isOverride() {
-		return override;
-	}
+	private void cleanUpAll() throws IOException {
+		LOG.info("Cleaning up all folders.");
+		File tempOutputFolder = new File("tempo");
+		File jarFilesContainer = new File("temp");
+		File tempNewDex = new File("temp-new.dex");
+		File tempJar = new File("temp-jar.jar");
 
-	public void setOverride(boolean override) {
-		this.override = override;
-	}
+		FileUtils.deleteDirectory(jarFilesContainer);
+		FileUtils.deleteDirectory(tempOutputFolder);
 
-	public IBytecodeInstrumenter getInstrumenter() {
-		return instrumenter;
-	}
+		File tempRezipFile = new File("jar-rezip.jar");
+		File tempDex = new File("temp-dex.dex");
 
-	public void setInstrumenter(IBytecodeInstrumenter instrumenter) {
-		this.instrumenter = instrumenter;
-	}
-
-	public File getKeystore() {
-		return keystore;
-	}
-
-	public void setKeystore(File keystore) {
-		this.keystore = keystore;
-	}
-
-	public String getAlias() {
-		return alias;
-	}
-
-	public void setAlias(String alias) {
-		this.alias = alias;
-	}
-
-	public String getPass() {
-		return pass;
-	}
-
-	public void setPass(String pass) {
-		this.pass = pass;
+		tempJar.delete();
+		tempNewDex.delete();
+		tempRezipFile.delete();
+		tempDex.delete();
+		MODIFIED_MANIFEST.delete();
 	}
 
 	private void unzipDex(File apk, File dex) throws ZipException, IOException {

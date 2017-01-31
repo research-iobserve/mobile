@@ -65,6 +65,20 @@ public class InstrumentationPoint {
 		}
 	}
 
+	/**
+	 * Creates a new instrumentation point.
+	 * 
+	 * @param className
+	 *            name of the class
+	 * @param methodName
+	 *            name of the method
+	 * @param description
+	 *            description of the method
+	 * @param sup
+	 *            whether superclass or not
+	 * @param inter
+	 *            whether interface or not
+	 */
 	public InstrumentationPoint(String className, String methodName, String description, boolean sup, boolean inter) {
 		this.description = description;
 		this.className = className;
@@ -73,46 +87,84 @@ public class InstrumentationPoint {
 		this.isInterface = inter;
 	}
 
+	/**
+	 * @return the className
+	 */
 	public String getClassName() {
 		return className;
 	}
 
+	/**
+	 * @param className
+	 *            the className to set
+	 */
 	public void setClassName(String className) {
 		this.className = className;
 	}
 
+	/**
+	 * @return the methodName
+	 */
 	public String getMethodName() {
 		return methodName;
 	}
 
+	/**
+	 * @param methodName
+	 *            the methodName to set
+	 */
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
 	}
 
-	public boolean isSuper() {
-		return isSuper;
-	}
-
-	public void setSuper(boolean isSuper) {
-		this.isSuper = isSuper;
-	}
-
-	public boolean isInterface() {
-		return isInterface;
-	}
-
-	public void setInterface(boolean isInterface) {
-		this.isInterface = isInterface;
-	}
-
+	/**
+	 * @return the description
+	 */
 	public String getDescription() {
 		return description;
 	}
 
+	/**
+	 * @param description
+	 *            the description to set
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	/**
+	 * @return the isSuper
+	 */
+	public boolean isSuper() {
+		return isSuper;
+	}
+
+	/**
+	 * @param isSuper
+	 *            the isSuper to set
+	 */
+	public void setSuper(boolean isSuper) {
+		this.isSuper = isSuper;
+	}
+
+	/**
+	 * @return the isInterface
+	 */
+	public boolean isInterface() {
+		return isInterface;
+	}
+
+	/**
+	 * @param isInterface
+	 *            the isInterface to set
+	 */
+	public void setInterface(boolean isInterface) {
+		this.isInterface = isInterface;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -125,6 +177,9 @@ public class InstrumentationPoint {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

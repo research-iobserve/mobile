@@ -24,7 +24,7 @@ public interface IBytecodeInstrumenter {
 	 * @param mv
 	 *            belonging MethodVisitor instance
 	 */
-	public void onMethodEnter(String owner, String name, String desc, AdviceAdapter parent, MethodVisitor mv);
+	void onMethodEnter(String owner, String name, String desc, AdviceAdapter parent, MethodVisitor mv);
 
 	/**
 	 * Executed at the method exit point.
@@ -42,6 +42,5 @@ public interface IBytecodeInstrumenter {
 	 * @param mv
 	 *            belonging MethodVisitor instance
 	 */
-	public void onMethodExit(int opcode, String owner, String name, String desc, AdviceAdapter parent,
-			MethodVisitor mv);
+	void onMethodExit(int opcode, String owner, String name, String desc, AdviceAdapter parent, MethodVisitor mv);
 }
