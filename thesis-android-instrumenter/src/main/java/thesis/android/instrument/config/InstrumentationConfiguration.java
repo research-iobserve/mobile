@@ -1,6 +1,8 @@
 package thesis.android.instrument.config;
 
 import java.io.File;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,13 +14,18 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.objectweb.asm.Type;
+
+import rocks.inspectit.android.sensor.KiekerSensor;
 import thesis.android.instrument.bytecode.InstrumentationPoint;
 import thesis.android.instrument.bytecode.NetworkBytecodeInstrumenter;
 
 public class InstrumentationConfiguration {
-
-	// Fully qualified name of kieker sensor class
-	private static final String KIEKER_SENSOR = "rocks.inspectit.android.sensor.KiekerSensor";
+	private static final String KIEKER_SENSOR = Type.getType(KiekerSensor.class).getClassName();
+	// HTTP POINTS
+	private static final Type HTTPURLCONNECTION_TYPE = Type.getType(HttpURLConnection.class);
+	private static final Type URL_TYPE = Type.getType(URL.class);
+	private static final Type WEBVIEW_TYPE = Type.getType(android.webkit.WebView.class);
 
 	private List<InstrumentationPoint> instrumentationPoints;
 	private Map<InstrumentationPoint, String> sensorMapping;
@@ -42,8 +49,10 @@ public class InstrumentationConfiguration {
 	}
 
 	public boolean matchesHttpInstrumentationPoint(String owner, String desc) {
-		return owner.equalsIgnoreCase("java/net/HttpURLConnection") || owner.equalsIgnoreCase("java/net/URL")
-				|| descReturnType(desc).equalsIgnoreCase("Ljava/net/HttpURLConnection;");
+		return owner.equalsIgnoreCase(HTTPURLCONNECTION_TYPE.getInternalName())
+				|| owner.equalsIgnoreCase(URL_TYPE.getClassName())
+				|| descReturnType(desc).equalsIgnoreCase(HTTPURLCONNECTION_TYPE.getDescriptor())
+				|| owner.equalsIgnoreCase(WEBVIEW_TYPE.getInternalName());
 	}
 
 	public Set<InstrumentationPoint> matchesInstrumentationPoint(String className, String superClass,

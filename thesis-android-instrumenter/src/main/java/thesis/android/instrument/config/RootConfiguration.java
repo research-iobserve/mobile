@@ -18,6 +18,9 @@ public class RootConfiguration {
 	@XmlElement(name = "instrumentation")
 	private InstrumentationRootConfiguration instrumentationRootConfiguration;
 
+	@XmlElement(name = "agentBuild")
+	private AgentBuildConfiguration agentBuildConfiguration;
+
 	public ConnectionInfo getConnectionInfo() {
 		return connectionInfo;
 	}
@@ -28,6 +31,10 @@ public class RootConfiguration {
 
 	public InstrumentationRootConfiguration getInstrumentationRootConfiguration() {
 		return instrumentationRootConfiguration;
+	}
+
+	public AgentBuildConfiguration getAgentBuildConfiguration() {
+		return agentBuildConfiguration;
 	}
 
 }

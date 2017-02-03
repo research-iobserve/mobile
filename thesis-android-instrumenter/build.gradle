@@ -19,5 +19,7 @@ dependencies {
 	compile group: 'org.ow2.asm', name: 'asm-all', version: '5.0.4'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.7'
 	
+	compile project(':thesis.android.agent')
+	
     testCompile 'junit:junit:4.12'
 }

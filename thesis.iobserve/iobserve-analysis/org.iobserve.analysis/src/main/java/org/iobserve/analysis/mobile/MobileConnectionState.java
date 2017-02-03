@@ -76,7 +76,7 @@ public class MobileConnectionState {
 					new MobileWifiConnectionInfo(record.getWSSID(), record.getWBSSID(), record.getProtocol()));
 		} else if (record.isMobile()) {
 			this.setConnectionType(MobileConnectionType.MOBILE);
-			this.setConnectionInfo(new MobileMobileConnectionInfo(record.getProtocol(), record.getMobileOperator()));
+			this.setConnectionInfo(new MobileMobileConnectionInfo(record.getProtocol(), record.getMobileCarrierName()));
 		}
 	}
 

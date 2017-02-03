@@ -2,6 +2,7 @@ package thesis.android.instrument.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
@@ -121,6 +122,9 @@ public class APKToolProxy {
 		File rebuildFile = new File(folderName + "/rebuild.apk");
 		ProcessBuilder pb = new ProcessBuilder("java", "-jar", LIB_PATH, "b", folderName, "-o",
 				rebuildFile.getAbsolutePath());
+
+		pb.redirectOutput(Redirect.INHERIT);
+		pb.redirectError(Redirect.INHERIT);
 
 		try {
 			pb.start().waitFor();

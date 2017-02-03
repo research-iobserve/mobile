@@ -50,6 +50,18 @@ public class NetworkModule extends AbstractAndroidModule {
 		}
 	}
 
+	public void webViewLoad(String url, String method) {
+		NetRequestResponse netRequest = new NetRequestResponse();
+
+		netRequest.setDeviceId(androidDataCollector.getDeviceId());
+		netRequest.setDuration(0);
+		netRequest.setMethod(method);
+		netRequest.setResponseCode(200);
+		netRequest.setUrl(url);
+
+		this.pushData(netRequest);
+	}
+
 	@Override
 	public void initModule(Context ctx) {
 		connectionStateMap = new HashMap<HttpURLConnection, ConnectionState>();

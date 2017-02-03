@@ -1,12 +1,18 @@
 package thesis.android.instrument.bytecode;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
+import rocks.inspectit.android.AndroidAgent;
+import rocks.inspectit.android.ExternalConfiguration;
 import thesis.android.instrument.config.ConnectionInfo;
 import thesis.android.instrument.config.InstrumentationConfiguration;
 import thesis.android.instrument.config.InstrumentationPointConfiguration;
@@ -20,6 +26,11 @@ import thesis.android.instrument.config.InstrumentationPointConfiguration;
  */
 public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 
+	private static final Logger LOG = LogManager.getLogger(InitBytecodeInstrumenter.class);
+
+	private static final Type EXTCONFIGURATION_TYPE = Type.getType(ExternalConfiguration.class);
+	private static final Type ANDROIDAGENT_TYPE = Type.getType(AndroidAgent.class);
+
 	/**
 	 * Information about the server which persists the monitoring data. -> This
 	 * has to be set at instrumentation time!
@@ -30,7 +41,27 @@ public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 	 * Mapping between methods of the Activity and methods which should be
 	 * called in the agent.
 	 */
-	private Map<String, String[]> activityPointMapping;
+	private Map<String, String> activityPointMapping;
+
+	// CORRESPONDENT METHODS
+	private Method setBeaconUrlMethod;
+	private Type setBeaconUrlType;
+
+	private Method setHelloUrlMethod;
+	private Type setHelloUrlType;
+
+	public InitBytecodeInstrumenter() {
+		try {
+			setBeaconUrlMethod = ExternalConfiguration.class.getMethod("setBeaconUrl", String.class);
+			setBeaconUrlType = Type.getType(setBeaconUrlMethod);
+
+			setHelloUrlMethod = ExternalConfiguration.class.getMethod("setHelloUrl", String.class);
+			setHelloUrlType = Type.getType(setHelloUrlMethod);
+		} catch (NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+			LOG.warn("Couldn't find all corresponding methods!");
+		}
+	}
 
 	/**
 	 * Creates a instance of the InitBytecodeInstrumenter.
@@ -40,12 +71,13 @@ public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 	 *            methods and agent methods.
 	 */
 	public InitBytecodeInstrumenter(InstrumentationConfiguration configuration) {
+		this();
 		this.connectionConfig = configuration.getXmlConfiguration().getConnectionInfo();
-		this.activityPointMapping = new HashMap<String, String[]>();
+		this.activityPointMapping = new HashMap<String, String>();
 
 		for (InstrumentationPointConfiguration point : configuration.getXmlConfiguration()
 				.getInstrumentationRootConfiguration().getInstrPointConfigs()) {
-			this.activityPointMapping.put(point.getType(), point.getValue().split("\\."));
+			this.activityPointMapping.put(point.getType(), point.getValue());
 		}
 	}
 
@@ -55,24 +87,25 @@ public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 	@Override
 	public void onMethodEnter(String owner, String name, String desc, AdviceAdapter parent, MethodVisitor mv) {
 		if (name.equals("onCreate")) {
-			String[] belAgentPoint = activityPointMapping.get("onCreate");
+			String belAgentPoint = activityPointMapping.get("onCreate");
 
 			// INSERT CONFIG CALLS
 			mv.visitLdcInsn(connectionConfig.getBeaconUrl());
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, "rocks/inspectit/android/ExternalConfiguration", "setBeaconUrl",
-					"(Ljava/lang/String;)V", false);
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, EXTCONFIGURATION_TYPE.getInternalName(),
+					setBeaconUrlMethod.getName(), setBeaconUrlType.getDescriptor(), false);
+
 			mv.visitLdcInsn(connectionConfig.getHelloUrl());
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, "rocks/inspectit/android/ExternalConfiguration", "setHelloUrl",
-					"(Ljava/lang/String;)V", false);
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, EXTCONFIGURATION_TYPE.getInternalName(),
+					setHelloUrlMethod.getName(), setHelloUrlType.getDescriptor(), false);
 
 			// INIT AGENT
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, belAgentPoint[0], belAgentPoint[1], "(Landroid/app/Activity;)V",
-					false);
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(), belAgentPoint,
+					"(Landroid/app/Activity;)V", false);
 		} else if (name.equals("onDestroy")) {
-			String[] belAgentPoint = activityPointMapping.get("onDestroy");
+			String belAgentPoint = activityPointMapping.get("onDestroy");
 
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, belAgentPoint[0], belAgentPoint[1], "()V", false);
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(), belAgentPoint, "()V", false);
 		}
 	}
 

@@ -250,16 +250,28 @@ public class AndroidAgent {
 		}
 	}
 
+	public static void webViewLoad(String url) {
+		networkModule.webViewLoad(url, "GET");
+	}
+
+	public static void webViewLoadPost(String url, byte[] data) {
+		networkModule.webViewLoad(url, "POST");
+	}
+
+	public static void webViewLoad(String url, Map<?, ?> params) {
+		networkModule.webViewLoad(url, "GET");
+	}
+
 	public static void httpConnect(HttpURLConnection connection) {
-		networkModule.openConnection(connection);
+		networkModule.openConnection((HttpURLConnection) connection);
 	}
 
 	public static OutputStream httpOutputStream(HttpURLConnection connection) throws IOException {
-		return networkModule.getOutputStream(connection);
+		return networkModule.getOutputStream((HttpURLConnection) connection);
 	}
 
 	public static int httpResponseCode(HttpURLConnection connection) throws IOException {
-		return networkModule.getResponseCode(connection);
+		return networkModule.getResponseCode((HttpURLConnection) connection);
 	}
 
 	public static void queueForInit(IMonitoringRecord afterOperationEvent) {

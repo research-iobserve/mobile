@@ -61,15 +61,15 @@ public class StandardClassVisitor extends ClassVisitor {
 		} else {
 			sensorPoints = config.matchesInstrumentationPoint(name, superName, interfaces);
 			this.classWithSensor = sensorPoints.size() > 0;
-			
-			this.classFromApplication = name.startsWith(config.getApplicationPackage());
+
+			this.classFromApplication = name.startsWith(config.getApplicationPackage()); // monitor
 		}
 	}
 
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
 		MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-		
+
 		if (classWithInit && matchesInstrumentationPoint(name, desc, POINTS_INIT) != null) {
 			setWritten(true);
 			return new DefaultInstrumentationAdapter(Opcodes.ASM5, className, access, name, desc, mv, initInstrumenter);

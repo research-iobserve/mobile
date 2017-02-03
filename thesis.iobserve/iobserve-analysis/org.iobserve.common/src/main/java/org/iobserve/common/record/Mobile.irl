@@ -11,7 +11,7 @@ entity MobileDeploymentRecord : MobileRecord {
 entity MobileNetworkEventRecord : MobileRecord {
 	boolean wifi
 	boolean mobile
-	string mobileOperator
+	string mobileCarrierName
 	string protocol
 	string wSSID
 	string wBSSID

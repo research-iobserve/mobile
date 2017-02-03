@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import kieker.common.configuration.Configuration;
+import kieker.common.record.IMonitoringRecord;
 import kieker.monitoring.core.configuration.ConfigurationFactory;
 import kieker.monitoring.core.controller.IMonitoringController;
 import kieker.monitoring.core.controller.MonitoringController;
@@ -105,8 +106,9 @@ public class RestService {
 
 			for (MobileDefaultData child : data.getChildData()) {
 				if (child instanceof IKiekerCompatible) {
+					IMonitoringRecord genRecord = ((IKiekerCompatible) child).generateRecord();
 					// PASS
-					controllerMap.get(appId).newMonitoringRecord(((IKiekerCompatible) child).generateRecord());
+					controllerMap.get(appId).newMonitoringRecord(genRecord);
 				}
 			}
 		}

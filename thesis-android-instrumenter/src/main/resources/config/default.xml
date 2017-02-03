@@ -11,14 +11,24 @@
 			<permission>android.permission.INTERNET</permission>
 			<permission>android.permission.ACCESS_NETWORK_STATE</permission>
 			<permission>android.permission.ACCESS_COARSE_LOCATION</permission>
+			<permission>android.permission.ACCESS_FINE_LOCATION</permission>
 			<permission>android.permission.ACCESS_WIFI_STATE</permission>
+			<permission>android.permission.READ_PHONE_STATE</permission>
 		</permissions>
 	</manifestTransformer>
 	
+	<agentBuild>
+		<libraryFolders>
+			<folder>rocks</folder>
+			<folder>org</folder>
+			<folder>kieker</folder>
+		</libraryFolders>
+	</agentBuild>
+	
 	<instrumentation>
 		<mapping>
-			<point type="onCreate">rocks/inspectit/android/AndroidAgent.initAgent</point>
-			<point type="onDestroy">rocks/inspectit/android/AndroidAgent.destroyAgent</point>
+			<point type="onCreate">initAgent</point>
+			<point type="onDestroy">destroyAgent</point>
 		</mapping>
 		
 		<sensors>

@@ -90,6 +90,7 @@ public class APKInstrumenter {
 			agentZipOld.delete();
 			ZipFile agentZipNew = new ZipFile("rocks.zip");
 
+			// TO NOT ADD INCONSISTENT FOLDERS
 			FileUtils.copyDirectory(AGENT_SHARED, AGENT_CURRENT);
 
 			agentZipNew.addFolder(AGENT_CURRENT, new ZipParameters());
@@ -103,37 +104,19 @@ public class APKInstrumenter {
 			}
 
 			File toAdd = new File(AGENT_LIB_CURRENT.getAbsolutePath() + "\\temp\\");
-			File[] toAddArray = new File(toAdd.getAbsolutePath() + "\\rocks\\").listFiles();
+			List<String> includedFolders = instrConfig.getXmlConfiguration().getAgentBuildConfiguration()
+					.getLibraryFolders();
 
-			// TODO FIX
-			File[] toAddArray2 = new File(toAdd.getAbsolutePath() + "\\org\\").listFiles();
-			File[] toAddArray3 = new File(toAdd.getAbsolutePath() + "\\kieker\\").listFiles();
-
-			ZipParameters paras = new ZipParameters();
-			paras.setRootFolderInZip("rocks");
-			for (File ff : toAddArray) {
-				if (ff.isDirectory()) {
-					agentZipNew.addFolder(ff, paras);
-				} else {
-					agentZipNew.addFile(ff, paras);
-				}
-			}
-
-			paras.setRootFolderInZip("org");
-			for (File ff : toAddArray2) {
-				if (ff.isDirectory()) {
-					agentZipNew.addFolder(ff, paras);
-				} else {
-					agentZipNew.addFile(ff, paras);
-				}
-			}
-
-			paras.setRootFolderInZip("kieker");
-			for (File ff : toAddArray3) {
-				if (ff.isDirectory()) {
-					agentZipNew.addFolder(ff, paras);
-				} else {
-					agentZipNew.addFile(ff, paras);
+			for (String includedFolder : includedFolders) {
+				File[] toAddArray = new File(toAdd.getAbsolutePath() + "\\" + includedFolder + "\\").listFiles();
+				ZipParameters paras = new ZipParameters();
+				paras.setRootFolderInZip(includedFolder);
+				for (File ff : toAddArray) {
+					if (ff.isDirectory()) {
+						agentZipNew.addFolder(ff, paras);
+					} else {
+						agentZipNew.addFile(ff, paras);
+					}
 				}
 			}
 

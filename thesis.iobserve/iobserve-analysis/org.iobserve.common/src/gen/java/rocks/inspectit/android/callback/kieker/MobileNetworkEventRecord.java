@@ -37,18 +37,18 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 	public static final int SIZE = TYPE_SIZE_STRING // MobileRecord.deviceId
 			 + TYPE_SIZE_BOOLEAN // MobileNetworkEventRecord.wifi
 			 + TYPE_SIZE_BOOLEAN // MobileNetworkEventRecord.mobile
-			 + TYPE_SIZE_STRING // MobileNetworkEventRecord.mobileOperator
+			 + TYPE_SIZE_STRING // MobileNetworkEventRecord.mobileCarrierName
 			 + TYPE_SIZE_STRING // MobileNetworkEventRecord.protocol
 			 + TYPE_SIZE_STRING // MobileNetworkEventRecord.wSSID
 			 + TYPE_SIZE_STRING // MobileNetworkEventRecord.wBSSID
 	;
-	private static final long serialVersionUID = 4719845710182256176L;
+	private static final long serialVersionUID = 7746529821372180319L;
 	
 	public static final Class<?>[] TYPES = {
 		String.class, // MobileRecord.deviceId
 		boolean.class, // MobileNetworkEventRecord.wifi
 		boolean.class, // MobileNetworkEventRecord.mobile
-		String.class, // MobileNetworkEventRecord.mobileOperator
+		String.class, // MobileNetworkEventRecord.mobileCarrierName
 		String.class, // MobileNetworkEventRecord.protocol
 		String.class, // MobileNetworkEventRecord.wSSID
 		String.class, // MobileNetworkEventRecord.wBSSID
@@ -57,7 +57,7 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 	/* user-defined constants */
 	/* default constants */
 	public static final String DEVICE_ID = "";
-	public static final String MOBILE_OPERATOR = "";
+	public static final String MOBILE_CARRIER_NAME = "";
 	public static final String PROTOCOL = "";
 	public static final String W_SSID = "";
 	public static final String W_BSSID = "";
@@ -65,7 +65,7 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 	private final String deviceId;
 	private final boolean wifi;
 	private final boolean mobile;
-	private final String mobileOperator;
+	private final String mobileCarrierName;
 	private final String protocol;
 	private final String wSSID;
 	private final String wBSSID;
@@ -79,8 +79,8 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 	 *            wifi
 	 * @param mobile
 	 *            mobile
-	 * @param mobileOperator
-	 *            mobileOperator
+	 * @param mobileCarrierName
+	 *            mobileCarrierName
 	 * @param protocol
 	 *            protocol
 	 * @param wSSID
@@ -88,11 +88,11 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 	 * @param wBSSID
 	 *            wBSSID
 	 */
-	public MobileNetworkEventRecord(final String deviceId, final boolean wifi, final boolean mobile, final String mobileOperator, final String protocol, final String wSSID, final String wBSSID) {
+	public MobileNetworkEventRecord(final String deviceId, final boolean wifi, final boolean mobile, final String mobileCarrierName, final String protocol, final String wSSID, final String wBSSID) {
 		this.deviceId = deviceId == null?"":deviceId;
 		this.wifi = wifi;
 		this.mobile = mobile;
-		this.mobileOperator = mobileOperator == null?"":mobileOperator;
+		this.mobileCarrierName = mobileCarrierName == null?"":mobileCarrierName;
 		this.protocol = protocol == null?"":protocol;
 		this.wSSID = wSSID == null?"":wSSID;
 		this.wBSSID = wBSSID == null?"":wBSSID;
@@ -110,7 +110,7 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 		this.deviceId = (String) values[0];
 		this.wifi = (Boolean) values[1];
 		this.mobile = (Boolean) values[2];
-		this.mobileOperator = (String) values[3];
+		this.mobileCarrierName = (String) values[3];
 		this.protocol = (String) values[4];
 		this.wSSID = (String) values[5];
 		this.wBSSID = (String) values[6];
@@ -129,7 +129,7 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 		this.deviceId = (String) values[0];
 		this.wifi = (Boolean) values[1];
 		this.mobile = (Boolean) values[2];
-		this.mobileOperator = (String) values[3];
+		this.mobileCarrierName = (String) values[3];
 		this.protocol = (String) values[4];
 		this.wSSID = (String) values[5];
 		this.wBSSID = (String) values[6];
@@ -148,7 +148,7 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 		this.deviceId = stringRegistry.get(buffer.getInt());
 		this.wifi = buffer.get()==1?true:false;
 		this.mobile = buffer.get()==1?true:false;
-		this.mobileOperator = stringRegistry.get(buffer.getInt());
+		this.mobileCarrierName = stringRegistry.get(buffer.getInt());
 		this.protocol = stringRegistry.get(buffer.getInt());
 		this.wSSID = stringRegistry.get(buffer.getInt());
 		this.wBSSID = stringRegistry.get(buffer.getInt());
@@ -163,7 +163,7 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 			this.getDeviceId(),
 			this.isWifi(),
 			this.isMobile(),
-			this.getMobileOperator(),
+			this.getMobileCarrierName(),
 			this.getProtocol(),
 			this.getWSSID(),
 			this.getWBSSID()
@@ -176,7 +176,7 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 	@Override
 	public void registerStrings(final IRegistry<String> stringRegistry) {	// NOPMD (generated code)
 		stringRegistry.get(this.getDeviceId());
-		stringRegistry.get(this.getMobileOperator());
+		stringRegistry.get(this.getMobileCarrierName());
 		stringRegistry.get(this.getProtocol());
 		stringRegistry.get(this.getWSSID());
 		stringRegistry.get(this.getWBSSID());
@@ -190,7 +190,7 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 		buffer.putInt(stringRegistry.get(this.getDeviceId()));
 		buffer.put((byte)(this.isWifi()?1:0));
 		buffer.put((byte)(this.isMobile()?1:0));
-		buffer.putInt(stringRegistry.get(this.getMobileOperator()));
+		buffer.putInt(stringRegistry.get(this.getMobileCarrierName()));
 		buffer.putInt(stringRegistry.get(this.getProtocol()));
 		buffer.putInt(stringRegistry.get(this.getWSSID()));
 		buffer.putInt(stringRegistry.get(this.getWBSSID()));
@@ -245,8 +245,8 @@ public class MobileNetworkEventRecord extends AbstractMonitoringRecord implement
 		return this.mobile;
 	}
 	
-	public final String getMobileOperator() {
-		return this.mobileOperator;
+	public final String getMobileCarrierName() {
+		return this.mobileCarrierName;
 	}
 	
 	public final String getProtocol() {

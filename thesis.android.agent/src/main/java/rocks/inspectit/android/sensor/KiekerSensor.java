@@ -2,6 +2,7 @@ package rocks.inspectit.android.sensor;
 
 import java.security.SecureRandom;
 import java.util.Stack;
+import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,7 +10,6 @@ import kieker.common.record.flow.trace.TraceMetadata;
 import kieker.common.record.flow.trace.operation.AfterOperationEvent;
 import kieker.common.record.flow.trace.operation.AfterOperationFailedEvent;
 import kieker.common.record.flow.trace.operation.BeforeOperationEvent;
-import kieker.monitoring.core.registry.SessionRegistry;
 import rocks.inspectit.android.AndroidAgent;
 import rocks.inspectit.android.callback.CallbackManager;
 import rocks.inspectit.android.util.DependencyManager;
@@ -100,31 +100,32 @@ public class KiekerSensor implements ISensor {
 	public void setSignature(String methodSignature) {
 		signature = formatOperation(methodSignature);
 	}
-	
+
 	private String formatClazz(String clazz) {
 		return clazz.replaceAll("/", ".");
 	}
-	
+
 	private String formatOperation(String operation) {
 		String[] opSplit = operation.split("\\)");
-		if (opSplit.length == 2) operation = opSplit[0] + ")"; // remove return type
+		if (opSplit.length == 2)
+			operation = opSplit[0] + ")"; // remove return type
 		return operation.replaceAll(";", "").replaceAll("/", ".").replaceAll("L", "");
 	}
-	
+
 	/***************************************************************************
 	 * Copyright 2015 Kieker Project (http://kieker-monitoring.net)
 	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License");
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
+	 * Licensed under the Apache License, Version 2.0 (the "License"); you may
+	 * not use this file except in compliance with the License. You may obtain a
+	 * copy of the License at
 	 *
-	 *     http://www.apache.org/licenses/LICENSE-2.0
+	 * http://www.apache.org/licenses/LICENSE-2.0
 	 *
 	 * Unless required by applicable law or agreed to in writing, software
-	 * distributed under the License is distributed on an "AS IS" BASIS,
-	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	 * See the License for the specific language governing permissions and
-	 * limitations under the License.
+	 * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+	 * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+	 * License for the specific language governing permissions and limitations
+	 * under the License.
 	 ***************************************************************************/
 	private enum TraceRegistry { // Singleton (Effective Java #3)
 		/**
@@ -200,7 +201,7 @@ public class KiekerSensor implements ISensor {
 				parentTraceId = traceId;
 				parentOrderId = -1;
 			}
-			final String sessionId = SessionRegistry.INSTANCE.recallThreadLocalSessionId();
+			final String sessionId = UUID.randomUUID().toString();
 			final TraceMetadata trace = new TraceMetadata(traceId, thread.getId(), sessionId, this.hostname,
 					parentTraceId, parentOrderId);
 			this.traceStorage.set(trace);

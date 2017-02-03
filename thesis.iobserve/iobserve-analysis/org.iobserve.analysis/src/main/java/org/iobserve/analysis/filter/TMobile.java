@@ -21,11 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import kieker.common.logging.Log;
-import kieker.common.logging.LogFactory;
-
-import teetime.framework.AbstractConsumerStage;
-
 import org.iobserve.analysis.mobile.MobileConnectionState;
 import org.iobserve.analysis.mobile.MobileMobileConnectionInfo;
 import org.iobserve.analysis.mobile.MobileWifiConnectionInfo;
@@ -53,10 +48,13 @@ import org.palladiosimulator.pcm.resourceenvironment.ResourceContainer;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceEnvironment;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceenvironmentFactory;
 
+import kieker.common.logging.Log;
+import kieker.common.logging.LogFactory;
 import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
 import rocks.inspectit.android.callback.kieker.MobileNetworkEventRecord;
 import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
 import rocks.inspectit.android.callback.kieker.MobileRecord;
+import teetime.framework.AbstractConsumerStage;
 
 /**
  * TMobile is responsible for the processing of monitoring records which belong
@@ -173,6 +171,9 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 			return;
 		}
 
+		if (hostname == null || path == null)
+			return;
+
 		// adjusting
 		this.resourceEnvironmentModelProvider.loadModel();
 		final ResourceEnvironment resourceEnvironment = this.resourceEnvironmentModelProvider.getModel();
@@ -263,7 +264,7 @@ public class TMobile extends AbstractConsumerStage<MobileRecord> {
 
 			final PrimitiveDataType stringDatatype = RepositoryFactory.eINSTANCE.createPrimitiveDataType();
 			stringDatatype.setType(PrimitiveTypeEnum.INT);
-			signature.setReturnType__OperationSignature(stringDatatype);
+			// signature.setReturnType__OperationSignature(stringDatatype);
 
 			belonging.getSignatures__OperationInterface().add(signature);
 		}
