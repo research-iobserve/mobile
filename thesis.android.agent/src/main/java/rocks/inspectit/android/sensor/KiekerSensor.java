@@ -15,24 +15,62 @@ import rocks.inspectit.android.callback.CallbackManager;
 import rocks.inspectit.android.util.DependencyManager;
 
 /**
- * Created by DMO on 09.01.2017.
+ * Sensor for dealing with operations executed before and after method
+ * instrumented executions. This class uses the trace registry class of Kieker
+ * in a modified version. The modified version is provided under
+ * {@link TraceRegistry} and the original form is
+ * {@link kieker.monitoring.core.registry.TraceRegistry}.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
 public class KiekerSensor implements ISensor {
-
+	/**
+	 * Link to the {@link TraceRegistry}
+	 */
 	private static final TraceRegistry TRACEREGISTRY = TraceRegistry.INSTANCE;
 
+	/**
+	 * Reference to the {@link CallbackManager}
+	 */
 	private CallbackManager callbackManager = DependencyManager.getCallbackManager();
+
+	/**
+	 * Name of the class.
+	 */
 	private String clazz;
+
+	/**
+	 * Signature of the method.
+	 */
 	private String signature;
 
 	// INNER
+	/**
+	 * Whether it is a new trace or not.
+	 */
 	private boolean newTrace;
+
+	/**
+	 * The id of the trace.
+	 */
 	private long traceId;
+
+	/**
+	 * Trace meta data Kieker record.
+	 */
 	private TraceMetadata trace;
 
+	/**
+	 * Creates a new instance.
+	 */
 	public KiekerSensor() {
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void beforeBody() {
 		trace = TRACEREGISTRY.getTrace();
@@ -57,6 +95,9 @@ public class KiekerSensor implements ISensor {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void exceptionThrown(String caused) {
 		if (newTrace) {
@@ -72,6 +113,9 @@ public class KiekerSensor implements ISensor {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void firstAfterBody() {
 		if (newTrace) {
@@ -87,24 +131,48 @@ public class KiekerSensor implements ISensor {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void secondAfterBody() {
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setOwner(String owner) {
 		clazz = formatClazz(owner);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setSignature(String methodSignature) {
 		signature = formatOperation(methodSignature);
 	}
 
+	/**
+	 * Formats a class by converting the internal representation to the original
+	 * class name.
+	 * 
+	 * @param clazz
+	 *            internal representation of the class
+	 * @return original class name
+	 */
 	private String formatClazz(String clazz) {
 		return clazz.replaceAll("/", ".");
 	}
 
+	/**
+	 * Formats a operation given in the internal representation format.
+	 * 
+	 * @param operation
+	 *            operation in the internal representation format
+	 * @return reformatted operation in nearly original form
+	 */
 	private String formatOperation(String operation) {
 		String[] opSplit = operation.split("\\)");
 		if (opSplit.length == 2)

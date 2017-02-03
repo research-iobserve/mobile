@@ -9,27 +9,56 @@ import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
+import android.webkit.WebView;
+import rocks.inspectit.android.callback.CallbackManager;
 import rocks.inspectit.android.callback.data.NetRequestResponse;
 import rocks.inspectit.android.module.AbstractAndroidModule;
 import rocks.inspectit.android.module.util.ConnectionState;
 import rocks.inspectit.android.module.util.ExecutionProperty;
 
 /**
- * Created by DMO on 09.12.2016.
+ * Special module which handles the instrumented network requests.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
-
 public class NetworkModule extends AbstractAndroidModule {
-
+	/**
+	 * Time after which the existing connections get collected and sent to the
+	 * monitoring server.
+	 */
 	private static final long COLLECT_AFTER = 30000L;
 
+	/**
+	 * Maps a single connection to a specific connection state.
+	 */
 	private Map<HttpURLConnection, ConnectionState> connectionStateMap;
 
+	/**
+	 * Executed when a connection is opened. This creates a new entry in the
+	 * state map for the connection.
+	 * 
+	 * @param conn
+	 *            the connection which has been created
+	 */
 	public void openConnection(HttpURLConnection conn) {
 		ConnectionState connState = new ConnectionState();
 		connState.update(ConnectionState.ConnectionPoint.CONNECT);
 		this.connectionStateMap.put(conn, connState);
 	}
 
+	/**
+	 * Executed when the response code of a connection is retrieved. This
+	 * updates the connection state for the belonging connection.
+	 * 
+	 * @param conn
+	 *            the connection
+	 * @return the response code
+	 * @throws IOException
+	 *             thrown when {@link HttpURLConnection#getResponseCode()}
+	 *             throws an exception
+	 */
 	public int getResponseCode(HttpURLConnection conn) throws IOException {
 		if (connectionStateMap.containsKey(conn)) {
 			int respCode = conn.getResponseCode();
@@ -40,6 +69,17 @@ public class NetworkModule extends AbstractAndroidModule {
 		}
 	}
 
+	/**
+	 * Executed when the output stream of a connection is requested. This
+	 * updates the connection state for the belonging connection.
+	 * 
+	 * @param conn
+	 *            the connection
+	 * @return the output stream for the connection
+	 * @throws IOException
+	 *             thrown when {@link HttpURLConnection#getOutputStream()}}
+	 *             throws an exception
+	 */
 	public OutputStream getOutputStream(HttpURLConnection conn) throws IOException {
 		if (connectionStateMap.containsKey(conn)) {
 			OutputStream out = conn.getOutputStream();
@@ -50,6 +90,15 @@ public class NetworkModule extends AbstractAndroidModule {
 		}
 	}
 
+	/**
+	 * Executed when the original application wants a {@link WebView} to load a
+	 * specific URL.
+	 * 
+	 * @param url
+	 *            the URL which is passed to the {@link WebView}
+	 * @param method
+	 *            the method of the request (either GET or POST)
+	 */
 	public void webViewLoad(String url, String method) {
 		NetRequestResponse netRequest = new NetRequestResponse();
 
@@ -62,15 +111,25 @@ public class NetworkModule extends AbstractAndroidModule {
 		this.pushData(netRequest);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void initModule(Context ctx) {
 		connectionStateMap = new HashMap<HttpURLConnection, ConnectionState>();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void shutdownModule() {
 	}
 
+	/**
+	 * Executed every 60 seconds and looks whether there are closed connections
+	 * and then passes data to the {@link CallbackManager} about the connection.
+	 */
 	@ExecutionProperty(interval = 60000L)
 	public void collectData() {
 		List<HttpURLConnection> removedConns = new ArrayList<HttpURLConnection>();

@@ -16,21 +16,47 @@ import rocks.inspectit.android.callback.data.HelloResponse;
 import rocks.inspectit.android.util.DependencyManager;
 
 /**
- * Created by David on 23.10.16.
+ * Task which is responsible for sending data to the REST interface of the
+ * server. This task runs asynchronously so it doesn't block the UI thread.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
-
 public class CallbackTask extends AsyncTask<String, Void, String> {
-
+	/**
+	 * Consistent log tag which is used by the agent.
+	 */
 	private static final String LOG_TAG = ExternalConfiguration.getLogTag();
+
+	/**
+	 * JSON object mapper for serializing and de-serializing JSON strings.
+	 */
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
+	/**
+	 * The REST interface URL.
+	 */
 	private String callbackUrl;
+
+	/**
+	 * Reference to the {@link CallbackManager}
+	 */
 	private CallbackManager callbackManager = DependencyManager.getCallbackManager();
 
+	/**
+	 * Creates a new task with a specified url.
+	 * 
+	 * @param url
+	 *            REST interface URL
+	 */
 	public CallbackTask(String url) {
 		this.callbackUrl = url;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected String doInBackground(String... params) {
 		if (params.length == 1) {
@@ -40,6 +66,9 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void onPostExecute(String result) {
 		if (result != null && !result.isEmpty()) {
@@ -55,6 +84,15 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 		}
 	}
 
+	/**
+	 * Performs a post request to a given URL with given data
+	 * 
+	 * @param rawUrl
+	 *            the URL
+	 * @param data
+	 *            the data
+	 * @return the response from the server
+	 */
 	private String postRequest(String rawUrl, String data) {
 		Log.i(LOG_TAG, "Sending back beacon to '" + rawUrl + "'.");
 		try {

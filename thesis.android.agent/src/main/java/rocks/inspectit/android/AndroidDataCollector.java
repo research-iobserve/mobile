@@ -6,8 +6,6 @@ import java.io.RandomAccessFile;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -18,7 +16,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.BatteryManager;
 import android.telephony.TelephonyManager;
 import rocks.inspectit.android.util.CacheValue;
 
@@ -29,54 +26,99 @@ import rocks.inspectit.android.util.CacheValue;
  * @author David Monschein
  */
 public class AndroidDataCollector {
-
-	private static final String POWER_PROFILE_CLASS = "com.android.internal.os.PowerProfile";
-
-	private IntentFilter itFilter;
-	private Intent batteryStatus;
-
+	/**
+	 * {@link TelephonyManager} for retrieving information
+	 */
 	private TelephonyManager telephonyManager;
-	private LocationManager locationManager;
-	private ConnectivityManager connectivityManager;
-	private ActivityManager activityManager;
-	private WifiManager wifiManager;
-	private Object mPowerProfile;
 
+	/**
+	 * {@link LocationManager} for retrieving information
+	 */
+	private LocationManager locationManager;
+
+	/**
+	 * {@link ConnectivityManager} for retrieving information
+	 */
+	private ConnectivityManager connectivityManager;
+
+	/**
+	 * {@link ActivityManager} for retrieving information
+	 */
+	private ActivityManager activityManager;
+
+	/**
+	 * {@link WifiManager} for retrieving information
+	 */
+	private WifiManager wifiManager;
+
+	/**
+	 * Context of the application which is needed to create the managers above
+	 */
 	private Context context;
 
 	// CACHE VALUES
-	private CacheValue<Float> batteryCache = new CacheValue<Float>(30000L);
-	private double batteryCapacityCache = -1;
+	/**
+	 * Cache value for the location.
+	 */
 	private CacheValue<Location> locationCache = new CacheValue<Location>(15000L);
+
+	/**
+	 * Cache value for the network information.
+	 */
 	private CacheValue<NetworkInfo> networkInfoCache = new CacheValue<NetworkInfo>(30000L);
-	private CacheValue<Boolean> chargingCache = new CacheValue<Boolean>(30000L);
+
+	/**
+	 * Cache value for the cpu usage.
+	 */
 	private CacheValue<Float> cpuUsage = new CacheValue<Float>(5000L);
+
+	/**
+	 * Cache value for the ram usage.
+	 */
 	private CacheValue<Double> ramUsage = new CacheValue<Double>(5000L);
+
+	/**
+	 * Cache value for the wifi information.
+	 */
 	private CacheValue<WifiInfo> wifiInfoCache = new CacheValue<WifiInfo>(30000L);
+
+	/**
+	 * Cache value for the wifi configuration.
+	 */
 	private CacheValue<WifiConfiguration> wifiConfigCache = new CacheValue<WifiConfiguration>(60000L);
 
-	private CacheValue<String> networkOperatorCache = new CacheValue<String>();
+	/**
+	 * Cache value for the network carrier.
+	 */
+	private CacheValue<String> networkCarrierCache = new CacheValue<String>();
+
+	/**
+	 * Cache value for the provided id of the device.
+	 */
 	private CacheValue<String> deviceIdCache = new CacheValue<String>();
 
+	/**
+	 * Creates a data collector and needs a given context as parameter.
+	 * 
+	 * @param ctx
+	 *            context of the application
+	 */
 	protected void initDataCollector(Context ctx) {
 		context = ctx;
-
-		itFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-		batteryStatus = ctx.registerReceiver(null, itFilter);
 
 		locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
 		connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 		wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
-		try {
-			mPowerProfile = Class.forName(POWER_PROFILE_CLASS).getConstructor(Context.class).newInstance(context);
-		} catch (Exception e) {
-			// TODO log
-		}
 	}
 
+	/**
+	 * Gets the version name of the application.
+	 * 
+	 * @return version name of the application or the value 'unknown' if the
+	 *         version isn't set
+	 */
 	public String getVersionName() {
 		PackageInfo pInfo = null;
 		try {
@@ -87,31 +129,35 @@ public class AndroidDataCollector {
 		}
 	}
 
+	/**
+	 * Gets the name of the application.
+	 * 
+	 * @return the name of the application
+	 */
 	public String resolveAppName() {
 		ApplicationInfo applicationInfo = context.getApplicationInfo();
 		int stringId = applicationInfo.labelRes;
 		return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
 	}
 
-	public boolean isCharging() {
-		return isCharging(false);
-	}
-
-	public boolean isCharging(boolean force) {
-		if (chargingCache != null && chargingCache.valid() && !force)
-			return chargingCache.value();
-
-		int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-		boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING
-				|| status == BatteryManager.BATTERY_STATUS_FULL;
-
-		return chargingCache.set(isCharging);
-	}
-
+	/**
+	 * Gets the last known location (Needs permissions for accessing location).
+	 * 
+	 * @return the location of the device
+	 */
 	public Location getLastKnownLocation() {
 		return getLastKnownLocation(false);
 	}
 
+	/**
+	 * Gets the last known location and provides a parameter for forcing the
+	 * collector to reload the value.
+	 * 
+	 * @param force
+	 *            if true, the current location will be reloaded and the value
+	 *            from the cache won'T be used
+	 * @return the last known location of the user
+	 */
 	public Location getLastKnownLocation(boolean force) {
 		if (locationCache != null && locationCache.valid() && !force)
 			return locationCache.value();
@@ -119,21 +165,23 @@ public class AndroidDataCollector {
 		return locationCache.set(getLocation());
 	}
 
-	public float getBatteryPct() {
-		return getBatteryPct(false);
-	}
-
-	public float getBatteryPct(boolean force) {
-		if (batteryCache != null && batteryCache.valid() && !force)
-			return batteryCache.value();
-
-		return batteryCache.set(getBatteryLevel() / (float) getBatteryScale());
-	}
-
+	/**
+	 * Gets network information of the device.
+	 * 
+	 * @return network information of the device
+	 */
 	public NetworkInfo getNetworkInfo() {
 		return getNetworkInfo(false);
 	}
 
+	/**
+	 * Gets network information and provides a parameter for forcing the reload
+	 * of the info.
+	 * 
+	 * @param force
+	 *            true if the collector should reload the network information
+	 * @return current network informations from the device
+	 */
 	public NetworkInfo getNetworkInfo(boolean force) {
 		if (networkInfoCache != null && networkInfoCache.valid() && !force)
 			return networkInfoCache.value();
@@ -141,10 +189,23 @@ public class AndroidDataCollector {
 		return networkInfoCache.set(_getNetworkInfo());
 	}
 
+	/**
+	 * Gets the current cpu usage.
+	 * 
+	 * @return the current cpu usage as float.
+	 */
 	public float getCpuUsage() {
 		return getCpuUsage(false);
 	}
 
+	/**
+	 * Gets the current cpu usage and provides a parameter to force a reload.
+	 * 
+	 * @param force
+	 *            true if the collector should reload the current usage and not
+	 *            take it from the cache
+	 * @return current cpu usage as float
+	 */
 	public float getCpuUsage(boolean force) {
 		if (cpuUsage != null && cpuUsage.valid() && !force)
 			return cpuUsage.value();
@@ -152,10 +213,24 @@ public class AndroidDataCollector {
 		return cpuUsage.set(readCPUUsage());
 	}
 
+	/**
+	 * Gets the current ram usage of the device.
+	 * 
+	 * @return the ram usage of the device
+	 */
 	public double getRamUsage() {
 		return getRamUsage(false);
 	}
 
+	/**
+	 * Gets the current ram usage and provides a parameter to force a reload of
+	 * the current usage.
+	 * 
+	 * @param force
+	 *            true if you want the collector to force a reload of the
+	 *            current usage
+	 * @return the current ram usage of the device
+	 */
 	public double getRamUsage(boolean force) {
 		if (ramUsage != null && ramUsage.valid() && !force)
 			return ramUsage.value();
@@ -163,10 +238,24 @@ public class AndroidDataCollector {
 		return ramUsage.set(readRamUsage());
 	}
 
+	/**
+	 * Gets informations about the wifi of the device.
+	 * 
+	 * @return wifi informations from the device
+	 */
 	public WifiInfo getWifiInfo() {
 		return getWifiInfo(false);
 	}
 
+	/**
+	 * Gets informations about the wifi of the device and provides a parameter
+	 * to force a reload of the current information
+	 * 
+	 * @param force
+	 *            true if you want the collector to force a reload of the wifi
+	 *            informations
+	 * @return the wifi informations for the device
+	 */
 	public WifiInfo getWifiInfo(boolean force) {
 		if (wifiInfoCache != null && wifiInfoCache.valid() && !force)
 			return wifiInfoCache.value();
@@ -174,10 +263,27 @@ public class AndroidDataCollector {
 		return wifiInfoCache.set(wifiManager.getConnectionInfo());
 	}
 
+	/**
+	 * Gets the wifi configuration for the wifi to which the device is connected
+	 * 
+	 * @return wifi configuration for the current configured and connected wifi
+	 *         of the device
+	 */
 	public WifiConfiguration getWifiConfiguration() {
 		return getWifiConfiguration(true, false);
 	}
 
+	/**
+	 * Gets the wifi configuration for the connected wifi.
+	 * 
+	 * @param preCheck
+	 *            previously check if we have a connection
+	 * @param force
+	 *            true if you want the collector to reload data about the
+	 *            configuration
+	 * @return wifi configuration for the current configured and connected wifi
+	 *         of the device
+	 */
 	public WifiConfiguration getWifiConfiguration(boolean preCheck, boolean force) {
 		if (wifiConfigCache != null && wifiConfigCache.valid() && !force)
 			return wifiConfigCache.value();
@@ -194,28 +300,24 @@ public class AndroidDataCollector {
 		return null;
 	}
 
-	public double getBatteryCapacity() {
-		if (batteryCapacityCache == -1) {
-			try {
-				double batteryCapacity = (Double) Class.forName(POWER_PROFILE_CLASS)
-						.getMethod("getAveragePower", java.lang.String.class).invoke(mPowerProfile, "battery.capacity");
-				batteryCapacityCache = batteryCapacity;
-				return batteryCapacity;
-			} catch (Exception e) {
-				return -1.0D;
-			}
-		} else {
-			return batteryCapacityCache;
-		}
+	/**
+	 * Gets the name of the mobile network carrier.
+	 * 
+	 * @return name of the mobile network carrier
+	 */
+	public String getNetworkCarrierName() {
+		if (networkCarrierCache != null && networkCarrierCache.valid())
+			return networkCarrierCache.value();
+
+		return networkCarrierCache.set(telephonyManager.getNetworkOperatorName());
 	}
 
-	public String getNetworkOperatorName() {
-		if (networkOperatorCache != null && networkOperatorCache.valid())
-			return networkOperatorCache.value();
-
-		return networkOperatorCache.set(telephonyManager.getNetworkOperatorName());
-	}
-
+	/**
+	 * Gets the id of the device. See {@link TelephonyManager} for detailed
+	 * information.
+	 * 
+	 * @return id of the device with model of the device as prefix
+	 */
 	public String getDeviceId() {
 		if (deviceIdCache != null && deviceIdCache.valid())
 			return deviceIdCache.value();
@@ -224,14 +326,13 @@ public class AndroidDataCollector {
 	}
 
 	// HELP FCTS
-	private int getBatteryLevel() {
-		return batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-	}
-
-	private int getBatteryScale() {
-		return batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-	}
-
+	/**
+	 * Accesses the current location of the device when the application has the
+	 * permissions to do so.
+	 * 
+	 * @return the location of the device and null if we don't have enough
+	 *         permissions
+	 */
 	private Location getLocation() {
 		if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
 			return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -239,6 +340,13 @@ public class AndroidDataCollector {
 		return null;
 	}
 
+	/**
+	 * Gets network informations and previously checks whether we have the
+	 * permission for that
+	 * 
+	 * @return current network information for the device and null if we don't
+	 *         have enough permissions
+	 */
 	private NetworkInfo _getNetworkInfo() {
 		if (checkPermission(Manifest.permission.ACCESS_NETWORK_STATE)) {
 			return connectivityManager.getActiveNetworkInfo();
@@ -246,10 +354,23 @@ public class AndroidDataCollector {
 		return null;
 	}
 
+	/**
+	 * Checks whether the application has a specific permission.
+	 * 
+	 * @param perm
+	 *            name of the permission
+	 * @return true if the application has the requested permission - false
+	 *         otherwise
+	 */
 	private boolean checkPermission(String perm) {
 		return context.checkCallingOrSelfPermission(perm) == PackageManager.PERMISSION_GRANTED;
 	}
 
+	/**
+	 * Collects the current ram usage.
+	 * 
+	 * @return current ram usage
+	 */
 	private double readRamUsage() {
 		ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
 		activityManager.getMemoryInfo(memoryInfo);
@@ -260,6 +381,11 @@ public class AndroidDataCollector {
 		return 1.0D - percentAvail;
 	}
 
+	/**
+	 * Collects the current cpu usage.
+	 * 
+	 * @return current cpu usage
+	 */
 	private float readCPUUsage() {
 		try {
 			RandomAccessFile reader = new RandomAccessFile("/proc/stat", "r");

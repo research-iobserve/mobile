@@ -1,14 +1,11 @@
 package rocks.inspectit.android.callback;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
+import android.util.Log;
 import kieker.common.record.IMonitoringRecord;
 import rocks.inspectit.android.ExternalConfiguration;
-import rocks.inspectit.android.Tag;
 import rocks.inspectit.android.callback.data.HelloRequest;
 import rocks.inspectit.android.callback.data.MobileCallbackData;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
@@ -17,67 +14,117 @@ import rocks.inspectit.android.callback.strategies.AbstractCallbackStrategy;
 import rocks.inspectit.android.util.DependencyManager;
 
 /**
- * Created by David on 25.10.16.
+ * Component which handles the connection to the server which persists the
+ * monitoring data.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
-
 public class CallbackManager {
+	/**
+	 * Consistent log tag for the agent.
+	 */
+	private static final String LOG_TAG = ExternalConfiguration.getLogTag();
 
-    private static final String LOG_TAG = ExternalConfiguration.getLogTag();
+	/**
+	 * The callback strategy which is used to send data.
+	 */
+	private AbstractCallbackStrategy strategy = DependencyManager.getCallbackStrategy();
 
-    private AbstractCallbackStrategy strategy = DependencyManager.getCallbackStrategy();
-    private boolean sessActive;
-    private List<MobileDefaultData> sessQueue;
+	/**
+	 * Whether there is an existing session.
+	 */
+	private boolean sessActive;
 
-    public CallbackManager() {
-        this.sessActive = false;
-        this.sessQueue = new ArrayList<MobileDefaultData>();
-    }
+	/**
+	 * Contains all data which isn't sent already because there is no connection
+	 */
+	private List<MobileDefaultData> sessQueue;
 
-    public void pushData(MobileDefaultData data) {
-        if (!sessActive) {
-            this.sessQueue.add(data);
-        } else {
-            this.strategy.addData(data);
-        }
-    }
+	/**
+	 * Creates a new callback manager.
+	 */
+	public CallbackManager() {
+		this.sessActive = false;
+		this.sessQueue = new ArrayList<MobileDefaultData>();
+	}
 
-    public void pushKiekerData(IMonitoringRecord record) {
-        this.pushData(new PlainKieker(record));
-    }
+	/**
+	 * Pass data to the callback manager and the manager manages the
+	 * transmission to the server.
+	 * 
+	 * @param data
+	 *            data which should be transferred to the server
+	 */
+	public void pushData(MobileDefaultData data) {
+		if (!sessActive) {
+			this.sessQueue.add(data);
+		} else {
+			this.strategy.addData(data);
+		}
+	}
 
-    public void pushHelloMessage(HelloRequest response, Set<Tag> tagList) {
-        MobileCallbackData data = new MobileCallbackData();
-        data.setTagList(new ArrayList<Tag>(tagList));
-        data.setSessionId(null);
+	/**
+	 * Pushes a Kieker record which is sent to the server.
+	 * 
+	 * @param record
+	 *            the Kieker record which should be transferred to the server
+	 */
+	public void pushKiekerData(IMonitoringRecord record) {
+		this.pushData(new PlainKieker(record));
+	}
 
-        List<MobileDefaultData> childs = new ArrayList<MobileDefaultData>();
-        childs.add(response);
+	/**
+	 * Pushes a hello message for session creation.
+	 * 
+	 * @param response
+	 *            hello request which should be sent to the servers
+	 */
+	public void pushHelloMessage(HelloRequest response) {
+		MobileCallbackData data = new MobileCallbackData();
+		data.setSessionId(null);
 
-        data.setChildData(childs);
+		List<MobileDefaultData> childs = new ArrayList<MobileDefaultData>();
+		childs.add(response);
 
-        // directly send it
-        strategy.sendImmediately(data, true);
-    }
+		data.setChildData(childs);
 
-    public void shutdown() {
-        strategy.stop();
-    }
+		// directly send it
+		strategy.sendImmediately(data, true);
+	}
 
-    private void swapQueue() {
-        for (MobileDefaultData data : sessQueue) {
-            strategy.addData(data);
-        }
-        sessQueue.clear();
-    }
+	/**
+	 * Shuts down the callback manager.
+	 */
+	public void shutdown() {
+		strategy.stop();
+	}
 
-    public void applySessionId(String id) {
-        if (!sessActive) {
-            Log.i(LOG_TAG, "Created session with id '" + id + "' for communicating with the CMR.");
+	/**
+	 * Flushes all entries in the session queue to the callback strategy.
+	 */
+	private void swapQueue() {
+		for (MobileDefaultData data : sessQueue) {
+			strategy.addData(data);
+		}
+		sessQueue.clear();
+	}
 
-            strategy.setSessId(id);
-            sessActive = true;
+	/**
+	 * Applies a given session id which is used to communicate with the server.
+	 * 
+	 * @param id
+	 *            session id
+	 */
+	public void applySessionId(String id) {
+		if (!sessActive) {
+			Log.i(LOG_TAG, "Created session with id '" + id + "' for communicating with the CMR.");
 
-            swapQueue();
-        }
-    }
+			strategy.setSessId(id);
+			sessActive = true;
+
+			swapQueue();
+		}
+	}
 }

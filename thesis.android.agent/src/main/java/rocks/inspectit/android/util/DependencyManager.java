@@ -1,49 +1,74 @@
 package rocks.inspectit.android.util;
 
 import rocks.inspectit.android.AndroidDataCollector;
-import rocks.inspectit.android.TagCollector;
 import rocks.inspectit.android.callback.CallbackManager;
 import rocks.inspectit.android.callback.strategies.AbstractCallbackStrategy;
 
 /**
- * Created by DMO on 17.12.2016.
+ * Class which manages and holds the important components of the agent.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
-
 public class DependencyManager {
-    private static CallbackManager callbackManager;
-    private static AndroidDataCollector androidDataCollector;
-    private static TagCollector tagCollector;
-    private static AbstractCallbackStrategy callbackStrategy;
+	/**
+	 * Reference to the {@link CallbackManager}
+	 */
+	private static CallbackManager callbackManager;
 
-    public static CallbackManager getCallbackManager() {
-        return callbackManager;
-    }
+	/**
+	 * Reference to the {@link AndroidDataCollector}
+	 */
+	private static AndroidDataCollector androidDataCollector;
 
-    public static void setCallbackManager(CallbackManager callbackManager) {
-        DependencyManager.callbackManager = callbackManager;
-    }
+	/**
+	 * Reference to the {@link AbstractCallbackStrategy}
+	 */
+	private static AbstractCallbackStrategy callbackStrategy;
 
-    public static AndroidDataCollector getAndroidDataCollector() {
-        return androidDataCollector;
-    }
+	/**
+	 * @return the callbackManager
+	 */
+	public static CallbackManager getCallbackManager() {
+		return callbackManager;
+	}
 
-    public static void setAndroidDataCollector(AndroidDataCollector androidDataCollector) {
-        DependencyManager.androidDataCollector = androidDataCollector;
-    }
+	/**
+	 * @param callbackManager
+	 *            the callbackManager to set
+	 */
+	public static void setCallbackManager(CallbackManager callbackManager) {
+		DependencyManager.callbackManager = callbackManager;
+	}
 
-    public static TagCollector getTagCollector() {
-        return tagCollector;
-    }
+	/**
+	 * @return the androidDataCollector
+	 */
+	public static AndroidDataCollector getAndroidDataCollector() {
+		return androidDataCollector;
+	}
 
-    public static void setTagCollector(TagCollector tagCollector) {
-        DependencyManager.tagCollector = tagCollector;
-    }
+	/**
+	 * @param androidDataCollector
+	 *            the androidDataCollector to set
+	 */
+	public static void setAndroidDataCollector(AndroidDataCollector androidDataCollector) {
+		DependencyManager.androidDataCollector = androidDataCollector;
+	}
 
-    public static AbstractCallbackStrategy getCallbackStrategy() {
-        return callbackStrategy;
-    }
+	/**
+	 * @return the callbackStrategy
+	 */
+	public static AbstractCallbackStrategy getCallbackStrategy() {
+		return callbackStrategy;
+	}
 
-    public static void setCallbackStrategy(AbstractCallbackStrategy callbackStrategy) {
-        DependencyManager.callbackStrategy = callbackStrategy;
-    }
+	/**
+	 * @param callbackStrategy
+	 *            the callbackStrategy to set
+	 */
+	public static void setCallbackStrategy(AbstractCallbackStrategy callbackStrategy) {
+		DependencyManager.callbackStrategy = callbackStrategy;
+	}
 }

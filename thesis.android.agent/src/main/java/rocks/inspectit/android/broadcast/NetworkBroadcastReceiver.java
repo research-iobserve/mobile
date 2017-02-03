@@ -12,15 +12,27 @@ import android.telephony.TelephonyManager;
 import rocks.inspectit.android.callback.kieker.NetInfoResponse;
 
 /**
- * Created by DMO on 04.01.2017.
+ * Concrete broadcast receiver for network events.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
-
 public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
+	/**
+	 * The action types which this receiver can process.
+	 */
 	private static final String[] ACTIONS = new String[] { "android.net.conn.CONNECTIVITY_CHANGE",
 			"android.net.wifi.WIFI_STATE_CHANGED" };
 
+	/**
+	 * The id of the device.
+	 */
 	private String deviceId;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (deviceId == null) {
@@ -50,7 +62,7 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 
 			// MOBILE PART
 			if (mobile) {
-				String provider = androidDataCollector.getNetworkOperatorName();
+				String provider = androidDataCollector.getNetworkCarrierName();
 				String protocolType = this.getProtocolName(currentNetwork.getSubtype());
 
 				this.pushData(new NetInfoResponse(deviceId, wifi, mobile, protocolType, provider, "", ""));
@@ -62,11 +74,21 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String[] getFilterActions() {
 		return ACTIONS;
 	}
 
+	/**
+	 * Gets the name of the protocol which is used from a wifi configuration.
+	 * 
+	 * @param config
+	 *            the wifi configuration
+	 * @return the protocol which is used as a string
+	 */
 	private String getProtocolName(WifiConfiguration config) {
 		BitSet allowedKeyMng = config.allowedKeyManagement;
 
@@ -89,6 +111,14 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 		}
 	}
 
+	/**
+	 * Gets the name of the protocol from a sub-type id which is derived from
+	 * the mobile network connection
+	 * 
+	 * @param subtype
+	 *            the sub-type id from a mobile network
+	 * @return name of the protocol as string
+	 */
 	private String getProtocolName(int subtype) {
 		switch (subtype) {
 		case TelephonyManager.NETWORK_TYPE_1xRTT:

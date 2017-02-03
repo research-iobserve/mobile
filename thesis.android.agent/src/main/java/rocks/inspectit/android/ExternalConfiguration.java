@@ -6,10 +6,19 @@ package rocks.inspectit.android;
  */
 public class ExternalConfiguration {
 
-	private static String beaconUrl;
-	private static String helloUrl;
-
+	/**
+	 * Log tag for consistent log outputs of the agent.
+	 */
 	private static final String LOG_TAG = "Android Agent";
+
+	/**
+	 * URL for sending monitoring beacons.
+	 */
+	private static String beaconUrl;
+	/**
+	 * URL for sending initial hello request to create a session.
+	 */
+	private static String helloUrl;
 
 	/**
 	 * @return the beaconUrl

@@ -1,73 +1,108 @@
 package rocks.inspectit.android.callback.strategies;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import rocks.fasterxml.jackson.core.JsonProcessingException;
 import rocks.fasterxml.jackson.databind.ObjectMapper;
 import rocks.inspectit.android.ExternalConfiguration;
-import rocks.inspectit.android.Tag;
-import rocks.inspectit.android.TagCollector;
 import rocks.inspectit.android.callback.CallbackTask;
 import rocks.inspectit.android.callback.data.MobileCallbackData;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
-import rocks.inspectit.android.util.DependencyManager;
 
 /**
- * Created by David on 25.10.16.
+ * Abstract class which represents a strategy for handling the data which is
+ * sent back to the server.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
-
 public abstract class AbstractCallbackStrategy {
-    private static ObjectMapper mapper = new ObjectMapper();
+	/**
+	 * JSON Object mapper for serializing and deserializing JSON strings.
+	 */
+	private static ObjectMapper mapper = new ObjectMapper();
 
-    protected MobileCallbackData data;
-    private TagCollector tagCollector = DependencyManager.getTagCollector();
+	/**
+	 * {@link MobileCallbackData} which holds the data which should be sent to
+	 * the server
+	 */
+	protected MobileCallbackData data;
 
-    public AbstractCallbackStrategy() {
-        this.data = new MobileCallbackData();
-    }
+	/**
+	 * Constructs a new callback strategy and creates an empty
+	 * {@link MobileCallbackData} object for holding data.
+	 */
+	public AbstractCallbackStrategy() {
+		this.data = new MobileCallbackData();
+	}
 
-    abstract public void addData(MobileDefaultData data);
+	/**
+	 * Adds data to the data holder.
+	 * 
+	 * @param data
+	 *            data which should be added
+	 */
+	public abstract void addData(MobileDefaultData data);
 
-    abstract public void stop();
+	/**
+	 * Stops the callback strategy.
+	 */
+	public abstract void stop();
 
-    public void sendImmediately(MobileCallbackData data, boolean isHello) {
-        this.sendBeacon(data, isHello);
-        data.clear();
-    }
+	/**
+	 * Immediately sends a data object to the server with not respecting the
+	 * strategy.
+	 * 
+	 * @param data
+	 *            data which should be sent immediately
+	 * @param isHello
+	 *            whether it is a session creation message or not
+	 */
+	public void sendImmediately(MobileCallbackData data, boolean isHello) {
+		this.sendBeacon(data, isHello);
+		data.clear();
+	}
 
-    public void setSessId(String id) {
-        this.data.setSessionId(id);
-    }
+	/**
+	 * Sets the session id.
+	 * 
+	 * @param id
+	 *            session id
+	 */
+	public void setSessId(String id) {
+		this.data.setSessionId(id);
+	}
 
-    protected synchronized void sendBeacon() {
-        this.sendBeacon(this.data, false);
-        data.clear();
-    }
+	/**
+	 * Sends the data to the server.
+	 */
+	protected void sendBeacon() {
+		this.sendBeacon(this.data, false);
+		data.clear();
+	}
 
-    private void sendBeacon(MobileCallbackData data, boolean helloReq) {
-        if (data != null && data.getChildData().size() > 0) {
-            if (data.getTagList() == null || data.getTagList().size() == 0) {
-                tagCollector.collectDynamicTags();
-                Set<Tag> tagSet = tagCollector.getDynamicTags();
-                List<Tag> tagList = new ArrayList<Tag>(tagSet);
-                data.setTagList(tagList);
-            }
+	/**
+	 * Sends a specified beacon to the server.
+	 * 
+	 * @param data
+	 *            beacon
+	 * @param helloReq
+	 *            whether it is a session creation message or not
+	 */
+	private void sendBeacon(MobileCallbackData data, boolean helloReq) {
+		if (data != null && data.getChildData().size() > 0) {
+			String callbackUrl;
+			if (helloReq) {
+				callbackUrl = ExternalConfiguration.getHelloUrl();
+			} else {
+				callbackUrl = ExternalConfiguration.getBeaconUrl();
+			}
 
-            String callbackUrl;
-            if (helloReq) {
-                callbackUrl = ExternalConfiguration.getHelloUrl();
-            } else {
-                callbackUrl = ExternalConfiguration.getBeaconUrl();
-            }
-
-            try {
-                new CallbackTask(callbackUrl).execute(mapper.writeValueAsString(data));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+			try {
+				new CallbackTask(callbackUrl).execute(mapper.writeValueAsString(data));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 }

@@ -3,20 +3,31 @@ package rocks.inspectit.android.callback.strategies;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
 
 /**
- * Created by David on 26.10.16.
+ * Strategy which immediately sends all data objects to the server. This means
+ * every data object is sent alone to the server and therefore this strategy
+ * produces a high overhead and is only suggested for debug purposes.
+ * 
+ * @author David Monschein
+ * @author RobertHeinrich
+ *
  */
-
 public class ImmediatelyStrategy extends AbstractCallbackStrategy {
-    @Override
-    public synchronized void addData(MobileDefaultData data) {
-        this.data.addChildData(data);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public synchronized void addData(MobileDefaultData data) {
+		this.data.addChildData(data);
 
-        // DIRECTLY SEND
-        super.sendBeacon();
-    }
+		// DIRECTLY SEND
+		super.sendBeacon();
+	}
 
-    @Override
-    public void stop() {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void stop() {
 
-    }
+	}
 }

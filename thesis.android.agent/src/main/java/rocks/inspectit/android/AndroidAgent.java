@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.util.Log;
+import android.webkit.WebView;
 import kieker.common.record.IMonitoringRecord;
 import rocks.inspectit.android.broadcast.AbstractBroadcastReceiver;
 import rocks.inspectit.android.broadcast.NetworkBroadcastReceiver;
@@ -25,7 +26,7 @@ import rocks.inspectit.android.callback.data.CrashResponse;
 import rocks.inspectit.android.callback.data.HelloRequest;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
 import rocks.inspectit.android.callback.strategies.AbstractCallbackStrategy;
-import rocks.inspectit.android.callback.strategies.ImmediatelyStrategy;
+import rocks.inspectit.android.callback.strategies.IntervalStrategy;
 import rocks.inspectit.android.module.AbstractAndroidModule;
 import rocks.inspectit.android.module.CPUModule;
 import rocks.inspectit.android.module.MemoryModule;
@@ -39,34 +40,101 @@ import rocks.inspectit.android.util.DependencyManager;
  */
 
 public class AndroidAgent {
+	/**
+	 * Resolve consistent log tag for the agent.
+	 */
 	private static final String LOG_TAG = ExternalConfiguration.getLogTag();
 
+	/**
+	 * Broadcast receiver classes which will be created when the agent is
+	 * initialized.
+	 */
 	private static final Class<?>[] BROADCAST_RECVS = new Class<?>[] { NetworkBroadcastReceiver.class };
 
+	/**
+	 * Modules which will be created when the agent is initialized.
+	 */
 	private static final Class<?>[] MODULES = new Class<?>[] { CPUModule.class, MemoryModule.class,
 			NetworkModule.class, };
 
+	/**
+	 * Maps a certain module class to an instantiated module object.
+	 */
 	private static Map<Class<?>, AbstractAndroidModule> instantiatedModules = new HashMap<Class<?>, AbstractAndroidModule>();
+
+	/**
+	 * Maps a entry id to a specific sensor.
+	 */
 	private static Map<Long, ISensor> sensorMap = new HashMap<>();
+
+	/**
+	 * List of created broadcast receivers.
+	 */
 	private static List<BroadcastReceiver> createdReceivers = new ArrayList<BroadcastReceiver>();
+
+	/**
+	 * Handler for scheduling timing tasks.
+	 */
 	private static Handler mHandler = new Handler();
 
+	/**
+	 * The context of the application.
+	 */
 	private static Context initContext;
 
+	/**
+	 * Callback manager component for the communication with the server which
+	 * persists the monitoring data.
+	 */
 	private static CallbackManager callbackManager;
-	private static TagCollector tagCollector;
+
+	/**
+	 * Network module which is responsible for capturing network monitoring
+	 * data.
+	 */
 	private static NetworkModule networkModule;
+
+	/**
+	 * Uncaught exception handler which is called when the application crashes
+	 */
 	private static Thread.UncaughtExceptionHandler defaultUEH;
 
 	// QUEUES FOR INIT
+	/**
+	 * Queue of kieker records which couldn't be sent till now because there is
+	 * no session. This queue will be sent when there is an active connection.
+	 */
 	private static List<IMonitoringRecord> kiekerQueueInit = new ArrayList<>();
+
+	/**
+	 * Queue of monitoring records which couldn't be sent till now because there
+	 * is no session. This queue will be sent when there is an active
+	 * connection.
+	 */
 	private static List<MobileDefaultData> defaultQueueInit = new ArrayList<>();
 
+	/**
+	 * Current entry id.
+	 */
 	private static long currentId;
 
+	/**
+	 * Specifies whether the agents init method has been already called or not.
+	 */
 	private static boolean inited = false;
+
+	/**
+	 * Specifies whether the agents destroy method has benn already called or
+	 * not.
+	 */
 	private static boolean closed = true;
 
+	/**
+	 * Inits the agent with a given application context.
+	 * 
+	 * @param ctx
+	 *            context of the application
+	 */
 	public static synchronized void initAgent(Activity ctx) {
 		if (inited)
 			return;
@@ -87,13 +155,8 @@ public class AndroidAgent {
 		androidDataCollector.initDataCollector(ctx);
 		DependencyManager.setAndroidDataCollector(androidDataCollector);
 
-		// INITING TAG COLLECTOR
-		tagCollector = new TagCollector(ctx);
-		tagCollector.collectStaticTags();
-		DependencyManager.setTagCollector(tagCollector);
-
 		// INITING CALLBACK
-		AbstractCallbackStrategy callbackStrategy = new ImmediatelyStrategy();
+		AbstractCallbackStrategy callbackStrategy = new IntervalStrategy(10000L);
 		DependencyManager.setCallbackStrategy(callbackStrategy);
 
 		callbackManager = new CallbackManager();
@@ -104,7 +167,7 @@ public class AndroidAgent {
 		helloRequest.setAppName(androidDataCollector.resolveAppName());
 		helloRequest.setDeviceId(androidDataCollector.getDeviceId());
 
-		callbackManager.pushHelloMessage(helloRequest, tagCollector.getStaticTags());
+		callbackManager.pushHelloMessage(helloRequest);
 
 		// INITING MODULES
 		for (Class<?> exModule : MODULES) {
@@ -166,6 +229,10 @@ public class AndroidAgent {
 		Log.i(LOG_TAG, "Finished initializing the Android Agent.");
 	}
 
+	/**
+	 * Shutsdown the agent. This methods suspends all modules and broadcast
+	 * receivers.
+	 */
 	public static synchronized void destroyAgent() {
 		if (closed)
 			return;
@@ -195,6 +262,18 @@ public class AndroidAgent {
 		closed = true;
 	}
 
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application.
+	 * 
+	 * @param sensorClassName
+	 *            The name of the sensor which should handle this call
+	 * @param methodSignature
+	 *            The signature of the method which has been called
+	 * @param owner
+	 *            The class which owns the method which has been called
+	 * @return entry id for determine corresponding sensor at the exitBody call
+	 */
 	public static synchronized long enterBody(String sensorClassName, String methodSignature, String owner) {
 		try {
 			Class<?> clazz = Class.forName(sensorClassName);
@@ -223,6 +302,16 @@ public class AndroidAgent {
 		}
 	}
 
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application and is executed when a instrumented methods throws an
+	 * exception.
+	 * 
+	 * @param e
+	 *            the exception which has been thrown
+	 * @param enterId
+	 *            the entry id for getting the responsible sensor instance
+	 */
 	public static synchronized void exitErrorBody(Throwable e, long enterId) {
 		if (enterId >= 0 && sensorMap.containsKey(enterId)) {
 			ISensor eSensor = sensorMap.get(enterId);
@@ -235,6 +324,13 @@ public class AndroidAgent {
 		}
 	}
 
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application and is executed when a instrumented methods returns
+	 * 
+	 * @param enterId
+	 *            the entry id for getting the responsible sensor instance
+	 */
 	public static synchronized void exitBody(long enterId) {
 		if (enterId >= 0 && sensorMap.containsKey(enterId)) {
 			ISensor eSensor = sensorMap.get(enterId);
@@ -250,38 +346,111 @@ public class AndroidAgent {
 		}
 	}
 
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application when the application uses a {@link WebView}.
+	 * 
+	 * @param url
+	 *            the url which is loaded by the webview
+	 */
 	public static void webViewLoad(String url) {
 		networkModule.webViewLoad(url, "GET");
 	}
 
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application when the application uses a {@link WebView}.
+	 * 
+	 * @param url
+	 *            the url which is loaded by the webview
+	 * @param data
+	 *            the data which is sent by the post request
+	 */
 	public static void webViewLoadPost(String url, byte[] data) {
 		networkModule.webViewLoad(url, "POST");
 	}
 
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application when the application uses a {@link WebView}.
+	 * 
+	 * @param url
+	 *            the url which is loaded by the webview
+	 * @param params
+	 *            the parameters for the get request
+	 */
 	public static void webViewLoad(String url, Map<?, ?> params) {
 		networkModule.webViewLoad(url, "GET");
 	}
 
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application when the application creates a {@link HttpURLConnection}.
+	 * 
+	 * @param connection
+	 *            a reference to the created connection
+	 */
 	public static void httpConnect(HttpURLConnection connection) {
 		networkModule.openConnection((HttpURLConnection) connection);
 	}
 
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application when the application accesses the output stream of a
+	 * {@link HttpURLConnection}.
+	 * 
+	 * @param connection
+	 *            a reference to the connection
+	 * @return the output stream for the connection
+	 * @throws IOException
+	 *             when the {@link HttpURLConnection#getOutputStream()} method
+	 *             of the connection fails
+	 */
 	public static OutputStream httpOutputStream(HttpURLConnection connection) throws IOException {
 		return networkModule.getOutputStream((HttpURLConnection) connection);
 	}
 
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application when the application accesses the response code of a
+	 * {@link HttpURLConnection}.
+	 * 
+	 * @param connection
+	 *            a reference to the connection
+	 * @return the response code of the connection
+	 * @throws IOException
+	 *             when the {@link HttpURLConnection#getResponseCode()} method
+	 *             of the connection fails
+	 */
 	public static int httpResponseCode(HttpURLConnection connection) throws IOException {
 		return networkModule.getResponseCode((HttpURLConnection) connection);
 	}
 
+	/**
+	 * Queues a Kieker monitoring record which will be sent after session
+	 * creations.
+	 * 
+	 * @param afterOperationEvent
+	 *            the record which should be queued
+	 */
 	public static void queueForInit(IMonitoringRecord afterOperationEvent) {
 		kiekerQueueInit.add(afterOperationEvent);
 	}
 
+	/**
+	 * Queues a monitoring record which will be sent after session creation.
+	 * 
+	 * @param data
+	 *            the record which should be queued
+	 */
 	public static void queueForInit(MobileDefaultData data) {
 		defaultQueueInit.add(data);
 	}
 
+	/**
+	 * Swaps queues for Kieker records and common monitoring records and passes
+	 * them to the {@link CallbackManager}.
+	 */
 	private static void swapInitQueues() {
 		for (IMonitoringRecord ikiek : kiekerQueueInit) {
 			callbackManager.pushKiekerData(ikiek);
@@ -295,6 +464,13 @@ public class AndroidAgent {
 		kiekerQueueInit.clear();
 	}
 
+	/**
+	 * Schedules all operations for a module which should be executed
+	 * periodically.
+	 * 
+	 * @param module
+	 *            a reference to the module which contains methods to schedule
+	 */
 	private static void setupScheduledMethods(AbstractAndroidModule module) {
 		for (Method method : module.getClass().getMethods()) {
 			if (method.isAnnotationPresent(ExecutionProperty.class)) {
@@ -324,17 +500,33 @@ public class AndroidAgent {
 		}
 	}
 
+	/**
+	 * Passes references to important agent components to a broadcast receiver.
+	 * 
+	 * @param recv
+	 *            the broadcast receiver
+	 */
 	private static void injectDependencies(AbstractBroadcastReceiver recv) {
 		recv.setCallbackManager(DependencyManager.getCallbackManager());
 		recv.setAndroidDataCollector(DependencyManager.getAndroidDataCollector());
 	}
 
+	/**
+	 * Passes references to important agent components to an android module.
+	 * 
+	 * @param androidModule
+	 *            the module
+	 */
 	private static void injectDependencies(AbstractAndroidModule androidModule) {
 		androidModule.setCallbackManager(DependencyManager.getCallbackManager());
 		androidModule.setAndroidDataCollector(DependencyManager.getAndroidDataCollector());
 	}
 
 	// handler listener
+	/**
+	 * Exception handler for uncaught exceptions which is only a extension of
+	 * the already set one.
+	 */
 	private static Thread.UncaughtExceptionHandler _unCaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
 		@Override
 		public void uncaughtException(Thread thread, Throwable ex) {
