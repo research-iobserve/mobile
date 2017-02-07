@@ -1,0 +1,12 @@
+Update 1
+------------------------------------------
+- Reorganized records and generalized them
+- Used existing deployment and allocation transformation
+- Added comments widely
+- Fixed small bugs
+
+Update 2
+------------------------------------------
+- Refined transformations
+- Refactored iObserve extensions
+- Added project for PCM constraint checking

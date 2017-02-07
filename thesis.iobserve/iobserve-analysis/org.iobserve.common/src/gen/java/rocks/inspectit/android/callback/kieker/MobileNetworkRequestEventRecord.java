@@ -26,13 +26,14 @@ import kieker.common.util.registry.IRegistry;
 import kieker.common.util.Version;
 
 import rocks.inspectit.android.callback.kieker.MobileRecord;
+import rocks.inspectit.android.callback.kieker.NetworkEvent;
 
 /**
  * @author Generic Kieker
  * 
  * @since 1.10
  */
-public class MobileNetworkRequestEventRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory, MobileRecord {
+public class MobileNetworkRequestEventRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory, MobileRecord, NetworkEvent {
 	/** Descriptive definition of the serialization size of the record. */
 	public static final int SIZE = TYPE_SIZE_STRING // MobileRecord.deviceId
 			 + TYPE_SIZE_STRING // MobileNetworkRequestEventRecord.url
@@ -40,7 +41,7 @@ public class MobileNetworkRequestEventRecord extends AbstractMonitoringRecord im
 			 + TYPE_SIZE_INT // MobileNetworkRequestEventRecord.responseCode
 			 + TYPE_SIZE_LONG // MobileNetworkRequestEventRecord.duration
 	;
-	private static final long serialVersionUID = -5663728785756766125L;
+	private static final long serialVersionUID = 8300232394325188760L;
 	
 	public static final Class<?>[] TYPES = {
 		String.class, // MobileRecord.deviceId

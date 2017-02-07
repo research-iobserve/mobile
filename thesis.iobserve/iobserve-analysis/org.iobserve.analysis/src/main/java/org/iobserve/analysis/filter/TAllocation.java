@@ -15,9 +15,6 @@
  ***************************************************************************/
 package org.iobserve.analysis.filter;
 
-import teetime.framework.AbstractConsumerStage;
-import teetime.framework.OutputPort;
-
 import org.iobserve.analysis.model.ResourceEnvironmentModelBuilder;
 import org.iobserve.analysis.model.ResourceEnvironmentModelProvider;
 import org.iobserve.analysis.utils.Opt;
@@ -26,10 +23,15 @@ import org.iobserve.common.record.IDeploymentRecord;
 import org.iobserve.common.record.ServletDeployedEvent;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceEnvironment;
 
+import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
+import teetime.framework.AbstractConsumerStage;
+import teetime.framework.OutputPort;
+
 /**
  * TAllocation creates a new resource container if and only if there is no
  * corresponding container already available.
  *
+ * @author David Monschein
  * @author Robert Heinrich
  * @author Alessandro Giusa
  */
@@ -72,6 +74,9 @@ public final class TAllocation extends AbstractConsumerStage<IDeploymentRecord> 
 		} else if (event instanceof EJBDeployedEvent) {
 			final String service = ((EJBDeployedEvent) event).getSerivce();
 			this.updateModel(service);
+		} else if (event instanceof MobileDeploymentRecord) {
+			final String deviceId = ((MobileDeploymentRecord) event).getDeviceId();
+			this.updateModel(deviceId);
 		}
 
 		// forward the event

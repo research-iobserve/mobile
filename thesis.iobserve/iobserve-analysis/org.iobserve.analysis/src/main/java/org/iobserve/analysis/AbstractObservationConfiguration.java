@@ -23,8 +23,9 @@ import org.iobserve.analysis.filter.TDeployment;
 import org.iobserve.analysis.filter.TEntryCall;
 import org.iobserve.analysis.filter.TEntryCallSequence;
 import org.iobserve.analysis.filter.TEntryEventSequence;
-import org.iobserve.analysis.filter.TMobile;
+import org.iobserve.analysis.filter.TNetworkEvent;
 import org.iobserve.analysis.filter.TNetworkLink;
+import org.iobserve.analysis.filter.TNetworkRequest;
 import org.iobserve.analysis.filter.TUndeployment;
 import org.iobserve.analysis.model.AllocationModelProvider;
 import org.iobserve.analysis.model.RepositoryModelProvider;
@@ -93,7 +94,8 @@ public abstract class AbstractObservationConfiguration extends Configuration {
 				repositoryModelProvider, varianceOfUserGroups, thinkTime, closedWorkload);
 		final TNetworkLink tNetworkLink = new TNetworkLink(allocationModelProvider, systemModelProvider,
 				resourceEnvironmentModelProvider);
-		final TMobile tMobileNetwork = new TMobile(correspondenceModel, allocationModelProvider, systemModelProvider,
+		final TNetworkEvent tNetworkEvent = new TNetworkEvent(resourceEnvironmentModelProvider);
+		final TNetworkRequest tNetworkRequest = new TNetworkRequest(allocationModelProvider, systemModelProvider,
 				resourceEnvironmentModelProvider, repositoryModelProvider);
 
 		/** dispatch different monitoring data. */
@@ -101,7 +103,9 @@ public abstract class AbstractObservationConfiguration extends Configuration {
 		this.connectPorts(this.recordSwitch.getUndeploymentOutputPort(), tUndeployment.getInputPort());
 		this.connectPorts(this.recordSwitch.getFlowOutputPort(), tEntryCall.getInputPort());
 		this.connectPorts(this.recordSwitch.getTraceMetaPort(), tNetworkLink.getInputPort());
-		this.connectPorts(this.recordSwitch.getMobileNetworkEventPort(), tMobileNetwork.getInputPort());
+		this.connectPorts(this.recordSwitch.getNetworkEventPort(), tNetworkEvent.getInputPort());
+
+		this.connectPorts(tNetworkEvent.getOutputPort(), tNetworkRequest.getInputPort());
 
 		this.connectPorts(tAllocation.getDeploymentOutputPort(), tDeployment.getInputPort());
 		this.connectPorts(tEntryCall.getOutputPort(), tEntryCallSequence.getInputPort());

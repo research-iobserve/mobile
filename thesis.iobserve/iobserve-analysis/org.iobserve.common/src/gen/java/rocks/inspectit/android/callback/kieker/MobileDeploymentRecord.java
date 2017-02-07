@@ -26,18 +26,19 @@ import kieker.common.util.registry.IRegistry;
 import kieker.common.util.Version;
 
 import rocks.inspectit.android.callback.kieker.MobileRecord;
+import org.iobserve.common.record.IDeploymentRecord;
 
 /**
  * @author Generic Kieker
  * 
  * @since 1.10
  */
-public class MobileDeploymentRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory, MobileRecord {
+public class MobileDeploymentRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory, MobileRecord, IDeploymentRecord {
 	/** Descriptive definition of the serialization size of the record. */
 	public static final int SIZE = TYPE_SIZE_STRING // MobileRecord.deviceId
 			 + TYPE_SIZE_STRING // MobileDeploymentRecord.appName
 	;
-	private static final long serialVersionUID = -8838436425971088282L;
+	private static final long serialVersionUID = -2073938731176655448L;
 	
 	public static final Class<?>[] TYPES = {
 		String.class, // MobileRecord.deviceId

@@ -4,11 +4,13 @@ template MobileRecord {
 	string deviceId
 }
 
-entity MobileDeploymentRecord : MobileRecord {
+template NetworkEvent
+
+entity MobileDeploymentRecord : MobileRecord, IDeploymentRecord {
 	string appName
 }
 
-entity MobileNetworkEventRecord : MobileRecord {
+entity MobileNetworkEventRecord : MobileRecord, NetworkEvent {
 	boolean wifi
 	boolean mobile
 	string mobileCarrierName
@@ -17,7 +19,7 @@ entity MobileNetworkEventRecord : MobileRecord {
 	string wBSSID
 }
 
-entity MobileNetworkRequestEventRecord : MobileRecord {
+entity MobileNetworkRequestEventRecord : MobileRecord, NetworkEvent {
 	string url
 	string method
 	int responseCode

@@ -25,22 +25,63 @@ import rocks.inspectit.android.callback.data.MobileDefaultData;
 import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
 import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
 
-// TODO handle kieker sessions
+/**
+ * REST interface which is used from the agent to communicate with the
+ * monitoring server. This REST interface basically receives monitoring records
+ * and if it is possible to convert them into Kieker records the server does so
+ * and saves them into Kieker logs.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 @Path("/rest/mobile")
 public class RestService {
+	/**
+	 * Specifies the path where the Kieker logs should be saved.
+	 */
 	private static final String BASE_PATH = new File("kieker-logs/").getAbsolutePath();
+
+	/**
+	 * The maximum size of a single Kieker log-file.
+	 */
 	private static final int MAXLOG = 100000;
 
+	/**
+	 * Jackson object mapper for handling JSON objects and strings.
+	 */
 	private static ObjectMapper objectMapper;
+
+	/**
+	 * Session storage which is used to associate session ids with string
+	 * values.
+	 */
 	private static ISessionStorage<String> sessionStorage;
+
+	/**
+	 * Map which maps the name of the mobile application to a certain
+	 * {@link MonitoringController}.
+	 */
 	private static Map<String, IMonitoringController> controllerMap;
 
+	/**
+	 * Initializes the static attributes
+	 */
 	static {
 		objectMapper = new ObjectMapper();
 		sessionStorage = new SimpleSessionStorage<>();
 		controllerMap = new HashMap<>();
 	}
 
+	/**
+	 * Method of the REST interface which is responsible for session creation
+	 * requests
+	 * 
+	 * @param hello
+	 *            the session creation request as JSON string
+	 * @return generated response which either contains a session id or an error
+	 *         message
+	 */
 	@POST
 	@Path("hello")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -53,6 +94,14 @@ public class RestService {
 		return String.valueOf(false);
 	}
 
+	/**
+	 * Method of the REST interface which is responsible for processing incoming
+	 * beacons.
+	 * 
+	 * @param beacon
+	 *            beacon to process
+	 * @return result of the processing
+	 */
 	@POST
 	@Path("beacon")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -65,6 +114,13 @@ public class RestService {
 		return String.valueOf(false);
 	}
 
+	/**
+	 * Prepares a beacon.
+	 * 
+	 * @param data
+	 *            beacon as a string
+	 * @return parsed beacon
+	 */
 	private MobileCallbackData preprocessBeacon(String data) {
 		try {
 			return objectMapper.readValue(data, MobileCallbackData.class);
@@ -74,6 +130,14 @@ public class RestService {
 		}
 	}
 
+	/**
+	 * Processes a message which only contains a {@link HelloRequest}.
+	 * 
+	 * @param data
+	 *            the message
+	 * @return generated result - either a JSON encoded {@link HelloResponse} or
+	 *         an error message
+	 */
 	private String processHello(MobileCallbackData data) {
 		if (data.getSessionId() == null) {
 			if (data.getChildData().size() != 1 || !(data.getChildData().get(0) instanceof HelloRequest)) {
@@ -100,6 +164,13 @@ public class RestService {
 		return null;
 	}
 
+	/**
+	 * Processes a container which contains several beacons.
+	 * 
+	 * @param data
+	 *            container with beacons
+	 * @return processing result
+	 */
 	private String processBeacon(MobileCallbackData data) {
 		if (data.getSessionId() != null && sessionStorage.exists(data.getSessionId())) {
 			String appId = sessionStorage.get(data.getSessionId());
@@ -115,11 +186,25 @@ public class RestService {
 		return "";
 	}
 
+	/**
+	 * Creates a deployment record after a session was created.
+	 * 
+	 * @param appName
+	 *            the name of the application
+	 * @param deviceId
+	 *            the id of the mobile device
+	 */
 	private void createDeploymentRecord(String appName, String deviceId) {
 		MobileDeploymentRecord record = new MobileDeploymentRecord(deviceId, appName);
 		controllerMap.get(appName).newMonitoringRecord(record);
 	}
 
+	/**
+	 * Creates a new {@link MonitoringController} to create Kieker logs.
+	 * 
+	 * @param id
+	 *            the name of the application
+	 */
 	private void createController(String id) {
 		File outputPath = new File(BASE_PATH + "/" + reformatId(id));
 		if (!outputPath.exists())
@@ -136,6 +221,14 @@ public class RestService {
 		controllerMap.put(id, MonitoringController.createInstance(configuration));
 	}
 
+	/**
+	 * Reformats the name of an application to bring it into a form which can be
+	 * assigned as folder name.
+	 * 
+	 * @param id
+	 *            name of the application
+	 * @return escaped and reformatted app name
+	 */
 	private String reformatId(String id) {
 		return id.replaceAll(" ", "").replaceAll("-", "");
 	}

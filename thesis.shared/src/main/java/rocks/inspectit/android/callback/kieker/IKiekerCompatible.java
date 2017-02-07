@@ -3,9 +3,18 @@ package rocks.inspectit.android.callback.kieker;
 import kieker.common.record.IMonitoringRecord;
 
 /**
- * Created by DMO on 04.01.2017.
+ * Interface indicating that a monitoring record can be converted into a Kieker
+ * record.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
-
 public interface IKiekerCompatible {
-    public IMonitoringRecord generateRecord();
+	/**
+	 * Generates a corresponding Kieker record.
+	 * 
+	 * @return corresponding Kieker record
+	 */
+	public IMonitoringRecord generateRecord();
 }

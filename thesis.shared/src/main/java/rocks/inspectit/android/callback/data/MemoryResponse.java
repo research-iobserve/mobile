@@ -5,21 +5,37 @@ import kieker.common.record.system.ResourceUtilizationRecord;
 import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
 
 /**
- * Created by DMO on 29.11.2016.
+ * Class holding information about the current memory usage of a mobile device.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
-
 public class MemoryResponse extends MobileDefaultData implements IKiekerCompatible {
 
+	/**
+	 * Percent of the RAM which are in use.
+	 */
 	private double percentUsed;
 
+	/**
+	 * @return the percentUsed
+	 */
 	public double getPercentUsed() {
 		return percentUsed;
 	}
 
+	/**
+	 * @param percentUsed
+	 *            the percentUsed to set
+	 */
 	public void setPercentUsed(double percentUsed) {
 		this.percentUsed = percentUsed;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public IMonitoringRecord generateRecord() {
 		return new ResourceUtilizationRecord(System.nanoTime(), "", "memory", percentUsed);

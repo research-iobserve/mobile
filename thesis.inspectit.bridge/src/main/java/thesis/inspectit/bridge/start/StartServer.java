@@ -6,8 +6,21 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import thesis.inspectit.bridge.rest.RestService;
 
+/**
+ * Class with a main method that is used to start a monitoring server.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 public class StartServer {
 
+	/**
+	 * Starts a monitoring server with Jetty.
+	 * 
+	 * @param args
+	 *            Command line arguments which are irrelevant in this case.
+	 */
 	public static void main(String[] args) {
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");

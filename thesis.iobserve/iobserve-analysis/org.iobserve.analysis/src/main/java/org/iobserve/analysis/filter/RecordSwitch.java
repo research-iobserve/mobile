@@ -29,7 +29,7 @@ import kieker.common.record.flow.IFlowRecord;
 import kieker.common.record.flow.trace.TraceMetadata;
 import kieker.common.record.misc.KiekerMetadataRecord;
 import rocks.inspectit.android.callback.kieker.MobileNetworkEventRecord;
-import rocks.inspectit.android.callback.kieker.MobileRecord;
+import rocks.inspectit.android.callback.kieker.NetworkEvent;
 import teetime.framework.AbstractConsumerStage;
 import teetime.framework.OutputPort;
 
@@ -53,7 +53,7 @@ public class RecordSwitch extends AbstractConsumerStage<IMonitoringRecord> {
 	/** output port for {@link TraceMetadata}. */
 	private final OutputPort<TraceMetadata> traceMetaPort = this.createOutputPort();
 	/** output port for {@link MobileNetworkEventRecord} */
-	private final OutputPort<MobileRecord> mobileNetworkEventPort = this.createOutputPort();
+	private final OutputPort<NetworkEvent> networkEventPort = this.createOutputPort();
 
 	/** internal map to collect unknown record types. */
 	private final Map<String, Integer> unknownRecords = new ConcurrentHashMap<>();
@@ -75,8 +75,9 @@ public class RecordSwitch extends AbstractConsumerStage<IMonitoringRecord> {
 			this.deploymentOutputPort.send((IDeploymentRecord) element);
 		} else if (element instanceof IUndeploymentRecord) {
 			this.undeploymentOutputPort.send((IUndeploymentRecord) element);
-		} else if (element instanceof MobileRecord) {
-			this.mobileNetworkEventPort.send((MobileRecord) element);
+		} else if (element instanceof NetworkEvent) {
+			// has to be AFTER the deployment case!
+			this.networkEventPort.send((NetworkEvent) element);
 		} else if (element instanceof ServletTraceHelper) { // NOCS
 			// TODO this is later used to improve trace information
 		} else if (element instanceof IFlowRecord) {
@@ -132,8 +133,8 @@ public class RecordSwitch extends AbstractConsumerStage<IMonitoringRecord> {
 	/**
 	 * @return the mobileNetworkEventPort
 	 */
-	public final OutputPort<MobileRecord> getMobileNetworkEventPort() {
-		return mobileNetworkEventPort;
+	public final OutputPort<NetworkEvent> getNetworkEventPort() {
+		return networkEventPort;
 	}
 
 	/**

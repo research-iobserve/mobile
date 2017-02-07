@@ -1,0 +1,14 @@
+
+provide {
+	$links : [ResourceEnvironment->!getLinkingResources__ResourceEnvironment->CommunicationLinkResourceSpecification]
+}
+
+constraint [$links] {
+	name : "Protocol security";
+	attr_in : "protocol" in ["lte", "wpa"]
+}
+
+constraint [$links] {
+	name : "SSID security";
+	attr_in : "ssid" in ["abcd"]
+}

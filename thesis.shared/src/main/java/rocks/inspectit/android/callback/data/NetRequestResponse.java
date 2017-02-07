@@ -5,62 +5,121 @@ import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
 import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
 
 /**
- * Created by DMO on 10.12.2016.
+ * Monitoring record class for network requests.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
  */
-
 public class NetRequestResponse extends MobileDefaultData implements IKiekerCompatible {
-	
+
+	/**
+	 * Id of the device.
+	 */
 	private String deviceId;
-    private String url;
-    private String method;
-    private long duration;
-    private int responseCode;
+	/**
+	 * URL which has been accessed.
+	 */
+	private String url;
+	/**
+	 * Method which was used.
+	 */
+	private String method;
+	/**
+	 * Duration of the request.
+	 */
+	private long duration;
+	/**
+	 * Response code of the request.
+	 */
+	private int responseCode;
 
-    public NetRequestResponse() {
-    }
+	/**
+	 * Creates an empty net request response with default values.
+	 */
+	public NetRequestResponse() {
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public IMonitoringRecord generateRecord() {
+		return new MobileNetworkRequestEventRecord(deviceId, url, method, responseCode, duration);
+	}
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public long getDuration() {
-        return duration;
-    }
-
-    public void setDuration(long duration) {
-        this.duration = duration;
-    }
-
-    public int getResponseCode() {
-        return responseCode;
-    }
-
-    public void setResponseCode(int responseCode) {
-        this.responseCode = responseCode;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-    
-    public String getDeviceId() {
+	/**
+	 * @return the deviceId
+	 */
+	public String getDeviceId() {
 		return deviceId;
 	}
 
+	/**
+	 * @param deviceId
+	 *            the deviceId to set
+	 */
 	public void setDeviceId(String deviceId) {
 		this.deviceId = deviceId;
 	}
 
-    @Override
-    public IMonitoringRecord generateRecord() {
-        return new MobileNetworkRequestEventRecord(deviceId, url, method, responseCode, duration);
-    }
+	/**
+	 * @return the url
+	 */
+	public String getUrl() {
+		return url;
+	}
+
+	/**
+	 * @param url
+	 *            the url to set
+	 */
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	/**
+	 * @return the method
+	 */
+	public String getMethod() {
+		return method;
+	}
+
+	/**
+	 * @param method
+	 *            the method to set
+	 */
+	public void setMethod(String method) {
+		this.method = method;
+	}
+
+	/**
+	 * @return the duration
+	 */
+	public long getDuration() {
+		return duration;
+	}
+
+	/**
+	 * @param duration
+	 *            the duration to set
+	 */
+	public void setDuration(long duration) {
+		this.duration = duration;
+	}
+
+	/**
+	 * @return the responseCode
+	 */
+	public int getResponseCode() {
+		return responseCode;
+	}
+
+	/**
+	 * @param responseCode
+	 *            the responseCode to set
+	 */
+	public void setResponseCode(int responseCode) {
+		this.responseCode = responseCode;
+	}
 }

@@ -14,7 +14,10 @@ import rocks.fasterxml.jackson.databind.JsonDeserializer;
 import rocks.fasterxml.jackson.databind.JsonNode;
 
 /**
+ * Used to deserialize a {@link PlainKieker} object at the server side.
+ * 
  * @author David Monschein
+ * @author Robert Heinrich
  *
  */
 public class PlainKiekerDeserializer extends JsonDeserializer<IMonitoringRecord> {
@@ -23,9 +26,10 @@ public class PlainKiekerDeserializer extends JsonDeserializer<IMonitoringRecord>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IMonitoringRecord deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+	public IMonitoringRecord deserialize(JsonParser jp, DeserializationContext ctxt)
+			throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
-		
+
 		String type = node.get("type").asText();
 
 		if (type.equals("BeforeOperationEvent")) {

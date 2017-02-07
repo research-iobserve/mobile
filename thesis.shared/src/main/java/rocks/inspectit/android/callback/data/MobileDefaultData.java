@@ -7,9 +7,11 @@ import rocks.inspectit.android.callback.kieker.NetInfoResponse;
 import rocks.inspectit.android.callback.kieker.PlainKieker;
 
 /**
- * Created by David on 26.10.16.
+ * Parent class for mobile monitoring records.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
  */
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = HelloRequest.class), @JsonSubTypes.Type(value = CPUResponse.class),
