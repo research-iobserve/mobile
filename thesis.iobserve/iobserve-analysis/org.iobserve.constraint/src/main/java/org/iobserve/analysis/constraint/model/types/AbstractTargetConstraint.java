@@ -10,7 +10,7 @@ public abstract class AbstractTargetConstraint {
 
 	public abstract void load(String info);
 
-	public abstract boolean verify(Object instance);
+	public abstract boolean verify(Object instance) throws ConstraintViolationException;
 
 	protected String parseString(String string) {
 		Matcher matcher = STRING_PATTERN.matcher(string.trim());

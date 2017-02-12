@@ -1,14 +1,16 @@
-
+// PCM PROVIDINGS
 provide {
 	$links : [ResourceEnvironment->!getLinkingResources__ResourceEnvironment->CommunicationLinkResourceSpecification]
 }
 
+// CONSTRAINT FOR PROTOCOL SECURITY
 constraint [$links] {
 	name : "Protocol security";
 	attr_in : "protocol" in ["lte", "wpa"]
 }
 
+// CONSTRAINT FOR SSID WHITELISTING
 constraint [$links] {
 	name : "SSID security";
-	attr_in : "ssid" in ["abcd"]
+	attr_in_file : "ssid" in [C:\Users\DMO\Desktop\Thesis\git-new\thesis-mobile-privacy\thesis.iobserve\iobserve-analysis\org.iobserve.constraint\src\main\resources\ssid_list.txt]
 }

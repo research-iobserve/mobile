@@ -17,6 +17,8 @@ package org.iobserve.analysis.filter;
 
 import java.util.Optional;
 
+import teetime.framework.AbstractConsumerStage;
+
 import org.iobserve.analysis.model.AllocationModelBuilder;
 import org.iobserve.analysis.model.AllocationModelProvider;
 import org.iobserve.analysis.model.ResourceEnvironmentModelBuilder;
@@ -33,7 +35,6 @@ import org.palladiosimulator.pcm.core.composition.AssemblyContext;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceContainer;
 
 import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
-import teetime.framework.AbstractConsumerStage;
 
 /**
  * This class contains the transformation for updating the PCM allocation model

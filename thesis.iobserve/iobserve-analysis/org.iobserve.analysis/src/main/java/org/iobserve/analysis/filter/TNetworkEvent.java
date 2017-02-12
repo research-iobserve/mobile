@@ -19,6 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import kieker.common.logging.Log;
+import kieker.common.logging.LogFactory;
+
+import teetime.framework.AbstractConsumerStage;
+import teetime.framework.OutputPort;
+
 import org.iobserve.analysis.mobile.MobileConnectionState;
 import org.iobserve.analysis.model.ResourceEnvironmentModelBuilder;
 import org.iobserve.analysis.model.ResourceEnvironmentModelProvider;
@@ -26,13 +32,9 @@ import org.iobserve.analysis.utils.Opt;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceContainer;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceEnvironment;
 
-import kieker.common.logging.Log;
-import kieker.common.logging.LogFactory;
 import rocks.inspectit.android.callback.kieker.MobileNetworkEventRecord;
 import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
 import rocks.inspectit.android.callback.kieker.NetworkEvent;
-import teetime.framework.AbstractConsumerStage;
-import teetime.framework.OutputPort;
 
 /**
  * TMobile is responsible for the processing of monitoring records which belong
@@ -46,7 +48,7 @@ public class TNetworkEvent extends AbstractConsumerStage<NetworkEvent> {
 	private static final Log LOG = LogFactory.getLog(RecordSwitch.class);
 
 	/** mapping of device to a connection state. */
-	protected static final Map<String, MobileConnectionState> connectionMapping;
+	protected static final Map<String, MobileConnectionState> CONNECTIONMAPPING;
 
 	/** further process output port. */
 	private final OutputPort<MobileNetworkRequestEventRecord> outputPort = this.createOutputPort();
@@ -55,7 +57,7 @@ public class TNetworkEvent extends AbstractConsumerStage<NetworkEvent> {
 	private final ResourceEnvironmentModelProvider resourceEnvironmentModelProvider;
 
 	static {
-		connectionMapping = new HashMap<String, MobileConnectionState>();
+		CONNECTIONMAPPING = new HashMap<String, MobileConnectionState>();
 	}
 
 	/**
@@ -71,11 +73,11 @@ public class TNetworkEvent extends AbstractConsumerStage<NetworkEvent> {
 	@Override
 	protected void execute(final NetworkEvent element) {
 		if (element instanceof MobileNetworkEventRecord) {
-			MobileNetworkEventRecord record = (MobileNetworkEventRecord) element;
+			final MobileNetworkEventRecord record = (MobileNetworkEventRecord) element;
 			this.process(record);
 		} else if (element instanceof MobileNetworkRequestEventRecord) {
-			MobileNetworkRequestEventRecord record = (MobileNetworkRequestEventRecord) element;
-			if (connectionMapping.containsKey(record.getDeviceId())) {
+			final MobileNetworkRequestEventRecord record = (MobileNetworkRequestEventRecord) element;
+			if (CONNECTIONMAPPING.containsKey(record.getDeviceId())) {
 				this.outputPort.send(record);
 			} else {
 				LOG.warn("No connection info present for device with id '" + record.getDeviceId() + "'.");
@@ -101,7 +103,7 @@ public class TNetworkEvent extends AbstractConsumerStage<NetworkEvent> {
 				.getResourceContainerByName(resourceEnvironment, deviceId);
 
 		Opt.of(deviceResourceContainer).ifPresent().apply(container -> {
-			TNetworkEvent.connectionMapping.put(deviceId, new MobileConnectionState(record));
+			TNetworkEvent.CONNECTIONMAPPING.put(deviceId, new MobileConnectionState(record));
 		}).elseApply(() -> LOG.warn("Container for device with id '" + deviceId + "' doesn't exist."));
 
 		// save model

@@ -53,4 +53,12 @@ public class SimpleSessionStorage<T> implements ISessionStorage<T> {
 		return dataMapping.get(id);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void close(String id) {
+		dataMapping.remove(id);
+	}
+
 }

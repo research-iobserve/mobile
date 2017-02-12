@@ -10,3 +10,9 @@ Update 2
 - Refined transformations
 - Refactored iObserve extensions
 - Added project for PCM constraint checking
+
+Update 3
+------------------------------------------
+- Cleaned up code
+- Implemented mobile undeployment record
+- Fixed checkstyle in iObserve project

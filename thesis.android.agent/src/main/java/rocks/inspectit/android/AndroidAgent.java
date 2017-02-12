@@ -25,6 +25,7 @@ import rocks.inspectit.android.callback.CallbackManager;
 import rocks.inspectit.android.callback.data.CrashResponse;
 import rocks.inspectit.android.callback.data.HelloRequest;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
+import rocks.inspectit.android.callback.data.SessionCloseRequest;
 import rocks.inspectit.android.callback.strategies.AbstractCallbackStrategy;
 import rocks.inspectit.android.callback.strategies.IntervalStrategy;
 import rocks.inspectit.android.module.AbstractAndroidModule;
@@ -237,6 +238,13 @@ public class AndroidAgent {
 		if (closed)
 			return;
 		Log.i(LOG_TAG, "Shutting down the Android Agent.");
+
+		// UNDEPLOYMENT
+		SessionCloseRequest undeployRequest = new SessionCloseRequest(
+				DependencyManager.getAndroidDataCollector().getDeviceId(),
+				DependencyManager.getAndroidDataCollector().resolveAppName());
+		callbackManager.sendBye(undeployRequest);
+
 		// SHUTDOWN MODULES
 		mHandler.removeCallbacksAndMessages(null);
 

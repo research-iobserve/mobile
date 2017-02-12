@@ -15,6 +15,7 @@ import org.iobserve.analysis.constraint.model.ConstraintModel;
 import org.iobserve.analysis.constraint.model.PCMConstraint;
 import org.iobserve.analysis.constraint.model.ProvideExpression;
 import org.iobserve.analysis.constraint.model.types.AbstractTargetConstraint;
+import org.iobserve.analysis.constraint.model.types.ConstraintViolationException;
 
 public class PCMAnalyzer {
 
@@ -43,12 +44,13 @@ public class PCMAnalyzer {
 				Object[] toVerify = varPCMMapping.get(constraint.getTarget().getName());
 				for (AbstractTargetConstraint childs : constraint.getConcreteConstraints()) {
 					for (Object obj : toVerify) {
-						if (!childs.verify(obj)) {
-							System.err.println("Found constraint violation at object '" + obj.toString()
-									+ "' with constraint name '" + constraint.getName() + "'.");
+						try {
+							childs.verify(obj);
+						} catch (ConstraintViolationException e) {
 							ConstraintViolation violation = new ConstraintViolation();
 							violation.setConstraintName(constraint.getName());
 							violation.setLocation(obj.toString());
+							violation.setMessage(e.getMessage());
 
 							violations.add(violation);
 						}

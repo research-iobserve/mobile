@@ -9,23 +9,27 @@ public class AttrInConstraint extends AbstractTargetConstraint {
 
 	private static final Pattern PATTERN = Pattern.compile("(.*?)\\s*in\\s*\\[(.*?)\\]");
 
-	private String attributeName;
-	private List<String> valueList;
+	protected String attributeName;
+	protected List<String> valueList;
 
 	@Override
-	public boolean verify(Object instance) {
+	public boolean verify(Object instance) throws ConstraintViolationException {
 		Object value = resolvePCMFieldValue(instance, attributeName);
 
 		if (value != null) {
 			// check
 			if (value instanceof String) {
-				return valueList.contains((String) value);
+				if (!_contains(valueList, (String) value, true)) {
+					throw new ConstraintViolationException("'" + ((String) value) + "' isn't in the list of values.");
+				}
 			} else {
-				System.out.println(String.valueOf(value));
-				return valueList.contains(String.valueOf(value));
+				if (!_contains(valueList, String.valueOf(value), true)) {
+					throw new ConstraintViolationException(
+							"'" + String.valueOf(value) + "' isn't in the list of values.");
+				}
 			}
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -70,6 +74,21 @@ public class AttrInConstraint extends AbstractTargetConstraint {
 	 */
 	public void setValueList(List<String> valueList) {
 		this.valueList = valueList;
+	}
+
+	private boolean _contains(List<String> list, String v, boolean ignoreCase) {
+		for (String s : list) {
+			if (ignoreCase) {
+				if (s.equalsIgnoreCase(v)) {
+					return true;
+				}
+			} else {
+				if (s.equals(v)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

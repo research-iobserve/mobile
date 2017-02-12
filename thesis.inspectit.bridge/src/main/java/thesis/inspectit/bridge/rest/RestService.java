@@ -22,8 +22,10 @@ import rocks.inspectit.android.callback.data.HelloRequest;
 import rocks.inspectit.android.callback.data.HelloResponse;
 import rocks.inspectit.android.callback.data.MobileCallbackData;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
+import rocks.inspectit.android.callback.data.SessionCloseRequest;
 import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
 import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
+import rocks.inspectit.android.callback.kieker.MobileUndeploymentRecord;
 
 /**
  * REST interface which is used from the agent to communicate with the
@@ -175,11 +177,21 @@ public class RestService {
 		if (data.getSessionId() != null && sessionStorage.exists(data.getSessionId())) {
 			String appId = sessionStorage.get(data.getSessionId());
 
-			for (MobileDefaultData child : data.getChildData()) {
-				if (child instanceof IKiekerCompatible) {
-					IMonitoringRecord genRecord = ((IKiekerCompatible) child).generateRecord();
-					// PASS
-					controllerMap.get(appId).newMonitoringRecord(genRecord);
+			if (data.getChildData().size() == 1 && data.getChildData().get(0) instanceof SessionCloseRequest) {
+				SessionCloseRequest closeRequest = (SessionCloseRequest) data.getChildData().get(0);
+				IMonitoringRecord undeployRecord = new MobileUndeploymentRecord(closeRequest.getDeviceId(),
+						closeRequest.getAppName());
+				controllerMap.get(appId).newMonitoringRecord(undeployRecord);
+
+				// REMOVE
+				sessionStorage.close(data.getSessionId());
+			} else {
+				for (MobileDefaultData child : data.getChildData()) {
+					if (child instanceof IKiekerCompatible) {
+						IMonitoringRecord genRecord = ((IKiekerCompatible) child).generateRecord();
+						// PASS
+						controllerMap.get(appId).newMonitoringRecord(genRecord);
+					}
 				}
 			}
 		}
@@ -212,13 +224,15 @@ public class RestService {
 
 		final Configuration configuration = ConfigurationFactory.createDefaultConfiguration();
 		configuration.setProperty(ConfigurationFactory.METADATA, "true");
-		configuration.setProperty(ConfigurationFactory.AUTO_SET_LOGGINGTSTAMP, "false");
+		configuration.setProperty(ConfigurationFactory.AUTO_SET_LOGGINGTSTAMP, "true");
 		configuration.setProperty(ConfigurationFactory.WRITER_CLASSNAME, SyncFsWriter.class.getName());
+		configuration.setProperty(ConfigurationFactory.TIMER_CLASSNAME, "kieker.monitoring.timer.SystemMilliTimer");
 		configuration.setProperty(SyncFsWriter.CONFIG_PATH, outputPath.getAbsolutePath());
 		configuration.setProperty(SyncFsWriter.CONFIG_MAXENTRIESINFILE, String.valueOf(MAXLOG));
 		configuration.setProperty(SyncFsWriter.CONFIG_MAXLOGFILES, "-1");
 
-		controllerMap.put(id, MonitoringController.createInstance(configuration));
+		IMonitoringController controller = MonitoringController.createInstance(configuration);
+		controllerMap.put(id, controller);
 	}
 
 	/**

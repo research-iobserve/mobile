@@ -10,6 +10,10 @@ entity MobileDeploymentRecord : MobileRecord, IDeploymentRecord {
 	string appName
 }
 
+entity MobileUndeploymentRecord : MobileRecord, IUndeploymentRecord {
+	string appName
+}
+
 entity MobileNetworkEventRecord : MobileRecord, NetworkEvent {
 	boolean wifi
 	boolean mobile

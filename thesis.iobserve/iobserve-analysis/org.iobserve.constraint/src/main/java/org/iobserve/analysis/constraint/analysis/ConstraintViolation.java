@@ -4,6 +4,7 @@ public class ConstraintViolation {
 
 	private String constraintName;
 	private String location;
+	private String message;
 
 	/**
 	 * @return the constraintName
@@ -33,6 +34,20 @@ public class ConstraintViolation {
 	 */
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	/**
+	 * @return the message
+	 */
+	public String getMessage() {
+		return message;
+	}
+
+	/**
+	 * @param message the message to set
+	 */
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 }

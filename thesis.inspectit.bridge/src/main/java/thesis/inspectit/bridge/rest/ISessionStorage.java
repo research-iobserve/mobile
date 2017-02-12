@@ -36,4 +36,12 @@ public interface ISessionStorage<T> {
 	 * @return the value which is assigned to the passed session id
 	 */
 	public T get(String id);
+
+	/**
+	 * Closes a session with a given session id.
+	 * 
+	 * @param id
+	 *            the id of the session which should be removed.
+	 */
+	public void close(String id);
 }

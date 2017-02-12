@@ -18,16 +18,17 @@ package org.iobserve.analysis.filter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.iobserve.analysis.data.EntryCallEvent;
-
 import kieker.common.logging.Log;
 import kieker.common.logging.LogFactory;
 import kieker.common.record.flow.IFlowRecord;
 import kieker.common.record.flow.trace.TraceMetadata;
 import kieker.common.record.flow.trace.operation.AfterOperationEvent;
 import kieker.common.record.flow.trace.operation.BeforeOperationEvent;
+
 import teetime.framework.AbstractConsumerStage;
 import teetime.framework.OutputPort;
+
+import org.iobserve.analysis.data.EntryCallEvent;
 
 /**
  * It could be interesting to combine DeploymentEventTransformation and

@@ -1,39 +1,61 @@
+/***************************************************************************
+ * Copyright (C) 2014 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.analysis.filter;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+import kieker.common.logging.Log;
+import kieker.common.logging.LogFactory;
+
+import teetime.framework.AbstractConsumerStage;
+
 import org.iobserve.analysis.mobile.MobileConnectionState;
 import org.iobserve.analysis.mobile.MobileMobileConnectionInfo;
 import org.iobserve.analysis.mobile.MobileWifiConnectionInfo;
 import org.iobserve.analysis.model.AllocationModelBuilder;
 import org.iobserve.analysis.model.AllocationModelProvider;
+import org.iobserve.analysis.model.RepositoryModelBuilder;
 import org.iobserve.analysis.model.RepositoryModelProvider;
 import org.iobserve.analysis.model.ResourceEnvironmentModelBuilder;
 import org.iobserve.analysis.model.ResourceEnvironmentModelProvider;
 import org.iobserve.analysis.model.SystemModelBuilder;
 import org.iobserve.analysis.model.SystemModelProvider;
 import org.iobserve.analysis.utils.Opt;
+
 import org.palladiosimulator.pcm.core.composition.AssemblyContext;
-import org.palladiosimulator.pcm.repository.Interface;
 import org.palladiosimulator.pcm.repository.OperationInterface;
-import org.palladiosimulator.pcm.repository.OperationSignature;
-import org.palladiosimulator.pcm.repository.PrimitiveDataType;
-import org.palladiosimulator.pcm.repository.PrimitiveTypeEnum;
 import org.palladiosimulator.pcm.repository.Repository;
-import org.palladiosimulator.pcm.repository.RepositoryFactory;
 import org.palladiosimulator.pcm.resourceenvironment.CommunicationLinkResourceSpecification;
 import org.palladiosimulator.pcm.resourceenvironment.LinkingResource;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceContainer;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceEnvironment;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceenvironmentFactory;
 
-import kieker.common.logging.Log;
-import kieker.common.logging.LogFactory;
 import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
-import teetime.framework.AbstractConsumerStage;
 
+/**
+ * Transformation which consumes {@link MobileNetworkRequestEventRecord} and
+ * performs adjustments at the PCM models.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestEventRecord> {
 
 	/** logger. */
@@ -48,6 +70,18 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 	/** reference to repository model provider. */
 	private final RepositoryModelProvider repositoryModelProvider;
 
+	/**
+	 * Creates a new network request filter.
+	 * 
+	 * @param allocationModelProvider
+	 *            reference to allocation model provider
+	 * @param systemModelProvider
+	 *            reference to system model provider
+	 * @param resourceEnvironmentModelProvider
+	 *            reference to resource environment model provider
+	 * @param repositoryModelProvider
+	 *            reference to repository model provider
+	 */
 	public TNetworkRequest(final AllocationModelProvider allocationModelProvider,
 			final SystemModelProvider systemModelProvider,
 			final ResourceEnvironmentModelProvider resourceEnvironmentModelProvider,
@@ -58,9 +92,12 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 		this.repositoryModelProvider = repositoryModelProvider;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected void execute(MobileNetworkRequestEventRecord record) {
-		String deviceId = record.getDeviceId();
+	protected void execute(final MobileNetworkRequestEventRecord record) {
+		final String deviceId = record.getDeviceId();
 
 		// prepare
 		final String hostname;
@@ -74,23 +111,32 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 			return;
 		}
 
-		if (hostname == null || path == null)
+		if (hostname == null || path == null) {
 			return;
+		}
 
 		// adjusting resource environment
-		ResourceContainer serverContainer = adjustResourceEnvironment(record.getDeviceId(), hostname);
+		final ResourceContainer serverContainer = adjustResourceEnvironment(record.getDeviceId(), hostname);
 
 		// adjust repository model
-		String context = adjustRepositoryModel(hostname, path, record);
+		final String context = adjustRepositoryModel(hostname, path, record);
 
 		// adjust system model
-		AssemblyContext assemblyContext = adjustSystemModel(context, deviceId);
+		final AssemblyContext assemblyContext = adjustSystemModel(context, deviceId);
 
 		// adjust allocation model
 		adjustAllocationModel(serverContainer, assemblyContext);
 	}
 
-	private void adjustAllocationModel(ResourceContainer serverContainer, AssemblyContext assemblyContext) {
+	/**
+	 * Performs adjustments at the allocation model.
+	 * 
+	 * @param serverContainer
+	 *            the server container
+	 * @param assemblyContext
+	 *            the assembly context
+	 */
+	private void adjustAllocationModel(final ResourceContainer serverContainer, final AssemblyContext assemblyContext) {
 		this.allocationModelProvider.loadModel();
 
 		AllocationModelBuilder.addAllocationContextIfAbsent(this.allocationModelProvider.getModel(), serverContainer,
@@ -99,7 +145,16 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 		this.allocationModelProvider.save();
 	}
 
-	private AssemblyContext adjustSystemModel(String belongingName, String deviceId) {
+	/**
+	 * Performs adjustments at the system model.
+	 * 
+	 * @param belongingName
+	 *            name of the assembly context of the system
+	 * @param deviceId
+	 *            the id of the device
+	 * @return assembly context of the application
+	 */
+	private AssemblyContext adjustSystemModel(final String belongingName, final String deviceId) {
 		this.systemModelProvider.loadModel();
 		final org.palladiosimulator.pcm.system.System systemModel = systemModelProvider.getModel();
 
@@ -112,58 +167,50 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 		return assemblyContext;
 	}
 
-	private String adjustRepositoryModel(String hostname, String path, MobileNetworkRequestEventRecord record) {
+	/**
+	 * Adjusts the repository model for the service which is requested by the
+	 * application.
+	 * 
+	 * @param hostname
+	 *            hostname url or address
+	 * @param path
+	 *            the path
+	 * @param record
+	 *            the request record
+	 * @return the name of the belonging operation interface
+	 */
+	private String adjustRepositoryModel(final String hostname, final String path,
+			final MobileNetworkRequestEventRecord record) {
 		this.repositoryModelProvider.loadModel();
 		final Repository repo = this.repositoryModelProvider.getModel();
 
 		// adjusting
 		final String belongingName = "I" + hostname.replaceAll("\\.", "_");
-		OperationInterface belonging = null;
-		for (Interface iface : repo.getInterfaces__Repository()) {
-			if (iface.getEntityName().equals(belongingName) && iface instanceof OperationInterface) {
-				belonging = (OperationInterface) iface;
-				break;
-			}
-		}
-
-		if (belonging == null) {
-			// create
-			belonging = RepositoryFactory.eINSTANCE.createOperationInterface();
-			belonging.setEntityName(belongingName);
-
-			repo.getInterfaces__Repository().add(belonging);
-		}
+		final OperationInterface belonging = RepositoryModelBuilder.createOperationInterfaceIfAbsent(repo,
+				belongingName);
 
 		// search for operation
 		final String preparedPath = path.split("\\.")[0];
 		final String operationName = record.getMethod().toLowerCase() + preparedPath.replaceAll("\\/", "_");
 
-		OperationSignature signature = null;
-		for (OperationSignature sig : belonging.getSignatures__OperationInterface()) {
-			if (sig.getEntityName().equals(operationName)) {
-				signature = sig;
-				break;
-			}
-		}
-
-		if (signature == null) {
-			// create
-			signature = RepositoryFactory.eINSTANCE.createOperationSignature();
-			signature.setEntityName(operationName);
-
-			final PrimitiveDataType stringDatatype = RepositoryFactory.eINSTANCE.createPrimitiveDataType();
-			stringDatatype.setType(PrimitiveTypeEnum.INT);
-			// signature.setReturnType__OperationSignature(stringDatatype);
-
-			belonging.getSignatures__OperationInterface().add(signature);
-		}
+		RepositoryModelBuilder.createOperationSignatureIfAbsent(belonging, operationName);
 
 		this.repositoryModelProvider.save();
 
 		return belongingName;
 	}
 
-	private ResourceContainer adjustResourceEnvironment(String deviceId, String hostname) {
+	/**
+	 * Adjusts the resource container for the server which is requested.
+	 * 
+	 * @param deviceId
+	 *            the id of the device
+	 * @param hostname
+	 *            the name of the host
+	 * @return creates a connection between the device and the host and returns
+	 *         the resource container of the server
+	 */
+	private ResourceContainer adjustResourceEnvironment(final String deviceId, final String hostname) {
 		this.resourceEnvironmentModelProvider.loadModel();
 		final ResourceEnvironment resourceEnvironment = this.resourceEnvironmentModelProvider.getModel();
 
@@ -186,7 +233,7 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 				specification = ResourceenvironmentFactory.eINSTANCE.createCommunicationLinkResourceSpecification();
 			}
 
-			final MobileConnectionState connState = TNetworkEvent.connectionMapping.get(deviceId);
+			final MobileConnectionState connState = TNetworkEvent.CONNECTIONMAPPING.get(deviceId);
 
 			// bring in the info
 			specification.setConnectionType(connState.getConnectionType().getStringExpression());
