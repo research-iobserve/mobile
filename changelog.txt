@@ -16,3 +16,7 @@ Update 3
 - Cleaned up code
 - Implemented mobile undeployment record
 - Fixed checkstyle in iObserve project
+
+Update 4
+------------------------------------------
+- Integrated all projects into iObserve namespace
