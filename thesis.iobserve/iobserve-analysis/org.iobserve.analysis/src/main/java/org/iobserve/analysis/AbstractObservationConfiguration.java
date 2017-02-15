@@ -17,8 +17,6 @@ package org.iobserve.analysis;
 
 import java.io.IOException;
 
-import teetime.framework.Configuration;
-
 import org.iobserve.analysis.filter.RecordSwitch;
 import org.iobserve.analysis.filter.TAllocation;
 import org.iobserve.analysis.filter.TDeployment;
@@ -35,6 +33,8 @@ import org.iobserve.analysis.model.ResourceEnvironmentModelProvider;
 import org.iobserve.analysis.model.SystemModelProvider;
 import org.iobserve.analysis.model.UsageModelProvider;
 import org.iobserve.analysis.model.correspondence.ICorrespondence;
+
+import teetime.framework.Configuration;
 
 /**
  * @author Reiner Jung
@@ -96,7 +96,7 @@ public abstract class AbstractObservationConfiguration extends Configuration {
 				resourceEnvironmentModelProvider);
 		final TNetworkEvent tNetworkEvent = new TNetworkEvent(resourceEnvironmentModelProvider);
 		final TNetworkRequest tNetworkRequest = new TNetworkRequest(allocationModelProvider, systemModelProvider,
-				resourceEnvironmentModelProvider, repositoryModelProvider);
+				resourceEnvironmentModelProvider, repositoryModelProvider, correspondenceModel);
 
 		/** dispatch different monitoring data. */
 		this.connectPorts(this.recordSwitch.getDeploymentOutputPort(), tAllocation.getInputPort());

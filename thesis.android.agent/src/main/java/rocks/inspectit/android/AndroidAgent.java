@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,24 +23,25 @@ import kieker.common.record.IMonitoringRecord;
 import rocks.inspectit.android.broadcast.AbstractBroadcastReceiver;
 import rocks.inspectit.android.broadcast.NetworkBroadcastReceiver;
 import rocks.inspectit.android.callback.CallbackManager;
-import rocks.inspectit.android.callback.data.CrashResponse;
 import rocks.inspectit.android.callback.data.HelloRequest;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
-import rocks.inspectit.android.callback.data.SessionCloseRequest;
+import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
+import rocks.inspectit.android.callback.kieker.MobileUndeploymentRecord;
 import rocks.inspectit.android.callback.strategies.AbstractCallbackStrategy;
 import rocks.inspectit.android.callback.strategies.IntervalStrategy;
 import rocks.inspectit.android.module.AbstractAndroidModule;
-import rocks.inspectit.android.module.CPUModule;
-import rocks.inspectit.android.module.MemoryModule;
-import rocks.inspectit.android.module.special.NetworkModule;
+import rocks.inspectit.android.module.NetworkModule;
 import rocks.inspectit.android.module.util.ExecutionProperty;
 import rocks.inspectit.android.sensor.ISensor;
 import rocks.inspectit.android.util.DependencyManager;
 
 /**
- * Created by David on 22.10.16.
+ * The main Android Agent class which is responsible for managing and scheduling
+ * tasks.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
  */
-
 public class AndroidAgent {
 	/**
 	 * Resolve consistent log tag for the agent.
@@ -55,8 +57,7 @@ public class AndroidAgent {
 	/**
 	 * Modules which will be created when the agent is initialized.
 	 */
-	private static final Class<?>[] MODULES = new Class<?>[] { CPUModule.class, MemoryModule.class,
-			NetworkModule.class, };
+	private static final Class<?>[] MODULES = new Class<?>[] { NetworkModule.class };
 
 	/**
 	 * Maps a certain module class to an instantiated module object.
@@ -94,11 +95,6 @@ public class AndroidAgent {
 	 * data.
 	 */
 	private static NetworkModule networkModule;
-
-	/**
-	 * Uncaught exception handler which is called when the application crashes
-	 */
-	private static Thread.UncaughtExceptionHandler defaultUEH;
 
 	// QUEUES FOR INIT
 	/**
@@ -146,10 +142,6 @@ public class AndroidAgent {
 		currentId = 0;
 
 		Log.i(LOG_TAG, "Initing mobile agent for Android.");
-
-		// INIT BEFORE CRASH HANDLER
-		defaultUEH = Thread.getDefaultUncaughtExceptionHandler();
-		Thread.setDefaultUncaughtExceptionHandler(_unCaughtExceptionHandler);
 
 		// INIT ANDROID DATA COLLECTOR
 		AndroidDataCollector androidDataCollector = new AndroidDataCollector();
@@ -239,12 +231,6 @@ public class AndroidAgent {
 			return;
 		Log.i(LOG_TAG, "Shutting down the Android Agent.");
 
-		// UNDEPLOYMENT
-		SessionCloseRequest undeployRequest = new SessionCloseRequest(
-				DependencyManager.getAndroidDataCollector().getDeviceId(),
-				DependencyManager.getAndroidDataCollector().resolveAppName());
-		callbackManager.sendBye(undeployRequest);
-
 		// SHUTDOWN MODULES
 		mHandler.removeCallbacksAndMessages(null);
 
@@ -268,6 +254,34 @@ public class AndroidAgent {
 		// SET VALUES
 		inited = false;
 		closed = true;
+	}
+
+	/**
+	 * Called from the main application when an onStart event in an activity
+	 * occurs.
+	 * 
+	 * @param activity
+	 *            the activity which is "started"
+	 */
+	public static synchronized void onStartActivity(Activity activity) {
+		String activityName = activity.getClass().getName();
+		String deviceId = DependencyManager.getAndroidDataCollector().getDeviceId();
+
+		callbackManager.pushKiekerData(new MobileDeploymentRecord(deviceId, activityName));
+	}
+
+	/**
+	 * Called from the main application when an onStop event in an activity
+	 * occurs.
+	 * 
+	 * @param activity
+	 *            the activity which is "stopped"
+	 */
+	public static synchronized void onStopActivity(Activity activity) {
+		String activityName = activity.getClass().getName();
+		String deviceId = DependencyManager.getAndroidDataCollector().getDeviceId();
+
+		callbackManager.pushKiekerData(new MobileUndeploymentRecord(deviceId, activityName));
 	}
 
 	/**
@@ -389,6 +403,10 @@ public class AndroidAgent {
 	 */
 	public static void webViewLoad(String url, Map<?, ?> params) {
 		networkModule.webViewLoad(url, "GET");
+	}
+
+	public static void httpConnect(URLConnection connection) {
+		networkModule.openConnection((HttpURLConnection) connection);
 	}
 
 	/**
@@ -529,23 +547,4 @@ public class AndroidAgent {
 		androidModule.setCallbackManager(DependencyManager.getCallbackManager());
 		androidModule.setAndroidDataCollector(DependencyManager.getAndroidDataCollector());
 	}
-
-	// handler listener
-	/**
-	 * Exception handler for uncaught exceptions which is only a extension of
-	 * the already set one.
-	 */
-	private static Thread.UncaughtExceptionHandler _unCaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
-		@Override
-		public void uncaughtException(Thread thread, Throwable ex) {
-			CrashResponse crashResponse = new CrashResponse();
-			crashResponse.setExceptionName(ex.getClass().getName());
-			crashResponse.setExceptionMessage(ex.getMessage());
-
-			callbackManager.pushData(crashResponse);
-
-			// do something
-			defaultUEH.uncaughtException(thread, ex);
-		}
-	};
 }

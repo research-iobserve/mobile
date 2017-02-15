@@ -29,24 +29,54 @@ import org.xml.sax.SAXException;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
+/**
+ * Proxy for the APK tool which allows us to modify the original manifest file.
+ * 
+ * @see https://ibotpeaches.github.io/Apktool/
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 public class APKToolProxy {
 
+	/** Logger. */
 	private static final Logger LOG = LogManager.getLogger(APKToolProxy.class);
 
+	/** Path to the library. */
 	private static final String LIB_PATH = "lib\\apktool_2.2.1.jar";
+
+	/** Name of the Android manifest file. */
 	private static final String MANIFEST_FILE = "AndroidManifest.xml";
 
+	/** Input Android application. */
 	private File input;
+
+	/** Name of the folder to where the application can be unzipped. */
 	private String folderName;
 
+	/** Name of the package provided by the application. */
 	private String packageName;
 
+	/**
+	 * Creates a proxy for the APKTool.
+	 * 
+	 * @param inputAPK
+	 *            input application
+	 */
 	public APKToolProxy(File inputAPK) {
 		this.input = inputAPK;
 		this.folderName = null;
 		this.packageName = null;
 	}
 
+	/**
+	 * Decodes the application to a specified folder.
+	 * 
+	 * @param folderName
+	 *            the folder where the application files can be stored
+	 *            temporarily.
+	 * @return true if success - false otherwise
+	 */
 	public boolean decodeAPK(String folderName) {
 		this.folderName = folderName;
 		// apktool d bar.apk -o baz
@@ -62,6 +92,15 @@ public class APKToolProxy {
 		}
 	}
 
+	/**
+	 * Adjust the manifest file of the application.
+	 * 
+	 * @param rights
+	 *            the rights which are mandatory
+	 * @param modifiedManifest
+	 *            the file where the adjusted manifest can be stored
+	 * @return true if success - false otherwise
+	 */
 	public boolean adjustManifest(List<String> rights, File modifiedManifest) {
 		if (folderName == null)
 			return false;
@@ -87,7 +126,7 @@ public class APKToolProxy {
 		}
 
 		Node manifestNode = dom.getElementsByTagName("manifest").item(0);
-		setPackageName(manifestNode.getAttributes().getNamedItem("package").getTextContent());
+		this.packageName = manifestNode.getAttributes().getNamedItem("package").getTextContent();
 		NodeList permissionNodes = manifestNode.getChildNodes();
 
 		for (int k = 0; k < permissionNodes.getLength(); k++) {
@@ -147,16 +186,23 @@ public class APKToolProxy {
 		return true;
 	}
 
+	/**
+	 * Cleans temporary files.
+	 * 
+	 * @throws IOException
+	 *             if not all temp files could be deleted.
+	 */
 	public void cleanup() throws IOException {
 		FileUtils.deleteDirectory(new File(folderName));
 	}
 
+	/**
+	 * Gets the package name for the application.
+	 * 
+	 * @return the package name for the application.
+	 */
 	public String getPackageName() {
 		return packageName;
-	}
-
-	public void setPackageName(String packageName) {
-		this.packageName = packageName;
 	}
 
 }

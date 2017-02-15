@@ -15,10 +15,14 @@
  ***************************************************************************/
 package org.iobserve.analysis.model;
 
+import org.palladiosimulator.pcm.repository.BasicComponent;
 import org.palladiosimulator.pcm.repository.Interface;
 import org.palladiosimulator.pcm.repository.OperationInterface;
+import org.palladiosimulator.pcm.repository.OperationProvidedRole;
 import org.palladiosimulator.pcm.repository.OperationSignature;
+import org.palladiosimulator.pcm.repository.ProvidedRole;
 import org.palladiosimulator.pcm.repository.Repository;
+import org.palladiosimulator.pcm.repository.RepositoryComponent;
 import org.palladiosimulator.pcm.repository.RepositoryFactory;
 
 /**
@@ -34,6 +38,65 @@ public final class RepositoryModelBuilder {
 	 * Private constructor.
 	 */
 	private RepositoryModelBuilder() {
+	}
+
+	/**
+	 * Creates a provided role for a specified component and a given interface
+	 * if it doesn't exist.
+	 * 
+	 * @param repo
+	 *            the repository model
+	 * @param comp
+	 *            the component
+	 * @param iface
+	 *            the operation interface
+	 */
+	public static void createProvidesRoleIfAbsent(final Repository repo, final BasicComponent comp,
+			OperationInterface iface) {
+
+		// CHECK IF PROVIDED ROLE EXISTS
+		for (ProvidedRole pRole : comp.getProvidedRoles_InterfaceProvidingEntity()) {
+			if (pRole instanceof OperationProvidedRole) {
+				OperationProvidedRole opProvRole = (OperationProvidedRole) pRole;
+
+				if (opProvRole.getProvidedInterface__OperationProvidedRole().equals(iface)) {
+					return;
+				}
+			}
+		}
+
+		OperationProvidedRole providedRole = RepositoryFactory.eINSTANCE.createOperationProvidedRole();
+		providedRole.setEntityName(comp.getEntityName() + "_" + iface.getEntityName());
+		providedRole.setProvidedInterface__OperationProvidedRole(iface);
+		comp.getProvidedRoles_InterfaceProvidingEntity().add(providedRole);
+	}
+
+	/**
+	 * Creates a basic component in the repository model if it doesn't exist.
+	 * 
+	 * @param repo
+	 *            the repository model
+	 * @param name
+	 *            the name of the basic component
+	 * @return the created or retrieved basic component
+	 */
+	public static BasicComponent createBasicComponentIfAbsent(final Repository repo, final String name) {
+		BasicComponent bel = null;
+		for (RepositoryComponent comp : repo.getComponents__Repository()) {
+			if (comp.getEntityName().equals(name) && comp instanceof BasicComponent) {
+				bel = (BasicComponent) comp;
+				break;
+			}
+		}
+
+		if (bel == null) {
+			bel = RepositoryFactory.eINSTANCE.createBasicComponent();
+			bel.setEntityName(name);
+
+			repo.getComponents__Repository().add(bel);
+		}
+
+		return bel;
 	}
 
 	/**

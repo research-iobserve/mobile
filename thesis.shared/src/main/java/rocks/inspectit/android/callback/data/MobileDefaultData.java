@@ -14,9 +14,7 @@ import rocks.inspectit.android.callback.kieker.PlainKieker;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({ @JsonSubTypes.Type(value = HelloRequest.class), @JsonSubTypes.Type(value = CPUResponse.class),
-		@JsonSubTypes.Type(value = MemoryResponse.class), @JsonSubTypes.Type(value = NetRequestResponse.class),
-		@JsonSubTypes.Type(value = CrashResponse.class), @JsonSubTypes.Type(value = NetInfoResponse.class),
-		@JsonSubTypes.Type(value = PlainKieker.class), @JsonSubTypes.Type(value = SessionCloseRequest.class) })
+@JsonSubTypes({ @JsonSubTypes.Type(value = HelloRequest.class), @JsonSubTypes.Type(value = NetRequestResponse.class),
+		@JsonSubTypes.Type(value = NetInfoResponse.class), @JsonSubTypes.Type(value = PlainKieker.class) })
 public class MobileDefaultData {
 }

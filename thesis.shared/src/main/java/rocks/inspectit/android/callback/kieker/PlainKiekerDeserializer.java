@@ -66,6 +66,16 @@ public class PlainKiekerDeserializer extends JsonDeserializer<IMonitoringRecord>
 			int parentOrderId = node.get("parentOrderId").asInt();
 
 			return new TraceMetadata(traceId, threadId, sessionId, hostname, parentTraceId, parentOrderId);
+		} else if (type.equals("MobileDeploymentRecord")) {
+			String activity = node.get("activityName").asText();
+			String deviceId = node.get("deviceId").asText();
+
+			return new MobileDeploymentRecord(deviceId, activity);
+		} else if (type.equals("MobileUndeploymentRecord")) {
+			String activity = node.get("activityName").asText();
+			String deviceId = node.get("deviceId").asText();
+
+			return new MobileUndeploymentRecord(deviceId, activity);
 		}
 
 		return null;

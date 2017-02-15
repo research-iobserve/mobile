@@ -30,15 +30,6 @@
 			<point type="onCreate">initAgent</point>
 			<point type="onDestroy">destroyAgent</point>
 		</mapping>
-		
-		<sensors>
-			<sensor>
-				<parent>android/os/AsyncTask</parent>
-				<method>doInBackground</method>
-				<signature>(Ljava/lang/Object;)Ljava/lang/Object;</signature>
-				<handler>rocks.inspectit.android.sensor.AsyncTaskSensor</handler>
-			</sensor>
-		</sensors>
 	</instrumentation>
 
 </instrumenter-configuration>

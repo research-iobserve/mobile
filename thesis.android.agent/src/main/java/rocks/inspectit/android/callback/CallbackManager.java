@@ -9,7 +9,6 @@ import rocks.inspectit.android.ExternalConfiguration;
 import rocks.inspectit.android.callback.data.HelloRequest;
 import rocks.inspectit.android.callback.data.MobileCallbackData;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
-import rocks.inspectit.android.callback.data.SessionCloseRequest;
 import rocks.inspectit.android.callback.kieker.PlainKieker;
 import rocks.inspectit.android.callback.strategies.AbstractCallbackStrategy;
 import rocks.inspectit.android.util.DependencyManager;
@@ -95,23 +94,11 @@ public class CallbackManager {
 		strategy.sendImmediately(data, true);
 	}
 
-	public void sendBye(SessionCloseRequest request) {
-		// undeployment
-		MobileCallbackData data = new MobileCallbackData();
-
-		List<MobileDefaultData> childs = new ArrayList<MobileDefaultData>();
-		childs.add(request);
-
-		data.setChildData(childs);
-
-		// directly send it and trigger the flushing of the buffer
-		strategy.sendByeMessage(data);
-	}
-
 	/**
 	 * Shuts down the callback manager.
 	 */
 	public void shutdown() {
+		strategy.flush();
 		strategy.stop();
 	}
 

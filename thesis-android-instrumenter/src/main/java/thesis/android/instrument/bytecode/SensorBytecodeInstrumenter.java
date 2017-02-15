@@ -11,25 +11,69 @@ import org.objectweb.asm.commons.AdviceAdapter;
 
 import rocks.inspectit.android.AndroidAgent;
 
+/**
+ * Class for instrumenting a certain method. It inserts a call at the start of
+ * the method and a call at the end of the method body.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {
-
+	/** Logger for the class. */
 	private static final Logger LOG = LogManager.getLogger(SensorBytecodeInstrumenter.class);
 
+	/** Type of {@link AndroidAgent}. */
 	private static final Type ANDROIDAGENT_TYPE = Type.getType(AndroidAgent.class);
 
+	/**
+	 * Name of the belonging sensor class.
+	 */
 	private String sensor;
+
+	/**
+	 * Index for local variable which stores the mapping entry of the call.
+	 */
 	private int index;
 
 	// METHOD CORRESPONDENTS
+	/**
+	 * Method link to {@link AndroidAgent#enterBody(String, String, String)}.
+	 */
 	private Method enterBodyMethod;
+
+	/**
+	 * Type of method {@link AndroidAgent#enterBody(String, String, String)}.
+	 */
 	private Type enterBodyType;
 
+	/**
+	 * Method link to {@link AndroidAgent#exitBody(long)}.
+	 */
 	private Method exitBodyMethod;
+
+	/**
+	 * Type of method {@link AndroidAgent#exitBody(long)}.
+	 */
 	private Type exitBodyType;
 
+	/**
+	 * Method link to {@link AndroidAgent#exitErrorBody(Throwable, long)}.
+	 */
 	private Method exitBodyErrorMethod;
+
+	/**
+	 * Type of method {@link AndroidAgent#exitErrorBody(Throwable, long)}.
+	 */
 	private Type exitBodyErrorType;
 
+	/**
+	 * Creates a new sensor instrumenter with a given sensor class name.
+	 * 
+	 * @param sensClass
+	 *            name of the sensor class which is responsible for processing
+	 *            the instrumented method call
+	 */
 	public SensorBytecodeInstrumenter(String sensClass) {
 		this.sensor = sensClass;
 
@@ -48,6 +92,9 @@ public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onMethodEnter(String owner, String name, String desc, AdviceAdapter parent, MethodVisitor mv) {
 		// add sensor call
@@ -60,6 +107,9 @@ public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {
 		mv.visitVarInsn(Opcodes.LSTORE, index);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onMethodExit(int opcode, String owner, String name, String desc, AdviceAdapter parent,
 			MethodVisitor mv) {

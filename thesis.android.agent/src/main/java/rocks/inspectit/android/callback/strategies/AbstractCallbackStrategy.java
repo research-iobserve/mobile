@@ -63,19 +63,11 @@ public abstract class AbstractCallbackStrategy {
 	}
 
 	/**
-	 * Sends a bye message and flushes all records gathered at the moment to the
-	 * outstream.
-	 * 
-	 * @param data
-	 *            the container which holds the goodbye message
+	 * Flushes all records gathered at the moment to the output REST interface.
 	 */
-	public void sendByeMessage(MobileCallbackData data) {
+	public void flush() {
 		// send data currently in the buffer
 		this.sendBeacon();
-
-		// send the goodbye
-		data.setSessionId(data.getSessionId());
-		this.sendBeacon(data, false);
 	}
 
 	/**

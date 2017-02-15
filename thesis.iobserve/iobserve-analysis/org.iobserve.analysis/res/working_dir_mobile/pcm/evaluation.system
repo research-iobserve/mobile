@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="ASCII"?>
+<system:System xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:system="http://palladiosimulator.org/PalladioComponentModel/System/5.1" id="_JL0wMPJREeax4O7oDubXgQ" entityName="evaluation">
+  <assemblyContexts__ComposedStructure id="_wDoo4PMCEeaFIZ01rJHYnA" entityName="GUI.Main_Android SDK built for x86-000000000000000"/>
+  <assemblyContexts__ComposedStructure id="_wEXosfMCEeaFIZ01rJHYnA" entityName="GUI.Network_Android SDK built for x86-000000000000000"/>
+  <assemblyContexts__ComposedStructure id="_wLfkY_MCEeaFIZ01rJHYnA" entityName="GUI.Calculation_Android SDK built for x86-000000000000000"/>
+  <assemblyContexts__ComposedStructure id="_wMY8RPMCEeaFIZ01rJHYnA" entityName="Server.REST_jsonplaceholder.typicode.com"/>
+</system:System>

@@ -177,7 +177,7 @@ public class KiekerSensor implements ISensor {
 		String[] opSplit = operation.split("\\)");
 		if (opSplit.length == 2)
 			operation = opSplit[0] + ")"; // remove return type
-		return operation.replaceAll(";", "").replaceAll("/", ".").replaceAll("L", "");
+		return clazz + "." + operation.replaceAll(";", "").replaceAll("/", ".").replaceAll("L", "");
 	}
 
 	/***************************************************************************

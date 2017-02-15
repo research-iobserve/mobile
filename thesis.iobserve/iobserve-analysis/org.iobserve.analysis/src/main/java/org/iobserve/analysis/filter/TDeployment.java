@@ -17,8 +17,6 @@ package org.iobserve.analysis.filter;
 
 import java.util.Optional;
 
-import teetime.framework.AbstractConsumerStage;
-
 import org.iobserve.analysis.model.AllocationModelBuilder;
 import org.iobserve.analysis.model.AllocationModelProvider;
 import org.iobserve.analysis.model.ResourceEnvironmentModelBuilder;
@@ -35,6 +33,7 @@ import org.palladiosimulator.pcm.core.composition.AssemblyContext;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceContainer;
 
 import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
+import teetime.framework.AbstractConsumerStage;
 
 /**
  * This class contains the transformation for updating the PCM allocation model
@@ -125,9 +124,16 @@ public final class TDeployment extends AbstractConsumerStage<IDeploymentRecord> 
 				.elseApply(() -> System.out.printf("No correspondent found for %s \n", service));
 	}
 
+	/**
+	 * Processes the given {@link MobileDeploymentRecord} event and update the
+	 * model.
+	 * 
+	 * @param record
+	 *            event to process
+	 */
 	private void process(final MobileDeploymentRecord record) {
 		final String service = record.getDeviceId();
-		final String context = record.getAppName();
+		final String context = record.getActivityName();
 
 		Opt.of(this.correspondence.getCorrespondent(context)).ifPresent()
 				.apply(correspondent -> this.updateModel(service, correspondent))

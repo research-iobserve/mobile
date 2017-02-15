@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ASCII"?>
+<allocation:Allocation xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:allocation="http://palladiosimulator.org/PalladioComponentModel/Allocation/5.1" id="_zWWcQPJREeax4O7oDubXgQ" entityName="evaluation">
+  <targetResourceEnvironment_Allocation href="evaluation.resourceenvironment#/"/>
+  <system_Allocation href="evaluation.system#_JL0wMPJREeax4O7oDubXgQ"/>
+  <allocationContexts_Allocation id="_wMOkMPMCEeaFIZ01rJHYnA" entityName="GUI.Main_Android SDK built for x86-000000000000000">
+    <resourceContainer_AllocationContext href="evaluation.resourceenvironment#_wDjwYPMCEeaFIZ01rJHYnA"/>
+    <assemblyContext_AllocationContext href="evaluation.system#_wDoo4PMCEeaFIZ01rJHYnA"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_wMdNtfMCEeaFIZ01rJHYnA" entityName="Server.REST_jsonplaceholder.typicode.com">
+    <resourceContainer_AllocationContext href="evaluation.resourceenvironment#_wMUq0fMCEeaFIZ01rJHYnA"/>
+    <assemblyContext_AllocationContext href="evaluation.system#_wMY8RPMCEeaFIZ01rJHYnA"/>
+  </allocationContexts_Allocation>
+</allocation:Allocation>

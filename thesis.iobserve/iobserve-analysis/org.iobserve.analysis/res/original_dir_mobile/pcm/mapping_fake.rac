@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PcmMapping>
+	<PcmEntities>
+		<PcmEntity>
+			<Name>GUI.Main</Name>
+			<Id>_HWFQMPJJEeax4O7oDubXgQ</Id>
+			<OperationSigatures>
+				<OperationSignature>
+					<Name>heavyCalculation</Name>
+					<SeffName>heavyCalculation</SeffName>
+					<Id>_L-TGkPJLEeax4O7oDubXgQ</Id>
+				</OperationSignature>
+			</OperationSigatures>
+			<Correspondents>
+				<Correspondent>
+					<Comment>fake correspondent</Comment>
+					<FilePath>no path</FilePath>
+					<ProjectName>no project</ProjectName>
+					<PackageName>evaluation.mobile.iobserve.org.thesisevaluation</PackageName>
+					<Interfaces>
+						<Interface>org.palladiosimulator.protocom.framework.IPerformancePrototypeComponent
+						</Interface>
+					</Interfaces>
+					<UnitName>MainActivity</UnitName>
+					<CorrespondentMethods>
+						<CorrespondentMethod>
+							<Name>heavyCalculation</Name>
+							<ReturnType>void</ReturnType>
+							<VisibilityModifier></VisibilityModifier>
+							<Parameters></Parameters>
+						</CorrespondentMethod>
+					</CorrespondentMethods>
+				</Correspondent>
+			</Correspondents>
+		</PcmEntity>
+		
+		<PcmEntity>
+			<Name>GUI.Network</Name>
+			<Id>_aiRGUPJLEeax4O7oDubXgQ</Id>
+			<OperationSigatures>
+				<OperationSignature>
+					<Name>restGetRequest</Name>
+					<SeffName>restGetRequest</SeffName>
+					<Id>_L-TGkPJLEeax4O7oDubXgQ</Id>
+				</OperationSignature>
+			</OperationSigatures>
+			<Correspondents>
+				<Correspondent>
+					<Comment>fake correspondent</Comment>
+					<FilePath>no path</FilePath>
+					<ProjectName>no project</ProjectName>
+					<PackageName>evaluation.mobile.iobserve.org.thesisevaluation</PackageName>
+					<Interfaces>
+						<Interface>org.palladiosimulator.protocom.framework.IPerformancePrototypeComponent
+						</Interface>
+					</Interfaces>
+					<UnitName>NetworkActivity</UnitName>
+					<CorrespondentMethods>
+						<CorrespondentMethod>
+							<Name>doNetworkRequest</Name>
+							<ReturnType>void</ReturnType>
+							<VisibilityModifier></VisibilityModifier>
+							<Parameters></Parameters>
+						</CorrespondentMethod>
+					</CorrespondentMethods>
+				</Correspondent>
+			</Correspondents>
+		</PcmEntity>
+		
+		<PcmEntity>
+			<Name>GUI.Calculation</Name>
+			<Id>_fNb08PJLEeax4O7oDubXgQ</Id>
+			<OperationSigatures>
+				<OperationSignature>
+					<Name>calculatePrimes</Name>
+					<SeffName>calculatePrimes</SeffName>
+					<Id>_kEfDcPJLEeax4O7oDubXgQ</Id>
+				</OperationSignature>
+			</OperationSigatures>
+			<Correspondents>
+				<Correspondent>
+					<Comment>fake correspondent</Comment>
+					<FilePath>no path</FilePath>
+					<ProjectName>no project</ProjectName>
+					<PackageName>evaluation.mobile.iobserve.org.thesisevaluation</PackageName>
+					<Interfaces>
+						<Interface>org.palladiosimulator.protocom.framework.IPerformancePrototypeComponent
+						</Interface>
+					</Interfaces>
+					<UnitName>CalculationActivity</UnitName>
+					<CorrespondentMethods>
+						<CorrespondentMethod>
+							<Name>calculatePrimes</Name>
+							<ReturnType>void</ReturnType>
+							<VisibilityModifier></VisibilityModifier>
+							<Parameters></Parameters>
+						</CorrespondentMethod>
+					</CorrespondentMethods>
+				</Correspondent>
+			</Correspondents>
+		</PcmEntity>
+		
+		<PcmEntity>
+			<Name>Server.REST</Name>
+			<Id>_fGY6EPMBEeaHTJaPAayEAA</Id>
+			<OperationSigatures>
+				<OperationSignature>
+					<Name>provideData</Name>
+					<SeffName>provideData</SeffName>
+					<Id>_h0_1YPMBEeaHTJaPAayEAA</Id>
+				</OperationSignature>
+			</OperationSigatures>
+			<Correspondents>
+				<Correspondent>
+					<Comment>fake correspondent</Comment>
+					<FilePath>no path</FilePath>
+					<ProjectName>no project</ProjectName>
+					<PackageName>jsonplaceholder</PackageName>
+					<Interfaces>
+						<Interface>org.palladiosimulator.protocom.framework.IPerformancePrototypeComponent
+						</Interface>
+					</Interfaces>
+					<UnitName>typicode.com</UnitName>
+					<CorrespondentMethods>
+						<CorrespondentMethod>
+							<Name>provideData</Name>
+							<ReturnType>String</ReturnType>
+							<VisibilityModifier></VisibilityModifier>
+							<Parameters></Parameters>
+						</CorrespondentMethod>
+					</CorrespondentMethods>
+				</Correspondent>
+			</Correspondents>
+		</PcmEntity>
+	</PcmEntities>
+</PcmMapping>

@@ -1,4 +1,4 @@
-package rocks.inspectit.android.module.special;
+package rocks.inspectit.android.module;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,7 +12,6 @@ import android.content.Context;
 import android.webkit.WebView;
 import rocks.inspectit.android.callback.CallbackManager;
 import rocks.inspectit.android.callback.data.NetRequestResponse;
-import rocks.inspectit.android.module.AbstractAndroidModule;
 import rocks.inspectit.android.module.util.ConnectionState;
 import rocks.inspectit.android.module.util.ExecutionProperty;
 
@@ -43,9 +42,11 @@ public class NetworkModule extends AbstractAndroidModule {
 	 *            the connection which has been created
 	 */
 	public void openConnection(HttpURLConnection conn) {
-		ConnectionState connState = new ConnectionState();
-		connState.update(ConnectionState.ConnectionPoint.CONNECT);
-		this.connectionStateMap.put(conn, connState);
+		if (!this.connectionStateMap.containsKey(conn)) {
+			ConnectionState connState = new ConnectionState();
+			connState.update(ConnectionState.ConnectionPoint.CONNECT);
+			this.connectionStateMap.put(conn, connState);
+		}
 	}
 
 	/**

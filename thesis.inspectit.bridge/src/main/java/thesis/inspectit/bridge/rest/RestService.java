@@ -22,10 +22,8 @@ import rocks.inspectit.android.callback.data.HelloRequest;
 import rocks.inspectit.android.callback.data.HelloResponse;
 import rocks.inspectit.android.callback.data.MobileCallbackData;
 import rocks.inspectit.android.callback.data.MobileDefaultData;
-import rocks.inspectit.android.callback.data.SessionCloseRequest;
 import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
 import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
-import rocks.inspectit.android.callback.kieker.MobileUndeploymentRecord;
 
 /**
  * REST interface which is used from the agent to communicate with the
@@ -147,12 +145,10 @@ public class RestService {
 			}
 
 			String appName = ((HelloRequest) data.getChildData().get(0)).getAppName();
-			String deviceId = ((HelloRequest) data.getChildData().get(0)).getDeviceId();
 
 			if (!controllerMap.containsKey(appName)) {
 				createController(appName);
 			}
-			createDeploymentRecord(appName, deviceId);
 
 			HelloResponse resp = new HelloResponse();
 			resp.setSessionId(sessionStorage.create(appName));
@@ -176,22 +172,11 @@ public class RestService {
 	private String processBeacon(MobileCallbackData data) {
 		if (data.getSessionId() != null && sessionStorage.exists(data.getSessionId())) {
 			String appId = sessionStorage.get(data.getSessionId());
-
-			if (data.getChildData().size() == 1 && data.getChildData().get(0) instanceof SessionCloseRequest) {
-				SessionCloseRequest closeRequest = (SessionCloseRequest) data.getChildData().get(0);
-				IMonitoringRecord undeployRecord = new MobileUndeploymentRecord(closeRequest.getDeviceId(),
-						closeRequest.getAppName());
-				controllerMap.get(appId).newMonitoringRecord(undeployRecord);
-
-				// REMOVE
-				sessionStorage.close(data.getSessionId());
-			} else {
-				for (MobileDefaultData child : data.getChildData()) {
-					if (child instanceof IKiekerCompatible) {
-						IMonitoringRecord genRecord = ((IKiekerCompatible) child).generateRecord();
-						// PASS
-						controllerMap.get(appId).newMonitoringRecord(genRecord);
-					}
+			for (MobileDefaultData child : data.getChildData()) {
+				if (child instanceof IKiekerCompatible) {
+					IMonitoringRecord genRecord = ((IKiekerCompatible) child).generateRecord();
+					// PASS
+					controllerMap.get(appId).newMonitoringRecord(genRecord);
 				}
 			}
 		}
@@ -206,8 +191,8 @@ public class RestService {
 	 * @param deviceId
 	 *            the id of the mobile device
 	 */
-	private void createDeploymentRecord(String appName, String deviceId) {
-		MobileDeploymentRecord record = new MobileDeploymentRecord(deviceId, appName);
+	private void createDeploymentRecord(String activityName, String deviceId, String appName) {
+		MobileDeploymentRecord record = new MobileDeploymentRecord(deviceId, activityName);
 		controllerMap.get(appName).newMonitoringRecord(record);
 	}
 

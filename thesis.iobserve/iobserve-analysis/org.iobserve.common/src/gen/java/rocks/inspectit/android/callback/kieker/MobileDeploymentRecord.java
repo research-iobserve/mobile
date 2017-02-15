@@ -36,34 +36,34 @@ import org.iobserve.common.record.IDeploymentRecord;
 public class MobileDeploymentRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory, MobileRecord, IDeploymentRecord {
 	/** Descriptive definition of the serialization size of the record. */
 	public static final int SIZE = TYPE_SIZE_STRING // MobileRecord.deviceId
-			 + TYPE_SIZE_STRING // MobileDeploymentRecord.appName
+			 + TYPE_SIZE_STRING // MobileDeploymentRecord.activityName
 	;
-	private static final long serialVersionUID = -2073938731176655448L;
+	private static final long serialVersionUID = 2512553347946103462L;
 	
 	public static final Class<?>[] TYPES = {
 		String.class, // MobileRecord.deviceId
-		String.class, // MobileDeploymentRecord.appName
+		String.class, // MobileDeploymentRecord.activityName
 	};
 	
 	/* user-defined constants */
 	/* default constants */
 	public static final String DEVICE_ID = "";
-	public static final String APP_NAME = "";
+	public static final String ACTIVITY_NAME = "";
 	/* property declarations */
 	private final String deviceId;
-	private final String appName;
+	private final String activityName;
 
 	/**
 	 * Creates a new instance of this class using the given parameters.
 	 * 
 	 * @param deviceId
 	 *            deviceId
-	 * @param appName
-	 *            appName
+	 * @param activityName
+	 *            activityName
 	 */
-	public MobileDeploymentRecord(final String deviceId, final String appName) {
+	public MobileDeploymentRecord(final String deviceId, final String activityName) {
 		this.deviceId = deviceId == null?"":deviceId;
-		this.appName = appName == null?"":appName;
+		this.activityName = activityName == null?"":activityName;
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class MobileDeploymentRecord extends AbstractMonitoringRecord implements 
 	public MobileDeploymentRecord(final Object[] values) { // NOPMD (direct store of values)
 		AbstractMonitoringRecord.checkArray(values, TYPES);
 		this.deviceId = (String) values[0];
-		this.appName = (String) values[1];
+		this.activityName = (String) values[1];
 	}
 	
 	/**
@@ -90,7 +90,7 @@ public class MobileDeploymentRecord extends AbstractMonitoringRecord implements 
 	protected MobileDeploymentRecord(final Object[] values, final Class<?>[] valueTypes) { // NOPMD (values stored directly)
 		AbstractMonitoringRecord.checkArray(values, valueTypes);
 		this.deviceId = (String) values[0];
-		this.appName = (String) values[1];
+		this.activityName = (String) values[1];
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class MobileDeploymentRecord extends AbstractMonitoringRecord implements 
 	 */
 	public MobileDeploymentRecord(final ByteBuffer buffer, final IRegistry<String> stringRegistry) throws BufferUnderflowException {
 		this.deviceId = stringRegistry.get(buffer.getInt());
-		this.appName = stringRegistry.get(buffer.getInt());
+		this.activityName = stringRegistry.get(buffer.getInt());
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class MobileDeploymentRecord extends AbstractMonitoringRecord implements 
 	public Object[] toArray() {
 		return new Object[] {
 			this.getDeviceId(),
-			this.getAppName()
+			this.getActivityName()
 		};
 	}
 
@@ -124,7 +124,7 @@ public class MobileDeploymentRecord extends AbstractMonitoringRecord implements 
 	@Override
 	public void registerStrings(final IRegistry<String> stringRegistry) {	// NOPMD (generated code)
 		stringRegistry.get(this.getDeviceId());
-		stringRegistry.get(this.getAppName());
+		stringRegistry.get(this.getActivityName());
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class MobileDeploymentRecord extends AbstractMonitoringRecord implements 
 	@Override
 	public void writeBytes(final ByteBuffer buffer, final IRegistry<String> stringRegistry) throws BufferOverflowException {
 		buffer.putInt(stringRegistry.get(this.getDeviceId()));
-		buffer.putInt(stringRegistry.get(this.getAppName()));
+		buffer.putInt(stringRegistry.get(this.getActivityName()));
 	}
 
 	/**
@@ -177,8 +177,8 @@ public class MobileDeploymentRecord extends AbstractMonitoringRecord implements 
 		return this.deviceId;
 	}
 	
-	public final String getAppName() {
-		return this.appName;
+	public final String getActivityName() {
+		return this.activityName;
 	}
 	
 }

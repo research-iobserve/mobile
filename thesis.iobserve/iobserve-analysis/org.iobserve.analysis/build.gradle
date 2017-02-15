@@ -5,6 +5,8 @@ project.ext {
 ext {
 	working_dir = 'res/working_dir/'
 	original_dir = 'res/original_dir/'
+	working_dir_mobile = 'res/working_dir_mobile/'
+	original_dir_mobile = 'res/original_dir_mobile/'
 }
 
 buildscript {
@@ -120,10 +122,20 @@ task cleanPcmWorkingDir(type: Delete) {
 	delete working_dir
 }
 
+task cleanPcmWorkingDirMobile(type: Delete) {
+	delete working_dir_mobile
+}
+
 task copyPcmToWorkingDir(type: Copy) {
 	dependsOn << cleanPcmWorkingDir
 	from original_dir
 	into working_dir
+}
+
+task copyPcmToWorkingDirMobile(type: Copy) {
+	dependsOn << cleanPcmWorkingDirMobile
+	from original_dir_mobile
+	into working_dir_mobile
 }
 
 task cleanDebug {

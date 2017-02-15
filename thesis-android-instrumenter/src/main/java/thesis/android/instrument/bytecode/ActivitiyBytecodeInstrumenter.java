@@ -11,31 +11,37 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
+import android.app.Activity;
 import rocks.inspectit.android.AndroidAgent;
 import rocks.inspectit.android.ExternalConfiguration;
-import thesis.android.instrument.config.ConnectionInfo;
 import thesis.android.instrument.config.InstrumentationConfiguration;
-import thesis.android.instrument.config.InstrumentationPointConfiguration;
+import thesis.android.instrument.config.xml.ConnectionInfoXml;
+import thesis.android.instrument.config.xml.InstrumentationPointConfigurationXml;
 
 /**
  * Bytecode instrumenter which is responsible for instrumenting Android Activity
- * classes.
+ * classes {@link Activity}.
  * 
  * @author David Monschein
+ * @author Robert Heinrich
  *
  */
-public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
+public class ActivitiyBytecodeInstrumenter implements IBytecodeInstrumenter {
 
-	private static final Logger LOG = LogManager.getLogger(InitBytecodeInstrumenter.class);
+	/** Logger for this class. */
+	private static final Logger LOG = LogManager.getLogger(ActivitiyBytecodeInstrumenter.class);
 
+	/** Type for {@link ExternalConfiguration}. */
 	private static final Type EXTCONFIGURATION_TYPE = Type.getType(ExternalConfiguration.class);
+
+	/** Type for {@link AndroidAgent}. */
 	private static final Type ANDROIDAGENT_TYPE = Type.getType(AndroidAgent.class);
 
 	/**
 	 * Information about the server which persists the monitoring data. -> This
 	 * has to be set at instrumentation time!
 	 */
-	private ConnectionInfo connectionConfig;
+	private ConnectionInfoXml connectionConfig;
 
 	/**
 	 * Mapping between methods of the Activity and methods which should be
@@ -44,19 +50,62 @@ public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 	private Map<String, String> activityPointMapping;
 
 	// CORRESPONDENT METHODS
+	/**
+	 * Method link to {@link ExternalConfiguration#setBeaconUrl(String)}.
+	 */
 	private Method setBeaconUrlMethod;
+
+	/**
+	 * Type for the {@link ExternalConfiguration#setBeaconUrl(String)} method.
+	 */
 	private Type setBeaconUrlType;
 
+	/**
+	 * Method link to {@link ExternalConfiguration#setHelloUrl(String)}.
+	 */
 	private Method setHelloUrlMethod;
+
+	/**
+	 * Type for the {@link ExternalConfiguration#setHelloUrl(String)} method.
+	 */
 	private Type setHelloUrlType;
 
-	public InitBytecodeInstrumenter() {
+	/**
+	 * Method link to {@link AndroidAgent#onStartActivity(Activity)}.
+	 */
+	private Method onStartActivityMethod;
+
+	/**
+	 * Type for the {@link AndroidAgent#onStartActivity(Activity)} method.
+	 */
+	private Type onStartActivityType;
+
+	/**
+	 * Method link to {@link AndroidAgent#onStopActivity(Activity)}.
+	 */
+	private Method onStopActivityMethod;
+
+	/**
+	 * Type for the {@link AndroidAgent#onStopActivity(Activity)} method.
+	 */
+	private Type onStopActivityType;
+
+	/**
+	 * Creates a new bytecode instrumenter for an activity class.
+	 */
+	public ActivitiyBytecodeInstrumenter() {
 		try {
 			setBeaconUrlMethod = ExternalConfiguration.class.getMethod("setBeaconUrl", String.class);
 			setBeaconUrlType = Type.getType(setBeaconUrlMethod);
 
 			setHelloUrlMethod = ExternalConfiguration.class.getMethod("setHelloUrl", String.class);
 			setHelloUrlType = Type.getType(setHelloUrlMethod);
+
+			onStartActivityMethod = AndroidAgent.class.getMethod("onStartActivity", Activity.class);
+			onStartActivityType = Type.getType(onStartActivityMethod);
+
+			onStopActivityMethod = AndroidAgent.class.getMethod("onStopActivity", Activity.class);
+			onStopActivityType = Type.getType(onStopActivityMethod);
 		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 			LOG.warn("Couldn't find all corresponding methods!");
@@ -70,12 +119,12 @@ public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 	 *            configuration which specifies the mapping between activity
 	 *            methods and agent methods.
 	 */
-	public InitBytecodeInstrumenter(InstrumentationConfiguration configuration) {
+	public ActivitiyBytecodeInstrumenter(InstrumentationConfiguration configuration) {
 		this();
 		this.connectionConfig = configuration.getXmlConfiguration().getConnectionInfo();
 		this.activityPointMapping = new HashMap<String, String>();
 
-		for (InstrumentationPointConfiguration point : configuration.getXmlConfiguration()
+		for (InstrumentationPointConfigurationXml point : configuration.getXmlConfiguration()
 				.getInstrumentationRootConfiguration().getInstrPointConfigs()) {
 			this.activityPointMapping.put(point.getType(), point.getValue());
 		}
@@ -106,6 +155,14 @@ public class InitBytecodeInstrumenter implements IBytecodeInstrumenter {
 			String belAgentPoint = activityPointMapping.get("onDestroy");
 
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(), belAgentPoint, "()V", false);
+		} else if (name.equals("onStart")) {
+			mv.visitVarInsn(Opcodes.ALOAD, 0);
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
+					onStartActivityMethod.getName(), onStartActivityType.getDescriptor(), false);
+		} else if (name.equals("onStop")) {
+			mv.visitVarInsn(Opcodes.ALOAD, 0);
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
+					onStopActivityMethod.getName(), onStopActivityType.getDescriptor(), false);
 		}
 	}
 

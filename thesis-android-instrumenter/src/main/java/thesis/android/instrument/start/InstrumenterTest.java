@@ -15,11 +15,41 @@ import org.apache.commons.io.FilenameUtils;
 import net.lingala.zip4j.exception.ZipException;
 import thesis.android.instrument.core.APKInstrumenter;
 
+/**
+ * Class which instruments a selected Android application.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 public class InstrumenterTest {
 
+	/**
+	 * Whether we should open a prompt to select the application or use a
+	 * predefined application.
+	 */
 	private static final boolean selectApk = true;
 
-	public static void main(String[] argv) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, ZipException, URISyntaxException {
+	/**
+	 * Executes the instrumentation.
+	 * 
+	 * @param argv
+	 *            not needed
+	 * @throws KeyStoreException
+	 *             caused by the instrumentation
+	 * @throws NoSuchAlgorithmException
+	 *             caused by the instrumentation
+	 * @throws CertificateException
+	 *             caused by the instrumentation
+	 * @throws IOException
+	 *             caused by the instrumentation
+	 * @throws ZipException
+	 *             caused by the instrumentation
+	 * @throws URISyntaxException
+	 *             caused by the instrumentation
+	 */
+	public static void main(String[] argv) throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
+			IOException, ZipException, URISyntaxException {
 		File toInstrument;
 		if (selectApk) {
 			final JFileChooser fc = new JFileChooser();
@@ -53,7 +83,7 @@ public class InstrumenterTest {
 		}
 
 		if (toInstrument.exists()) {
-			APKInstrumenter instr = new APKInstrumenter(true, null, new File("lib/release.keystore"), "androiddebugkey",
+			APKInstrumenter instr = new APKInstrumenter(true, new File("lib/release.keystore"), "androiddebugkey",
 					"android");
 			instr.instrumentAPK(toInstrument, new File("instr-output.apk"));
 		} else {

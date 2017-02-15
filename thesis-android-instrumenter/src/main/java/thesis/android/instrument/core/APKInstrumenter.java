@@ -22,40 +22,126 @@ import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import thesis.android.instrument.bytecode.BytecodeInstrumentationManager;
-import thesis.android.instrument.bytecode.IBytecodeInstrumenter;
 import thesis.android.instrument.config.InstrumentationConfiguration;
 
+/**
+ * Main class which schedules and performs the instrumentation of an Android
+ * application.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 public class APKInstrumenter {
+	// TEMPORARY USED FILES
+	/** Temporary file for the rezipped JAR file. */
+	private static final File JAR_REZIP = new File("jar-rezip.jar");
+
+	/** Temporary file for building the current agent version. */
+	private static final File AGENT_BUILD = new File("agent-current.zip");
+
+	/** Temporary output folder for rezipping the application. */
+	private static final File OUTPUT_TEMP = new File("temp");
+
+	/** Temporary output folder for unzipping the application. */
+	private static final File OUTPUT_TEMPO = new File("tempo");
+
+	/** New created dex file. */
+	private static final File TEMP_DEX_NEW = new File("temp-new.dex");
+
+	/** Temporary extracted dex file. */
+	private static final File TEMP_DEX_OLD = new File("temp-dex.dex");
+
+	/** Temporary transformed JAR file created by dex2jar. */
+	private static final File TEMP_JAR = new File("temp-jar.jar");
+
+	// _________________________________________________ //
+
+	/** Logger. */
 	private static final Logger LOG = LogManager.getLogger(APKInstrumenter.class);
 
+	/** Path to the agent files. */
 	private static final File AGENT_CURRENT = new File("../thesis.android.agent/build/classes/main");
+
+	/** Path to the agent shared files. */
 	private static final File AGENT_SHARED = new File("../thesis.shared/build/classes/main");
+
+	/** Path to the libs used by the agent. */
 	private static final File AGENT_LIB_CURRENT = new File("../thesis.android.agent/build/libs");
+
+	/** Path which is used to save a modified manifest file. */
 	private static final File MODIFIED_MANIFEST = new File("modified_manifest.xml");
 
+	/** Byte to Megabyte factor. */
 	private static final double MB_FACTOR = 1024d * 1024d;
 
+	/** Flags if we override an existing output or not. */
 	private boolean override;
 
-	private IBytecodeInstrumenter instrumenter;
+	/** Path to the keystore used to resign the application. */
 	private File keystore;
+
+	/** Alias of the keystore. */
 	private String alias;
+
+	/** Password for the keystore. */
 	private String pass;
+
+	/** Permissions which are needed by the agent. */
 	private List<String> neededRights;
 
+	/** Flags whether to build the agent or not. */
 	private boolean buildAgent = true;
+
+	/** Flags whether to cleanup before instrumentation. */
 	private boolean cleanBefore = true;
+
+	/** Flags whether to cleanup after instrumentation. */
 	private boolean cleanAfter = true;
+
+	/** Flags whether to adjust the manifest or not. (recommended) */
 	private boolean adjustManifest = true;
 
-	public APKInstrumenter(boolean override, IBytecodeInstrumenter instr, File keystore, String alias, String pass) {
+	/**
+	 * Creates a new instance for instrumenting Android applications.
+	 * 
+	 * @param override
+	 *            whether to override existing files or not
+	 * @param keystore
+	 *            the path to the keystore
+	 * @param alias
+	 *            the alias of the keystore
+	 * @param pass
+	 *            the password of the keystore
+	 */
+	public APKInstrumenter(boolean override, File keystore, String alias, String pass) {
 		this.setOverride(override);
-		this.setInstrumenter(instr);
 		this.setKeystore(keystore);
 		this.setAlias(alias);
 		this.setPass(pass);
 	}
 
+	/**
+	 * Instruments an android application.
+	 * 
+	 * @param input
+	 *            the input application
+	 * @param output
+	 *            the path where to save the instrumented application
+	 * @return true if success - false otherwise
+	 * @throws IOException
+	 *             if there is an I/O problem
+	 * @throws ZipException
+	 *             if zip4j can't zip/unzip your application files
+	 * @throws KeyStoreException
+	 *             if there is a problem with the used keystore
+	 * @throws NoSuchAlgorithmException
+	 *             algorithm not found
+	 * @throws CertificateException
+	 *             certificate error
+	 * @throws URISyntaxException
+	 *             URI syntax problem
+	 */
 	public boolean instrumentAPK(File input, File output) throws IOException, ZipException, KeyStoreException,
 			NoSuchAlgorithmException, CertificateException, URISyntaxException {
 		// CHECK IF INPUT EXISTS AND OUTPUT DOESNT
@@ -86,9 +172,9 @@ public class APKInstrumenter {
 		// ZIP CURRENT AGENT VERSION
 		if (buildAgent) {
 			LOG.info("Bundling current agent version.");
-			File agentZipOld = new File("rocks.zip");
+			File agentZipOld = AGENT_BUILD;
 			agentZipOld.delete();
-			ZipFile agentZipNew = new ZipFile("rocks.zip");
+			ZipFile agentZipNew = new ZipFile(AGENT_BUILD);
 
 			// TO NOT ADD INCONSISTENT FOLDERS
 			FileUtils.copyDirectory(AGENT_SHARED, AGENT_CURRENT);
@@ -150,13 +236,12 @@ public class APKInstrumenter {
 			}
 		}
 
-		File agentZip = new File("rocks.zip");
-		if (!agentZip.exists()) {
+		if (!AGENT_BUILD.exists()) {
 			return false;
 		}
 
 		// COPY INPUT TO OUTPUT
-		File tempOutputFolder = new File("tempo");
+		File tempOutputFolder = OUTPUT_TEMPO;
 		tempOutputFolder.mkdir();
 		ZipFile tempInputZip = new ZipFile(input);
 		tempInputZip.extractAll(tempOutputFolder.getAbsolutePath() + "/");
@@ -164,7 +249,7 @@ public class APKInstrumenter {
 		LOG.info("Created copy of original APK file.");
 
 		// TEMP WRITE DEX
-		File tempDex = new File("temp-dex.dex");
+		File tempDex = TEMP_DEX_OLD;
 		unzipDex(input, tempDex);
 
 		LOG.info("Searched and extracted dex files.");
@@ -176,7 +261,7 @@ public class APKInstrumenter {
 		LOG.info("Dex2jar finished transformation.");
 
 		// UNZIP JAR
-		File jarFilesContainer = new File("temp");
+		File jarFilesContainer = OUTPUT_TEMP;
 		jarFilesContainer.mkdir();
 
 		ZipFile jarZip = new ZipFile(tempJar);
@@ -194,7 +279,7 @@ public class APKInstrumenter {
 
 		// INJECT AGENT
 		LOG.info("Injecting agent files into rezipped JAR.");
-		ZipFile agentZipfile = new ZipFile(agentZip);
+		ZipFile agentZipfile = new ZipFile(AGENT_BUILD);
 		agentZipfile.extractAll(jarFilesContainer.getAbsolutePath() + "/");
 		LOG.info("Agent has been injected.");
 
@@ -204,7 +289,7 @@ public class APKInstrumenter {
 		LOG.info("Finished building new JAR file.");
 
 		// JAR 2 DEX
-		File tempNewDex = new File("temp-new.dex");
+		File tempNewDex = TEMP_DEX_NEW;
 		LOG.info("Executing jar2dex to transform new JAR file to DEX.");
 		Dex2JarProxy.createDexFromJar(tempRezipFile, tempNewDex);
 		LOG.info("jar2dex has been successfully executed.");
@@ -352,36 +437,30 @@ public class APKInstrumenter {
 	}
 
 	/**
-	 * @return the instrumenter
+	 * Creates a jar file from a folder which contains the bytecode files.
+	 * 
+	 * @param jarFilesContainer
+	 *            folder which contains bytecode files
+	 * @return path to the created jar file
+	 * @throws ZipException
+	 *             if zip4j fails
 	 */
-	public IBytecodeInstrumenter getInstrumenter() {
-		return instrumenter;
+	private File rebuildJar(File jarFilesContainer) throws ZipException {
+		this.rezipOutput(JAR_REZIP, jarFilesContainer);
+
+		return JAR_REZIP;
 	}
 
 	/**
-	 * @param instrumenter
-	 *            the instrumenter to set
+	 * Rezips a folder to a zip file.
+	 * 
+	 * @param output
+	 *            the zip file to create
+	 * @param tempOutputFolder
+	 *            the folder which should be zipped
+	 * @throws ZipException
+	 *             if zip4j fails
 	 */
-	public void setInstrumenter(IBytecodeInstrumenter instrumenter) {
-		this.instrumenter = instrumenter;
-	}
-
-	private File rebuildJar(File jarFilesContainer) throws ZipException {
-		ZipParameters parameters = new ZipParameters();
-		File tempRezipFile = new File("jar-rezip.jar");
-		ZipFile nZip = new ZipFile(tempRezipFile);
-
-		for (File fileEntry : jarFilesContainer.listFiles()) {
-			if (fileEntry.isDirectory()) {
-				nZip.addFolder(fileEntry, parameters);
-			} else {
-				nZip.addFile(fileEntry, parameters);
-			}
-		}
-
-		return tempRezipFile;
-	}
-
 	private void rezipOutput(File output, File tempOutputFolder) throws ZipException {
 		ZipParameters parameters = new ZipParameters();
 		ZipFile zipOutput = new ZipFile(output);
@@ -395,26 +474,37 @@ public class APKInstrumenter {
 		}
 	}
 
+	/**
+	 * Cleans all folders and files temporary used for instrumentation.
+	 * 
+	 * @throws IOException
+	 *             if not all files and folders could be removed successfully
+	 */
 	private void cleanUpAll() throws IOException {
 		LOG.info("Cleaning up all folders.");
-		File tempOutputFolder = new File("tempo");
-		File jarFilesContainer = new File("temp");
-		File tempNewDex = new File("temp-new.dex");
-		File tempJar = new File("temp-jar.jar");
 
-		FileUtils.deleteDirectory(jarFilesContainer);
-		FileUtils.deleteDirectory(tempOutputFolder);
+		FileUtils.deleteDirectory(OUTPUT_TEMP);
+		FileUtils.deleteDirectory(OUTPUT_TEMPO);
 
-		File tempRezipFile = new File("jar-rezip.jar");
-		File tempDex = new File("temp-dex.dex");
-
-		tempJar.delete();
-		tempNewDex.delete();
-		tempRezipFile.delete();
-		tempDex.delete();
+		TEMP_JAR.delete();
+		TEMP_DEX_NEW.delete();
+		JAR_REZIP.delete();
+		TEMP_DEX_OLD.delete();
 		MODIFIED_MANIFEST.delete();
 	}
 
+	/**
+	 * Extracts only a the classes.dex file from an Android application.
+	 * 
+	 * @param apk
+	 *            the Android application
+	 * @param dex
+	 *            the path where the dex should be saved
+	 * @throws ZipException
+	 *             if zip4j fails
+	 * @throws IOException
+	 *             if there is an I/O problem
+	 */
 	private void unzipDex(File apk, File dex) throws ZipException, IOException {
 		if (apk.exists() && !dex.exists()) {
 			ZipFile parent = new ZipFile(apk);
@@ -438,13 +528,33 @@ public class APKInstrumenter {
 		}
 	}
 
+	/**
+	 * Closes two input streams.
+	 * 
+	 * @param a
+	 *            a zip input stream
+	 * @param b
+	 *            a file output stream
+	 * @throws IOException
+	 *             if one of the streams can't be closed
+	 */
 	private void closeStreams(ZipInputStream a, FileOutputStream b) throws IOException {
-		if (a != null)
+		if (a != null) {
 			a.close();
-		if (b != null)
+		}
+
+		if (b != null) {
 			b.close();
+		}
 	}
 
+	/**
+	 * Rounds a double to two decimal places.
+	 * 
+	 * @param a
+	 *            input double
+	 * @return rounded double
+	 */
 	private double round(double a) {
 		return Math.round(a * 100d) / 100d;
 	}

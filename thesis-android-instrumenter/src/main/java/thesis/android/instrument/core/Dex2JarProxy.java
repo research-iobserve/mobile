@@ -7,18 +7,42 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Proxy class for using the dex2jar tooling.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 public class Dex2JarProxy {
 
+	/** Logger. */
 	private static final Logger LOG = LogManager.getLogger(Dex2JarProxy.class);
 
+	/** Path to the dex2jar library folder. */
 	private static final String DEX2JAR_BASEPATH = "lib/dex2jar-2.0/";
 
+	/** Path to the jar2dex batch tool. */
 	private static final String JAR2DEX_BATCH = "d2j-jar2dex.bat";
+
+	/** Path to the jar2dex sh tool. */
 	private static final String JAR2DEX_SH = "d2j-jar2dex.sh";
 
+	/** Path to the dex2jar sh tool. */
 	private static final String DEX2JAR_SH = "d2j-dex2jar.sh";
+
+	/** Path to the dex2jar batch tool. */
 	private static final String DEX2JAR_BATCH = "d2j-dex2jar.bat";
 
+	/**
+	 * Creates a jar file from a dex file.
+	 * 
+	 * @param dex
+	 *            the dex file
+	 * @param output
+	 *            the path where to store the jar
+	 * @return true if success - false otherwise
+	 */
 	public static boolean createJarFromDex(File dex, File output) {
 		if (!dex.exists() || output.exists())
 			return false;
@@ -26,6 +50,15 @@ public class Dex2JarProxy {
 		return executeTool(DEX2JAR_BATCH, DEX2JAR_SH, dex, output);
 	}
 
+	/**
+	 * Creates a dex file from a given jar file.
+	 * 
+	 * @param jar
+	 *            the jar file
+	 * @param dex
+	 *            the path where to store the dex
+	 * @return true if success - false otherwise
+	 */
 	public static boolean createDexFromJar(File jar, File dex) {
 		if (!jar.exists() || dex.exists())
 			return false;
@@ -33,6 +66,19 @@ public class Dex2JarProxy {
 		return executeTool(JAR2DEX_BATCH, JAR2DEX_SH, jar, dex);
 	}
 
+	/**
+	 * Executes a given dex2jar sub tool.
+	 * 
+	 * @param windows
+	 *            path to the windows tool
+	 * @param unix
+	 *            path to the unix tool
+	 * @param input
+	 *            input file
+	 * @param output
+	 *            output file
+	 * @return true if sucess - false otherwise
+	 */
 	private static boolean executeTool(String windows, String unix, File input, File output) {
 		ProcessBuilder pb = null;
 		if (SystemUtils.IS_OS_WINDOWS) {
