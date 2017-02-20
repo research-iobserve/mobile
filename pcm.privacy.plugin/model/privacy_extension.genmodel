@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/pcm.privacy/src" modelPluginID="pcm.privacy" modelName="Privacy_extension"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="8.0" usedGenPackages="../../de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier ../../org.palladiosimulator.pcm/model/pcm.genmodel#//pcm ../../de.uka.ipd.sdq.probfunction/model/ProbabilityFunction.genmodel#//probfunction ../../de.uka.ipd.sdq.stoex/model/stoex.genmodel#//stoex ../../de.uka.ipd.sdq.units/model/Units.genmodel#//units"
+    importOrganizing="true">
+  <foreignModel>privacy_extension.ecore</foreignModel>
+  <genPackages prefix="Privacy_ext" disposableProviderFactory="true" ecorePackage="privacy_extension.ecore#/">
+    <genClasses ecoreClass="privacy_extension.ecore#//CommunicationLinkPrivacy">
+      <genFeatures children="true" createChild="false" ecoreFeature="ecore:EAttribute privacy_extension.ecore#//CommunicationLinkPrivacy/connectionType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute privacy_extension.ecore#//CommunicationLinkPrivacy/ssid"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute privacy_extension.ecore#//CommunicationLinkPrivacy/bssid"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute privacy_extension.ecore#//CommunicationLinkPrivacy/carrier"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute privacy_extension.ecore#//CommunicationLinkPrivacy/protocol"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

@@ -30,6 +30,8 @@ import org.palladiosimulator.pcm.resourceenvironment.ResourceenvironmentFactory;
 
 import kieker.common.logging.Log;
 import kieker.common.logging.LogFactory;
+import privacy_ext.CommunicationLinkPrivacy;
+import privacy_ext.Privacy_extFactory;
 
 /**
  * Model builder for resource environment models.
@@ -129,29 +131,28 @@ public final class ResourceEnvironmentModelBuilder {
 					deviceContainer, server);
 			connectionLink.setEntityName(deviceContainer.getEntityName() + "_" + server.getEntityName());
 
-			final CommunicationLinkResourceSpecification specification = createCommunicationLinkResourceSpecificationIfNull(
-					connectionLink);
+			final CommunicationLinkPrivacy privacyLink = Privacy_extFactory.eINSTANCE.createCommunicationLinkPrivacy();
 
 			// bring in the info
-			specification.setConnectionType(connexion.getConnectionType().getStringExpression());
+			privacyLink.setConnectionType(connexion.getConnectionType().getStringExpression());
 			switch (connexion.getConnectionType()) {
 			case MOBILE:
 				final MobileMobileConnectionInfo info = (MobileMobileConnectionInfo) connexion.getConnectionInfo();
-				specification.setProtocol(info.getProtocol());
-				specification.setOperator(info.getProvider());
+				privacyLink.setProtocol(info.getProtocol());
+				privacyLink.setCarrier(info.getProvider());
 				break;
 			case WLAN:
 				final MobileWifiConnectionInfo wifiinfo = (MobileWifiConnectionInfo) connexion.getConnectionInfo();
-				specification.setSsid(wifiinfo.getSsid());
-				specification.setBssid(wifiinfo.getBssid());
-				specification.setProtocol(wifiinfo.getProtocol());
+				privacyLink.setSsid(wifiinfo.getSsid());
+				privacyLink.setBssid(wifiinfo.getBssid());
+				privacyLink.setProtocol(wifiinfo.getProtocol());
 				break;
 			default:
 				LOG.warn("Found an request without an active connection.");
 			}
 
 			// set it
-			connectionLink.setCommunicationLinkResourceSpecifications_LinkingResource(specification);
+			connectionLink.setCommunicationLinkResourceSpecifications_LinkingResource(privacyLink);
 		}).elseApply(() -> LOG.warn("Container for device doesn't exist."));
 	}
 
