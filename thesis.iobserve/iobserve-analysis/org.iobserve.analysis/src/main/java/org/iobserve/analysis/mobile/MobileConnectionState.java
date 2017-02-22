@@ -15,6 +15,7 @@
  ***************************************************************************/
 package org.iobserve.analysis.mobile;
 
+import privacy_ext.CommunicationLinkPrivacy;
 import rocks.inspectit.android.callback.kieker.MobileNetworkEventRecord;
 
 /**
@@ -81,6 +82,27 @@ public class MobileConnectionState {
 	}
 
 	/**
+	 * Creates a new instance out of a {@link CommunicationLinkPrivacy}
+	 * instance.
+	 * 
+	 * @param link
+	 *            the privacy communication link instance
+	 */
+	public MobileConnectionState(final CommunicationLinkPrivacy link) {
+		// set connection type
+		this.setConnectionType(MobileConnectionType.get(link.getConnectionType()));
+		if (this.getConnectionType() == MobileConnectionType.WLAN) {
+			this.setConnected(true);
+			this.setConnectionInfo(new MobileWifiConnectionInfo(link.getSsid(), link.getBssid(), link.getProtocol()));
+		} else if (this.getConnectionType() == MobileConnectionType.MOBILE) {
+			this.setConnected(true);
+			this.setConnectionInfo(new MobileMobileConnectionInfo(link.getProtocol(), link.getCarrier()));
+		} else {
+			this.setConnected(false);
+		}
+	}
+
+	/**
 	 * @return the connected
 	 */
 	public boolean isConnected() {
@@ -123,6 +145,43 @@ public class MobileConnectionState {
 	 */
 	public void setConnectionInfo(final AbstractMobileConnectionInfo connectionInfo) {
 		this.connectionInfo = connectionInfo;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (connected ? 1231 : 1237);
+		result = prime * result + ((connectionInfo == null) ? 0 : connectionInfo.hashCode());
+		result = prime * result + ((connectionType == null) ? 0 : connectionType.hashCode());
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MobileConnectionState other = (MobileConnectionState) obj;
+		if (connected != other.connected)
+			return false;
+		if (connectionInfo == null) {
+			if (other.connectionInfo != null)
+				return false;
+		} else if (!connectionInfo.equals(other.connectionInfo))
+			return false;
+		if (connectionType != other.connectionType)
+			return false;
+		return true;
 	}
 
 }

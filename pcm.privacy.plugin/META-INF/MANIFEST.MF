@@ -19,4 +19,3 @@ Require-Bundle: org.eclipse.e4.ui.model.workbench;bundle-version="1.2.0",
  de.uka.ipd.sdq.probfunction;visibility:=reexport,
  de.uka.ipd.sdq.stoex;visibility:=reexport,
  de.uka.ipd.sdq.units;visibility:=reexport
-Bundle-ActivationPolicy: lazy

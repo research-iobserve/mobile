@@ -32,7 +32,7 @@ public class MobileMobileConnectionInfo extends AbstractMobileConnectionInfo {
 	/**
 	 * The carrier which is used.
 	 */
-	private String provider;
+	private String carrier;
 
 	/**
 	 * Creates a new instance with a given protocol and a given provider.
@@ -45,7 +45,7 @@ public class MobileMobileConnectionInfo extends AbstractMobileConnectionInfo {
 	public MobileMobileConnectionInfo(final String protocol, final String provider) {
 		super();
 		this.protocol = protocol;
-		this.provider = provider;
+		this.carrier = provider;
 	}
 
 	/**
@@ -67,15 +67,15 @@ public class MobileMobileConnectionInfo extends AbstractMobileConnectionInfo {
 	 * @param protocol
 	 *            the protocol to set
 	 */
-	public void setProtocol(final String protocol) {
+	public void setCarrier(final String protocol) {
 		this.protocol = protocol;
 	}
 
 	/**
 	 * @return the provider
 	 */
-	public String getProvider() {
-		return provider;
+	public String getCarrier() {
+		return carrier;
 	}
 
 	/**
@@ -83,7 +83,44 @@ public class MobileMobileConnectionInfo extends AbstractMobileConnectionInfo {
 	 *            the provider to set
 	 */
 	public void setProvider(final String provider) {
-		this.provider = provider;
+		this.carrier = provider;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
+		result = prime * result + ((carrier == null) ? 0 : carrier.hashCode());
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MobileMobileConnectionInfo other = (MobileMobileConnectionInfo) obj;
+		if (protocol == null) {
+			if (other.protocol != null)
+				return false;
+		} else if (!protocol.equals(other.protocol))
+			return false;
+		if (carrier == null) {
+			if (other.carrier != null)
+				return false;
+		} else if (!carrier.equals(other.carrier))
+			return false;
+		return true;
 	}
 
 }

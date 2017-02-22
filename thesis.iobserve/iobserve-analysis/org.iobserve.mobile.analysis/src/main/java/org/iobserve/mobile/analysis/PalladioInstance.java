@@ -1,4 +1,4 @@
-package org.iobserve.analysis.constraint.analysis;
+package org.iobserve.mobile.analysis;
 
 import org.palladiosimulator.pcm.allocation.Allocation;
 import org.palladiosimulator.pcm.repository.Repository;

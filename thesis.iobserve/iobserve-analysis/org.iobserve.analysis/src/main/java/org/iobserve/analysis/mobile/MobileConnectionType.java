@@ -73,7 +73,7 @@ public enum MobileConnectionType {
 	 *            the string representation
 	 * @return the belonging enum value and null if there is none
 	 */
-	public MobileConnectionType get(final String val) {
+	public static MobileConnectionType get(final String val) {
 		return MAPPING.get(val);
 	}
 }

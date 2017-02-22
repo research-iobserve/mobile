@@ -29,4 +29,12 @@ public abstract class AbstractMobileConnectionInfo {
 	 * @return type of the connection.
 	 */
 	public abstract MobileConnectionType getCorrespondingType();
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object b) {
+		return super.equals(b);
+	}
 }

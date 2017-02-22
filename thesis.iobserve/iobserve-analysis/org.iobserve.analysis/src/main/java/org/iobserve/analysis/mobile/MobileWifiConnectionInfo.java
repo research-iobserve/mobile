@@ -109,4 +109,47 @@ public class MobileWifiConnectionInfo extends AbstractMobileConnectionInfo {
 		this.protocol = protocol;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((bssid == null) ? 0 : bssid.hashCode());
+		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
+		result = prime * result + ((ssid == null) ? 0 : ssid.hashCode());
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MobileWifiConnectionInfo other = (MobileWifiConnectionInfo) obj;
+		if (bssid == null) {
+			if (other.bssid != null)
+				return false;
+		} else if (!bssid.equals(other.bssid))
+			return false;
+		if (protocol == null) {
+			if (other.protocol != null)
+				return false;
+		} else if (!protocol.equals(other.protocol))
+			return false;
+		if (ssid == null) {
+			if (other.ssid != null)
+				return false;
+		} else if (!ssid.equals(other.ssid))
+			return false;
+		return true;
+	}
+
 }

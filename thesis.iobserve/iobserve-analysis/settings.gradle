@@ -1,2 +1,2 @@
 
-include "org.iobserve.analysis", "org.iobserve.common", "org.iobserve.monitoring", "org.iobserve.analysis.service", "org.iobserve.analysis.cli", "org.iobserve.collector", "org.iobserve.constraint", "org.iobserve.mobile.shared", "org.iobserve.mobile.server", "org.iobserve.mobile.agent", "org.iobserve.mobile.instrument"
+include "org.iobserve.analysis", "org.iobserve.common", "org.iobserve.monitoring", "org.iobserve.analysis.service", "org.iobserve.analysis.cli", "org.iobserve.collector", "org.iobserve.mobile.analysis", "org.iobserve.mobile.shared", "org.iobserve.mobile.server", "org.iobserve.mobile.agent", "org.iobserve.mobile.instrument"

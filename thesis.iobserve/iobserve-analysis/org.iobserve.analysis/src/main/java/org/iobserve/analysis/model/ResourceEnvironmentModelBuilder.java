@@ -126,6 +126,10 @@ public final class ResourceEnvironmentModelBuilder {
 	public static void connectResourceContainerExtended(final ResourceEnvironment model, final ResourceContainer device,
 			final ResourceContainer server, MobileConnectionState connexion) {
 
+		if (privacyLinkExists(model, device, server, connexion)) {
+			return;
+		}
+
 		Opt.of(device).ifPresent().apply(deviceContainer -> {
 			final LinkingResource connectionLink = ResourceEnvironmentModelBuilder.connectResourceContainer(model,
 					deviceContainer, server);
@@ -139,7 +143,7 @@ public final class ResourceEnvironmentModelBuilder {
 			case MOBILE:
 				final MobileMobileConnectionInfo info = (MobileMobileConnectionInfo) connexion.getConnectionInfo();
 				privacyLink.setProtocol(info.getProtocol());
-				privacyLink.setCarrier(info.getProvider());
+				privacyLink.setCarrier(info.getCarrier());
 				break;
 			case WLAN:
 				final MobileWifiConnectionInfo wifiinfo = (MobileWifiConnectionInfo) connexion.getConnectionInfo();
@@ -174,6 +178,46 @@ public final class ResourceEnvironmentModelBuilder {
 			specification = ResourceenvironmentFactory.eINSTANCE.createCommunicationLinkResourceSpecification();
 		}
 		return specification;
+	}
+
+	/**
+	 * Checks whether a connection with specified info already exists.
+	 * 
+	 * @param model
+	 *            the resource environment model
+	 * @param device
+	 *            the resource container for the device
+	 * @param server
+	 *            the resource container for the server
+	 * @param connexion
+	 *            the connection information
+	 */
+	private static boolean privacyLinkExists(final ResourceEnvironment model, final ResourceContainer device,
+			final ResourceContainer server, MobileConnectionState connexion) {
+
+		for (LinkingResource lr : model.getLinkingResources__ResourceEnvironment()) {
+			boolean b1 = false, b2 = false;
+			for (ResourceContainer container : lr.getConnectedResourceContainers_LinkingResource()) {
+				if (container.equals(device)) {
+					b1 = true;
+				}
+				if (container.equals(server)) {
+					b2 = true;
+				}
+			}
+
+			if (b1 && b2) {
+				CommunicationLinkResourceSpecification specification = lr
+						.getCommunicationLinkResourceSpecifications_LinkingResource();
+				if (specification != null && specification instanceof CommunicationLinkPrivacy) {
+					MobileConnectionState state = new MobileConnectionState((CommunicationLinkPrivacy) specification);
+					if (state.equals(connexion)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 }
