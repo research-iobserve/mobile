@@ -1,10 +1,9 @@
 package org.iobserve.shared.callback.data;
 
+import org.iobserve.common.mobile.record.MobileNetworkRequestEventRecord;
 import org.iobserve.shared.callback.kieker.IKiekerCompatible;
 
 import kieker.common.record.IMonitoringRecord;
-import rocks.inspectit.android.callback.data.MobileDefaultData;
-import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
 
 /**
  * Monitoring record class for network requests.

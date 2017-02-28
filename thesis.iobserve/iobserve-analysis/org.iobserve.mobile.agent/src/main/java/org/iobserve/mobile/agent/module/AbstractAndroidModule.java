@@ -2,9 +2,9 @@ package org.iobserve.mobile.agent.module;
 
 import org.iobserve.mobile.agent.callback.CallbackManager;
 import org.iobserve.mobile.agent.core.AndroidDataCollector;
+import org.iobserve.shared.callback.data.MobileDefaultData;
 
 import android.content.Context;
-import rocks.inspectit.android.callback.data.MobileDefaultData;
 
 /**
  * Abstract Android module which has an init and an exit point.

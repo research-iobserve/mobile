@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.iobserve.mobile.agent.core.AndroidAgent;
+import org.iobserve.mobile.agent.core.ExternalConfiguration;
 import org.iobserve.mobile.instrument.config.InstrumentationConfiguration;
 import org.iobserve.mobile.instrument.config.xml.ConnectionInfoXml;
 import org.iobserve.mobile.instrument.config.xml.InstrumentationPointConfigurationXml;
@@ -15,8 +17,6 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
 import android.app.Activity;
-import rocks.inspectit.android.AndroidAgent;
-import rocks.inspectit.android.ExternalConfiguration;
 
 /**
  * Bytecode instrumenter which is responsible for instrumenting Android Activity

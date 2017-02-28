@@ -11,10 +11,10 @@ import java.util.Map;
 import org.iobserve.mobile.agent.callback.CallbackManager;
 import org.iobserve.mobile.agent.module.util.ConnectionState;
 import org.iobserve.mobile.agent.module.util.ExecutionProperty;
+import org.iobserve.shared.callback.data.NetRequestResponse;
 
 import android.content.Context;
 import android.webkit.WebView;
-import rocks.inspectit.android.callback.data.NetRequestResponse;
 
 /**
  * Special module which handles the instrumented network requests.

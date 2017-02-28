@@ -15,18 +15,17 @@
  ***************************************************************************/
 package org.iobserve.analysis.filter;
 
-import teetime.framework.AbstractConsumerStage;
-import teetime.framework.OutputPort;
-
 import org.iobserve.analysis.model.ResourceEnvironmentModelBuilder;
 import org.iobserve.analysis.model.ResourceEnvironmentModelProvider;
 import org.iobserve.analysis.utils.Opt;
+import org.iobserve.common.mobile.record.MobileDeploymentRecord;
 import org.iobserve.common.record.EJBDeployedEvent;
 import org.iobserve.common.record.IDeploymentRecord;
 import org.iobserve.common.record.ServletDeployedEvent;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceEnvironment;
 
-import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
+import teetime.framework.AbstractConsumerStage;
+import teetime.framework.OutputPort;
 
 /**
  * TAllocation creates a new resource container if and only if there is no

@@ -18,22 +18,20 @@ package org.iobserve.analysis.filter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import kieker.common.record.IMonitoringRecord;
-import kieker.common.record.flow.IFlowRecord;
-import kieker.common.record.flow.trace.TraceMetadata;
-import kieker.common.record.misc.KiekerMetadataRecord;
-
-import teetime.framework.AbstractConsumerStage;
-import teetime.framework.OutputPort;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.iobserve.common.mobile.record.MobileNetworkEventRecord;
+import org.iobserve.common.mobile.record.NetworkEvent;
 import org.iobserve.common.record.IDeploymentRecord;
 import org.iobserve.common.record.IUndeploymentRecord;
 import org.iobserve.common.record.ServletTraceHelper;
 
-import rocks.inspectit.android.callback.kieker.MobileNetworkEventRecord;
-import rocks.inspectit.android.callback.kieker.NetworkEvent;
+import kieker.common.record.IMonitoringRecord;
+import kieker.common.record.flow.IFlowRecord;
+import kieker.common.record.flow.trace.TraceMetadata;
+import kieker.common.record.misc.KiekerMetadataRecord;
+import teetime.framework.AbstractConsumerStage;
+import teetime.framework.OutputPort;
 
 /**
  * The record switch filter is used to scan the event stream and send events

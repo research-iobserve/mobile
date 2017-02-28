@@ -2,11 +2,11 @@ package org.iobserve.mobile.agent.callback.strategies;
 
 import org.iobserve.mobile.agent.callback.CallbackTask;
 import org.iobserve.mobile.agent.core.ExternalConfiguration;
+import org.iobserve.shared.callback.data.MobileCallbackData;
+import org.iobserve.shared.callback.data.MobileDefaultData;
 
 import rocks.fasterxml.jackson.core.JsonProcessingException;
 import rocks.fasterxml.jackson.databind.ObjectMapper;
-import rocks.inspectit.android.callback.data.MobileCallbackData;
-import rocks.inspectit.android.callback.data.MobileDefaultData;
 
 /**
  * Abstract class which represents a strategy for handling the data which is

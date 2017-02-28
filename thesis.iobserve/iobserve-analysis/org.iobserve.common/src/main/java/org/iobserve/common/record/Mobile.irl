@@ -1,4 +1,4 @@
-package rocks.inspectit.android.callback.kieker
+package org.iobserve.common.mobile.record
 
 template MobileRecord {
 	string deviceId

@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.iobserve.common.mobile.record.MobileDeploymentRecord;
+import org.iobserve.common.mobile.record.MobileUndeploymentRecord;
 import org.iobserve.mobile.agent.broadcast.AbstractBroadcastReceiver;
 import org.iobserve.mobile.agent.broadcast.NetworkBroadcastReceiver;
 import org.iobserve.mobile.agent.callback.CallbackManager;
@@ -22,6 +24,8 @@ import org.iobserve.mobile.agent.module.NetworkModule;
 import org.iobserve.mobile.agent.module.util.ExecutionProperty;
 import org.iobserve.mobile.agent.sensor.ISensor;
 import org.iobserve.mobile.agent.util.DependencyManager;
+import org.iobserve.shared.callback.data.HelloRequest;
+import org.iobserve.shared.callback.data.MobileDefaultData;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -31,10 +35,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
 import kieker.common.record.IMonitoringRecord;
-import rocks.inspectit.android.callback.data.HelloRequest;
-import rocks.inspectit.android.callback.data.MobileDefaultData;
-import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
-import rocks.inspectit.android.callback.kieker.MobileUndeploymentRecord;
 
 /**
  * The main Android Agent class which is responsible for managing and scheduling

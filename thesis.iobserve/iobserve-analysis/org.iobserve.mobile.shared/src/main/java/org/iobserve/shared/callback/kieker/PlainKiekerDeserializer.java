@@ -2,6 +2,9 @@ package org.iobserve.shared.callback.kieker;
 
 import java.io.IOException;
 
+import org.iobserve.common.mobile.record.MobileDeploymentRecord;
+import org.iobserve.common.mobile.record.MobileUndeploymentRecord;
+
 import kieker.common.record.IMonitoringRecord;
 import kieker.common.record.flow.trace.TraceMetadata;
 import kieker.common.record.flow.trace.operation.AfterOperationEvent;
@@ -12,9 +15,6 @@ import rocks.fasterxml.jackson.core.JsonProcessingException;
 import rocks.fasterxml.jackson.databind.DeserializationContext;
 import rocks.fasterxml.jackson.databind.JsonDeserializer;
 import rocks.fasterxml.jackson.databind.JsonNode;
-import rocks.inspectit.android.callback.kieker.MobileDeploymentRecord;
-import rocks.inspectit.android.callback.kieker.MobileUndeploymentRecord;
-import rocks.inspectit.android.callback.kieker.PlainKieker;
 
 /**
  * Used to deserialize a {@link PlainKieker} object at the server side.

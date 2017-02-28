@@ -2,6 +2,8 @@ package org.iobserve.mobile.agent.broadcast;
 
 import java.util.BitSet;
 
+import org.iobserve.shared.callback.kieker.NetInfoResponse;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -9,7 +11,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.telephony.TelephonyManager;
-import rocks.inspectit.android.callback.kieker.NetInfoResponse;
 
 /**
  * Concrete broadcast receiver for network events.

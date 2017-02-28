@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-package rocks.inspectit.android.callback.kieker;
+package org.iobserve.common.mobile.record;
 
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
@@ -25,8 +25,8 @@ import kieker.common.record.IMonitoringRecord;
 import kieker.common.util.registry.IRegistry;
 import kieker.common.util.Version;
 
-import rocks.inspectit.android.callback.kieker.MobileRecord;
-import rocks.inspectit.android.callback.kieker.NetworkEvent;
+import org.iobserve.common.mobile.record.MobileRecord;
+import org.iobserve.common.mobile.record.NetworkEvent;
 
 /**
  * @author Generic Kieker

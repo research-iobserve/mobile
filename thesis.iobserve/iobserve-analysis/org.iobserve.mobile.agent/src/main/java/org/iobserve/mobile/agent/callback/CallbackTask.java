@@ -10,11 +10,11 @@ import java.net.URL;
 
 import org.iobserve.mobile.agent.core.ExternalConfiguration;
 import org.iobserve.mobile.agent.util.DependencyManager;
+import org.iobserve.shared.callback.data.HelloResponse;
 
 import android.os.AsyncTask;
 import android.util.Log;
 import rocks.fasterxml.jackson.databind.ObjectMapper;
-import rocks.inspectit.android.callback.data.HelloResponse;
 
 /**
  * Task which is responsible for sending data to the REST interface of the

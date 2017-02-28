@@ -2,9 +2,9 @@ package org.iobserve.mobile.agent.broadcast;
 
 import org.iobserve.mobile.agent.callback.CallbackManager;
 import org.iobserve.mobile.agent.core.AndroidDataCollector;
+import org.iobserve.shared.callback.data.MobileDefaultData;
 
 import android.content.BroadcastReceiver;
-import rocks.inspectit.android.callback.data.MobileDefaultData;
 
 /**
  * Abstract class for setting up a broadcast receiver for Android.

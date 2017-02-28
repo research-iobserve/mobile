@@ -6,13 +6,13 @@ import java.util.List;
 import org.iobserve.mobile.agent.callback.strategies.AbstractCallbackStrategy;
 import org.iobserve.mobile.agent.core.ExternalConfiguration;
 import org.iobserve.mobile.agent.util.DependencyManager;
+import org.iobserve.shared.callback.data.HelloRequest;
+import org.iobserve.shared.callback.data.MobileCallbackData;
+import org.iobserve.shared.callback.data.MobileDefaultData;
+import org.iobserve.shared.callback.kieker.PlainKieker;
 
 import android.util.Log;
 import kieker.common.record.IMonitoringRecord;
-import rocks.inspectit.android.callback.data.HelloRequest;
-import rocks.inspectit.android.callback.data.MobileCallbackData;
-import rocks.inspectit.android.callback.data.MobileDefaultData;
-import rocks.inspectit.android.callback.kieker.PlainKieker;
 
 /**
  * Component which handles the connection to the server which persists the

@@ -4,12 +4,11 @@ import java.lang.reflect.Method;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.iobserve.mobile.agent.core.AndroidAgent;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
-
-import rocks.inspectit.android.AndroidAgent;
 
 /**
  * Class for instrumenting a certain method. It inserts a call at the start of

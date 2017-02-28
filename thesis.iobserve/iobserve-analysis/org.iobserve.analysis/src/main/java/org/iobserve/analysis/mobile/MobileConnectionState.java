@@ -15,8 +15,9 @@
  ***************************************************************************/
 package org.iobserve.analysis.mobile;
 
+import org.iobserve.common.mobile.record.MobileNetworkEventRecord;
+
 import privacy_ext.CommunicationLinkPrivacy;
-import rocks.inspectit.android.callback.kieker.MobileNetworkEventRecord;
 
 /**
  * Represents the current network connection of a mobile device.

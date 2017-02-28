@@ -19,22 +19,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import kieker.common.logging.Log;
-import kieker.common.logging.LogFactory;
-
-import teetime.framework.AbstractConsumerStage;
-import teetime.framework.OutputPort;
-
 import org.iobserve.analysis.mobile.MobileConnectionState;
 import org.iobserve.analysis.model.ResourceEnvironmentModelBuilder;
 import org.iobserve.analysis.model.ResourceEnvironmentModelProvider;
 import org.iobserve.analysis.utils.Opt;
+import org.iobserve.common.mobile.record.MobileNetworkEventRecord;
+import org.iobserve.common.mobile.record.MobileNetworkRequestEventRecord;
+import org.iobserve.common.mobile.record.NetworkEvent;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceContainer;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceEnvironment;
 
-import rocks.inspectit.android.callback.kieker.MobileNetworkEventRecord;
-import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
-import rocks.inspectit.android.callback.kieker.NetworkEvent;
+import kieker.common.logging.Log;
+import kieker.common.logging.LogFactory;
+import teetime.framework.AbstractConsumerStage;
+import teetime.framework.OutputPort;
 
 /**
  * TMobile is responsible for the processing of monitoring records which belong

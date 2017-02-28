@@ -6,13 +6,13 @@ import java.net.URLConnection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.iobserve.mobile.agent.core.AndroidAgent;
 import org.iobserve.mobile.instrument.bytecode.visitors.DefaultMethodCodeVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 import android.webkit.WebView;
-import rocks.inspectit.android.AndroidAgent;
 
 /**
  * Class which is responsible for instrumenting calls which result in a network

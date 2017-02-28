@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-package rocks.inspectit.android.callback.kieker;
+package org.iobserve.common.mobile.record;
 
 import java.nio.ByteBuffer;
 
@@ -26,19 +26,19 @@ import kieker.common.util.registry.IRegistry;
  * 
  * @since 1.10
  */
-public final class MobileNetworkEventRecordFactory implements IRecordFactory<MobileNetworkEventRecord> {
+public final class MobileNetworkRequestEventRecordFactory implements IRecordFactory<MobileNetworkRequestEventRecord> {
 	
 	@Override
-	public MobileNetworkEventRecord create(final ByteBuffer buffer, final IRegistry<String> stringRegistry) {
-		return new MobileNetworkEventRecord(buffer, stringRegistry);
+	public MobileNetworkRequestEventRecord create(final ByteBuffer buffer, final IRegistry<String> stringRegistry) {
+		return new MobileNetworkRequestEventRecord(buffer, stringRegistry);
 	}
 	
 	@Override
-	public MobileNetworkEventRecord create(final Object[] values) {
-		return new MobileNetworkEventRecord(values);
+	public MobileNetworkRequestEventRecord create(final Object[] values) {
+		return new MobileNetworkRequestEventRecord(values);
 	}
 	
 	public int getRecordSizeInBytes() {
-		return MobileNetworkEventRecord.SIZE;
+		return MobileNetworkRequestEventRecord.SIZE;
 	}
 }

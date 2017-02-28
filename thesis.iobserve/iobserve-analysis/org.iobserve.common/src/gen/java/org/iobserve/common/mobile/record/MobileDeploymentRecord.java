@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 
-package rocks.inspectit.android.callback.kieker;
+package org.iobserve.common.mobile.record;
 
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
@@ -25,24 +25,24 @@ import kieker.common.record.IMonitoringRecord;
 import kieker.common.util.registry.IRegistry;
 import kieker.common.util.Version;
 
-import rocks.inspectit.android.callback.kieker.MobileRecord;
-import org.iobserve.common.record.IUndeploymentRecord;
+import org.iobserve.common.mobile.record.MobileRecord;
+import org.iobserve.common.record.IDeploymentRecord;
 
 /**
  * @author Generic Kieker
  * 
  * @since 1.10
  */
-public class MobileUndeploymentRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory, MobileRecord, IUndeploymentRecord {
+public class MobileDeploymentRecord extends AbstractMonitoringRecord implements IMonitoringRecord.Factory, IMonitoringRecord.BinaryFactory, MobileRecord, IDeploymentRecord {
 	/** Descriptive definition of the serialization size of the record. */
 	public static final int SIZE = TYPE_SIZE_STRING // MobileRecord.deviceId
-			 + TYPE_SIZE_STRING // MobileUndeploymentRecord.activityName
+			 + TYPE_SIZE_STRING // MobileDeploymentRecord.activityName
 	;
-	private static final long serialVersionUID = 4740054219719127322L;
+	private static final long serialVersionUID = 2512553347946103462L;
 	
 	public static final Class<?>[] TYPES = {
 		String.class, // MobileRecord.deviceId
-		String.class, // MobileUndeploymentRecord.activityName
+		String.class, // MobileDeploymentRecord.activityName
 	};
 	
 	/* user-defined constants */
@@ -61,7 +61,7 @@ public class MobileUndeploymentRecord extends AbstractMonitoringRecord implement
 	 * @param activityName
 	 *            activityName
 	 */
-	public MobileUndeploymentRecord(final String deviceId, final String activityName) {
+	public MobileDeploymentRecord(final String deviceId, final String activityName) {
 		this.deviceId = deviceId == null?"":deviceId;
 		this.activityName = activityName == null?"":activityName;
 	}
@@ -73,7 +73,7 @@ public class MobileUndeploymentRecord extends AbstractMonitoringRecord implement
 	 * @param values
 	 *            The values for the record.
 	 */
-	public MobileUndeploymentRecord(final Object[] values) { // NOPMD (direct store of values)
+	public MobileDeploymentRecord(final Object[] values) { // NOPMD (direct store of values)
 		AbstractMonitoringRecord.checkArray(values, TYPES);
 		this.deviceId = (String) values[0];
 		this.activityName = (String) values[1];
@@ -87,7 +87,7 @@ public class MobileUndeploymentRecord extends AbstractMonitoringRecord implement
 	 * @param valueTypes
 	 *            The types of the elements in the first array.
 	 */
-	protected MobileUndeploymentRecord(final Object[] values, final Class<?>[] valueTypes) { // NOPMD (values stored directly)
+	protected MobileDeploymentRecord(final Object[] values, final Class<?>[] valueTypes) { // NOPMD (values stored directly)
 		AbstractMonitoringRecord.checkArray(values, valueTypes);
 		this.deviceId = (String) values[0];
 		this.activityName = (String) values[1];
@@ -102,7 +102,7 @@ public class MobileUndeploymentRecord extends AbstractMonitoringRecord implement
 	 * @throws BufferUnderflowException
 	 *             if buffer not sufficient
 	 */
-	public MobileUndeploymentRecord(final ByteBuffer buffer, final IRegistry<String> stringRegistry) throws BufferUnderflowException {
+	public MobileDeploymentRecord(final ByteBuffer buffer, final IRegistry<String> stringRegistry) throws BufferUnderflowException {
 		this.deviceId = stringRegistry.get(buffer.getInt());
 		this.activityName = stringRegistry.get(buffer.getInt());
 	}

@@ -29,6 +29,7 @@ import org.iobserve.analysis.model.SystemModelBuilder;
 import org.iobserve.analysis.model.SystemModelProvider;
 import org.iobserve.analysis.model.correspondence.ICorrespondence;
 import org.iobserve.analysis.utils.Opt;
+import org.iobserve.common.mobile.record.MobileNetworkRequestEventRecord;
 import org.palladiosimulator.pcm.core.composition.AssemblyContext;
 import org.palladiosimulator.pcm.repository.BasicComponent;
 import org.palladiosimulator.pcm.repository.OperationInterface;
@@ -38,7 +39,6 @@ import org.palladiosimulator.pcm.resourceenvironment.ResourceEnvironment;
 
 import kieker.common.logging.Log;
 import kieker.common.logging.LogFactory;
-import rocks.inspectit.android.callback.kieker.MobileNetworkRequestEventRecord;
 import teetime.framework.AbstractConsumerStage;
 
 /**

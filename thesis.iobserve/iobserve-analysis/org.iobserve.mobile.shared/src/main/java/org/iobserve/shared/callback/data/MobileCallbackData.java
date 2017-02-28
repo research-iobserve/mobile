@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rocks.fasterxml.jackson.annotation.JsonProperty;
-import rocks.inspectit.android.callback.data.MobileDefaultData;
 
 /**
  * Contains multiple monitoring records and the session id. This is the

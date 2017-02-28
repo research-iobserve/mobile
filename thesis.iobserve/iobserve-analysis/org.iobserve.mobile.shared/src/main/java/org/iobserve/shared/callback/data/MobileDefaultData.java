@@ -6,8 +6,6 @@ import org.iobserve.shared.callback.kieker.PlainKieker;
 import rocks.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import rocks.fasterxml.jackson.annotation.JsonSubTypes;
 import rocks.fasterxml.jackson.annotation.JsonTypeInfo;
-import rocks.inspectit.android.callback.data.HelloRequest;
-import rocks.inspectit.android.callback.data.NetRequestResponse;
 
 /**
  * Parent class for mobile monitoring records.

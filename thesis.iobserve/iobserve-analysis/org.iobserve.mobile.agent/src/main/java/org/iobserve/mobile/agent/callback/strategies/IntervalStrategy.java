@@ -1,7 +1,8 @@
 package org.iobserve.mobile.agent.callback.strategies;
 
+import org.iobserve.shared.callback.data.MobileDefaultData;
+
 import android.os.Handler;
-import rocks.inspectit.android.callback.data.MobileDefaultData;
 
 /**
  * Callback strategy which collects data over a specified period of time and

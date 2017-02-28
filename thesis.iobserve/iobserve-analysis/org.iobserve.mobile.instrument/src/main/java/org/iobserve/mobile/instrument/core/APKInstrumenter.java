@@ -202,15 +202,17 @@ public class APKInstrumenter {
 
 			for (String includedFolder : includedFolders) {
 				File[] toAddArray = new File(toAdd.getAbsolutePath() + "/" + includedFolder).listFiles();
-				File containingFolder = new File(AGENT_CURRENT.getAbsolutePath() + "/" + includedFolder);
-				if (!containingFolder.exists()) {
-					containingFolder.mkdir();
-				}
-				for (File ff : toAddArray) {
-					if (ff.isDirectory()) {
-						FileUtils.copyDirectoryToDirectory(ff, containingFolder);
-					} else {
-						FileUtils.copyFile(ff, new File(containingFolder.getAbsolutePath() + "/" + ff.getName()));
+				if (toAddArray != null) {
+					File containingFolder = new File(AGENT_CURRENT.getAbsolutePath() + "/" + includedFolder);
+					if (!containingFolder.exists()) {
+						containingFolder.mkdir();
+					}
+					for (File ff : toAddArray) {
+						if (ff.isDirectory()) {
+							FileUtils.copyDirectoryToDirectory(ff, containingFolder);
+						} else {
+							FileUtils.copyFile(ff, new File(containingFolder.getAbsolutePath() + "/" + ff.getName()));
+						}
 					}
 				}
 			}

@@ -5,9 +5,6 @@ import org.iobserve.shared.callback.data.MobileDefaultData;
 import kieker.common.record.IMonitoringRecord;
 import rocks.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import rocks.fasterxml.jackson.databind.annotation.JsonSerialize;
-import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
-import rocks.inspectit.android.callback.kieker.PlainKiekerDeserializer;
-import rocks.inspectit.android.callback.kieker.PlainKiekerSerializer;
 
 /**
  * Monitoring record which wraps a Kieker record.

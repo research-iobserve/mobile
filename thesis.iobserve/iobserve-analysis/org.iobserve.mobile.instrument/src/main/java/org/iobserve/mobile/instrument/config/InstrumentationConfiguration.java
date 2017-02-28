@@ -8,12 +8,12 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.iobserve.mobile.agent.sensor.KiekerSensor;
 import org.iobserve.mobile.instrument.bytecode.NetworkBytecodeInstrumenter;
 import org.iobserve.mobile.instrument.config.xml.RootConfigurationXml;
 import org.objectweb.asm.Type;
 
 import android.webkit.WebView;
-import rocks.inspectit.android.sensor.KiekerSensor;
 
 /**
  * Configuration class for the instrumentation process of Android applications.

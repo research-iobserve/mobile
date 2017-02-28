@@ -26,13 +26,13 @@ import org.iobserve.analysis.model.SystemModelProvider;
 import org.iobserve.analysis.model.correspondence.Correspondent;
 import org.iobserve.analysis.model.correspondence.ICorrespondence;
 import org.iobserve.analysis.utils.Opt;
+import org.iobserve.common.mobile.record.MobileUndeploymentRecord;
 import org.iobserve.common.record.EJBUndeployedEvent;
 import org.iobserve.common.record.IUndeploymentRecord;
 import org.iobserve.common.record.ServletUndeployedEvent;
 import org.palladiosimulator.pcm.core.composition.AssemblyContext;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceContainer;
 
-import rocks.inspectit.android.callback.kieker.MobileUndeploymentRecord;
 import teetime.framework.AbstractConsumerStage;
 
 /**

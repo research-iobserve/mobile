@@ -14,31 +14,14 @@
  * limitations under the License.
  ***************************************************************************/
 
-package rocks.inspectit.android.callback.kieker;
+package org.iobserve.common.mobile.record;
 
-import java.nio.ByteBuffer;
-
-import kieker.common.record.factory.IRecordFactory;
-import kieker.common.util.registry.IRegistry;
+import kieker.common.record.IMonitoringRecord;
 
 /**
  * @author Generic Kieker
  * 
  * @since 1.10
  */
-public final class MobileUndeploymentRecordFactory implements IRecordFactory<MobileUndeploymentRecord> {
-	
-	@Override
-	public MobileUndeploymentRecord create(final ByteBuffer buffer, final IRegistry<String> stringRegistry) {
-		return new MobileUndeploymentRecord(buffer, stringRegistry);
-	}
-	
-	@Override
-	public MobileUndeploymentRecord create(final Object[] values) {
-		return new MobileUndeploymentRecord(values);
-	}
-	
-	public int getRecordSizeInBytes() {
-		return MobileUndeploymentRecord.SIZE;
-	}
+public interface NetworkEvent extends IMonitoringRecord {
 }

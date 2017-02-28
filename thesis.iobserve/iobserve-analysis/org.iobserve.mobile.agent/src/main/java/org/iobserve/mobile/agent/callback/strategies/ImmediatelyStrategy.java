@@ -1,6 +1,6 @@
 package org.iobserve.mobile.agent.callback.strategies;
 
-import rocks.inspectit.android.callback.data.MobileDefaultData;
+import org.iobserve.shared.callback.data.MobileDefaultData;
 
 /**
  * Strategy which immediately sends all data objects to the server. This means

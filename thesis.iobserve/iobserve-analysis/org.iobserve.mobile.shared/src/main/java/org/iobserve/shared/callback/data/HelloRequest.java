@@ -1,7 +1,5 @@
 package org.iobserve.shared.callback.data;
 
-import rocks.inspectit.android.callback.data.MobileDefaultData;
-
 /**
  * Class holding information about a device which wants to connect to the
  * server.
