@@ -1,12 +1,23 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.core;
-
-import java.io.IOException;
-import java.io.RandomAccessFile;
 
 import org.iobserve.mobile.agent.util.CacheValue;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -28,32 +39,27 @@ import android.telephony.TelephonyManager;
  */
 public class AndroidDataCollector {
 	/**
-	 * {@link TelephonyManager} for retrieving information
+	 * {@link TelephonyManager} for retrieving information.
 	 */
 	private TelephonyManager telephonyManager;
 
 	/**
-	 * {@link LocationManager} for retrieving information
+	 * {@link LocationManager} for retrieving information.
 	 */
 	private LocationManager locationManager;
 
 	/**
-	 * {@link ConnectivityManager} for retrieving information
+	 * {@link ConnectivityManager} for retrieving information.
 	 */
 	private ConnectivityManager connectivityManager;
 
 	/**
-	 * {@link ActivityManager} for retrieving information
-	 */
-	private ActivityManager activityManager;
-
-	/**
-	 * {@link WifiManager} for retrieving information
+	 * {@link WifiManager} for retrieving information.
 	 */
 	private WifiManager wifiManager;
 
 	/**
-	 * Context of the application which is needed to create the managers above
+	 * Context of the application which is needed to create the managers above.
 	 */
 	private Context context;
 
@@ -67,16 +73,6 @@ public class AndroidDataCollector {
 	 * Cache value for the network information.
 	 */
 	private CacheValue<NetworkInfo> networkInfoCache = new CacheValue<NetworkInfo>(30000L);
-
-	/**
-	 * Cache value for the cpu usage.
-	 */
-	private CacheValue<Float> cpuUsage = new CacheValue<Float>(5000L);
-
-	/**
-	 * Cache value for the ram usage.
-	 */
-	private CacheValue<Double> ramUsage = new CacheValue<Double>(5000L);
 
 	/**
 	 * Cache value for the wifi information.
@@ -99,17 +95,22 @@ public class AndroidDataCollector {
 	private CacheValue<String> deviceIdCache = new CacheValue<String>();
 
 	/**
+	 * Default instance creation.
+	 */
+	public AndroidDataCollector() {
+	}
+
+	/**
 	 * Creates a data collector and needs a given context as parameter.
 	 * 
 	 * @param ctx
 	 *            context of the application
 	 */
-	protected void initDataCollector(Context ctx) {
+	protected void initDataCollector(final Context ctx) {
 		context = ctx;
 
 		locationManager = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
 		connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 		wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 	}
@@ -136,8 +137,8 @@ public class AndroidDataCollector {
 	 * @return the name of the application
 	 */
 	public String resolveAppName() {
-		ApplicationInfo applicationInfo = context.getApplicationInfo();
-		int stringId = applicationInfo.labelRes;
+		final ApplicationInfo applicationInfo = context.getApplicationInfo();
+		final int stringId = applicationInfo.labelRes;
 		return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
 	}
 
@@ -159,9 +160,10 @@ public class AndroidDataCollector {
 	 *            from the cache won'T be used
 	 * @return the last known location of the user
 	 */
-	public Location getLastKnownLocation(boolean force) {
-		if (locationCache != null && locationCache.valid() && !force)
+	public Location getLastKnownLocation(final boolean force) {
+		if (locationCache != null && locationCache.valid() && !force) {
 			return locationCache.value();
+		}
 
 		return locationCache.set(getLocation());
 	}
@@ -183,60 +185,12 @@ public class AndroidDataCollector {
 	 *            true if the collector should reload the network information
 	 * @return current network informations from the device
 	 */
-	public NetworkInfo getNetworkInfo(boolean force) {
-		if (networkInfoCache != null && networkInfoCache.valid() && !force)
+	public NetworkInfo getNetworkInfo(final boolean force) {
+		if (networkInfoCache != null && networkInfoCache.valid() && !force) {
 			return networkInfoCache.value();
+		}
 
-		return networkInfoCache.set(_getNetworkInfo());
-	}
-
-	/**
-	 * Gets the current cpu usage.
-	 * 
-	 * @return the current cpu usage as float.
-	 */
-	public float getCpuUsage() {
-		return getCpuUsage(false);
-	}
-
-	/**
-	 * Gets the current cpu usage and provides a parameter to force a reload.
-	 * 
-	 * @param force
-	 *            true if the collector should reload the current usage and not
-	 *            take it from the cache
-	 * @return current cpu usage as float
-	 */
-	public float getCpuUsage(boolean force) {
-		if (cpuUsage != null && cpuUsage.valid() && !force)
-			return cpuUsage.value();
-
-		return cpuUsage.set(readCPUUsage());
-	}
-
-	/**
-	 * Gets the current ram usage of the device.
-	 * 
-	 * @return the ram usage of the device
-	 */
-	public double getRamUsage() {
-		return getRamUsage(false);
-	}
-
-	/**
-	 * Gets the current ram usage and provides a parameter to force a reload of
-	 * the current usage.
-	 * 
-	 * @param force
-	 *            true if you want the collector to force a reload of the
-	 *            current usage
-	 * @return the current ram usage of the device
-	 */
-	public double getRamUsage(boolean force) {
-		if (ramUsage != null && ramUsage.valid() && !force)
-			return ramUsage.value();
-
-		return ramUsage.set(readRamUsage());
+		return networkInfoCache.set(getNetworkInfoInner());
 	}
 
 	/**
@@ -250,22 +204,24 @@ public class AndroidDataCollector {
 
 	/**
 	 * Gets informations about the wifi of the device and provides a parameter
-	 * to force a reload of the current information
+	 * to force a reload of the current information.
 	 * 
 	 * @param force
 	 *            true if you want the collector to force a reload of the wifi
 	 *            informations
 	 * @return the wifi informations for the device
 	 */
-	public WifiInfo getWifiInfo(boolean force) {
-		if (wifiInfoCache != null && wifiInfoCache.valid() && !force)
+	public WifiInfo getWifiInfo(final boolean force) {
+		if (wifiInfoCache != null && wifiInfoCache.valid() && !force) {
 			return wifiInfoCache.value();
+		}
 
 		return wifiInfoCache.set(wifiManager.getConnectionInfo());
 	}
 
 	/**
-	 * Gets the wifi configuration for the wifi to which the device is connected
+	 * Gets the wifi configuration for the wifi to which the device is
+	 * connected.
 	 * 
 	 * @return wifi configuration for the current configured and connected wifi
 	 *         of the device
@@ -285,18 +241,21 @@ public class AndroidDataCollector {
 	 * @return wifi configuration for the current configured and connected wifi
 	 *         of the device
 	 */
-	public WifiConfiguration getWifiConfiguration(boolean preCheck, boolean force) {
-		if (wifiConfigCache != null && wifiConfigCache.valid() && !force)
+	public WifiConfiguration getWifiConfiguration(final boolean preCheck, final boolean force) {
+		if (wifiConfigCache != null && wifiConfigCache.valid() && !force) {
 			return wifiConfigCache.value();
+		}
 
 		if (preCheck) {
-			if (getWifiInfo(true) == null)
+			if (getWifiInfo(true) == null) {
 				return null;
+			}
 		}
 
 		for (WifiConfiguration conf : wifiManager.getConfiguredNetworks()) {
-			if (conf.status == WifiConfiguration.Status.CURRENT)
+			if (conf.status == WifiConfiguration.Status.CURRENT) {
 				return wifiConfigCache.set(conf);
+			}
 		}
 		return null;
 	}
@@ -307,8 +266,9 @@ public class AndroidDataCollector {
 	 * @return name of the mobile network carrier
 	 */
 	public String getNetworkCarrierName() {
-		if (networkCarrierCache != null && networkCarrierCache.valid())
+		if (networkCarrierCache != null && networkCarrierCache.valid()) {
 			return networkCarrierCache.value();
+		}
 
 		return networkCarrierCache.set(telephonyManager.getNetworkOperatorName());
 	}
@@ -320,8 +280,9 @@ public class AndroidDataCollector {
 	 * @return id of the device with model of the device as prefix
 	 */
 	public String getDeviceId() {
-		if (deviceIdCache != null && deviceIdCache.valid())
+		if (deviceIdCache != null && deviceIdCache.valid()) {
 			return deviceIdCache.value();
+		}
 
 		return deviceIdCache.set(android.os.Build.MODEL + "-" + telephonyManager.getDeviceId());
 	}
@@ -343,12 +304,12 @@ public class AndroidDataCollector {
 
 	/**
 	 * Gets network informations and previously checks whether we have the
-	 * permission for that
+	 * permission for that.
 	 * 
 	 * @return current network information for the device and null if we don't
 	 *         have enough permissions
 	 */
-	private NetworkInfo _getNetworkInfo() {
+	private NetworkInfo getNetworkInfoInner() {
 		if (checkPermission(Manifest.permission.ACCESS_NETWORK_STATE)) {
 			return connectivityManager.getActiveNetworkInfo();
 		}
@@ -363,60 +324,7 @@ public class AndroidDataCollector {
 	 * @return true if the application has the requested permission - false
 	 *         otherwise
 	 */
-	private boolean checkPermission(String perm) {
+	private boolean checkPermission(final String perm) {
 		return context.checkCallingOrSelfPermission(perm) == PackageManager.PERMISSION_GRANTED;
-	}
-
-	/**
-	 * Collects the current ram usage.
-	 * 
-	 * @return current ram usage
-	 */
-	private double readRamUsage() {
-		ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-		activityManager.getMemoryInfo(memoryInfo);
-
-		// double availableMegs = memoryInfo.availMem / 1048576L;
-		double percentAvail = (double) memoryInfo.availMem / (double) memoryInfo.totalMem;
-
-		return 1.0D - percentAvail;
-	}
-
-	/**
-	 * Collects the current cpu usage.
-	 * 
-	 * @return current cpu usage
-	 */
-	private float readCPUUsage() {
-		try {
-			RandomAccessFile reader = new RandomAccessFile("/proc/stat", "r");
-			String load = reader.readLine();
-			String[] toks = load.split(" +"); // Split on one or more spaces
-
-			long idle1 = Long.parseLong(toks[4]);
-			long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[5])
-					+ Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
-
-			try {
-				Thread.sleep(360);
-			} catch (Exception e) {
-			}
-
-			reader.seek(0);
-			load = reader.readLine();
-			reader.close();
-
-			toks = load.split(" +");
-
-			long idle2 = Long.parseLong(toks[4]);
-			long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[5])
-					+ Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
-
-			return (float) (cpu2 - cpu1) / ((cpu2 + idle2) - (cpu1 + idle1));
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-
-		return 0;
 	}
 }

@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.core;
 
 import java.io.IOException;
@@ -11,6 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import kieker.common.record.IMonitoringRecord;
 
 import org.iobserve.common.mobile.record.MobileDeploymentRecord;
 import org.iobserve.common.mobile.record.MobileUndeploymentRecord;
@@ -34,7 +51,6 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
-import kieker.common.record.IMonitoringRecord;
 
 /**
  * The main Android Agent class which is responsible for managing and scheduling
@@ -43,7 +59,7 @@ import kieker.common.record.IMonitoringRecord;
  * @author David Monschein
  * @author Robert Heinrich
  */
-public class AndroidAgent {
+public final class AndroidAgent {
 	/**
 	 * Resolve consistent log tag for the agent.
 	 */
@@ -128,16 +144,25 @@ public class AndroidAgent {
 	private static boolean closed = true;
 
 	/**
+	 * Full static class, therefore no instance creation allowed.
+	 */
+	private AndroidAgent() {
+	}
+
+	/**
 	 * Inits the agent with a given application context.
 	 * 
 	 * @param ctx
 	 *            context of the application
 	 */
-	public static synchronized void initAgent(Activity ctx) {
-		if (inited)
+	public static synchronized void initAgent(final Activity ctx) {
+		if (inited) {
 			return;
-		if (ctx == null)
+		}
+
+		if (ctx == null) {
 			return;
+		}
 		// INITING VARS
 		initContext = ctx;
 		currentId = 0;
@@ -145,19 +170,19 @@ public class AndroidAgent {
 		Log.i(LOG_TAG, "Initing mobile agent for Android.");
 
 		// INIT ANDROID DATA COLLECTOR
-		AndroidDataCollector androidDataCollector = new AndroidDataCollector();
+		final AndroidDataCollector androidDataCollector = new AndroidDataCollector();
 		androidDataCollector.initDataCollector(ctx);
 		DependencyManager.setAndroidDataCollector(androidDataCollector);
 
 		// INITING CALLBACK
-		AbstractCallbackStrategy callbackStrategy = new IntervalStrategy(10000L);
+		final AbstractCallbackStrategy callbackStrategy = new IntervalStrategy(10000L);
 		DependencyManager.setCallbackStrategy(callbackStrategy);
 
 		callbackManager = new CallbackManager();
 		DependencyManager.setCallbackManager(callbackManager);
 
 		// OPEN COMMUNICATION WITH CMR
-		HelloRequest helloRequest = new HelloRequest();
+		final HelloRequest helloRequest = new HelloRequest();
 		helloRequest.setAppName(androidDataCollector.resolveAppName());
 		helloRequest.setDeviceId(androidDataCollector.getDeviceId());
 
@@ -166,7 +191,7 @@ public class AndroidAgent {
 		// INITING MODULES
 		for (Class<?> exModule : MODULES) {
 			try {
-				AbstractAndroidModule createdModule = (AbstractAndroidModule) exModule.newInstance();
+				final AbstractAndroidModule createdModule = (AbstractAndroidModule) exModule.newInstance();
 				instantiatedModules.put(exModule, createdModule);
 
 				injectDependencies(createdModule);
@@ -182,7 +207,7 @@ public class AndroidAgent {
 		// INIT MODULE REOCCURING CALLS
 		Log.i(LOG_TAG, "Creating and initializing existing modules.");
 		for (Class<?> moduleEntry : MODULES) {
-			AbstractAndroidModule module = instantiatedModules.get(moduleEntry);
+			final AbstractAndroidModule module = instantiatedModules.get(moduleEntry);
 
 			if (module instanceof NetworkModule) {
 				networkModule = (NetworkModule) module;
@@ -195,11 +220,11 @@ public class AndroidAgent {
 		Log.i(LOG_TAG, "Initializing broadcast receivers programmatically.");
 		for (Class<?> bRecvEntry : BROADCAST_RECVS) {
 			try {
-				AbstractBroadcastReceiver bRecv = (AbstractBroadcastReceiver) bRecvEntry.newInstance();
+				final AbstractBroadcastReceiver bRecv = (AbstractBroadcastReceiver) bRecvEntry.newInstance();
 				injectDependencies(bRecv);
 
 				// create filter
-				IntentFilter filter = new IntentFilter();
+				final IntentFilter filter = new IntentFilter();
 				for (String action : bRecv.getFilterActions()) {
 					filter.addAction(action);
 				}
@@ -228,15 +253,16 @@ public class AndroidAgent {
 	 * receivers.
 	 */
 	public static synchronized void destroyAgent() {
-		if (closed)
+		if (closed) {
 			return;
+		}
 		Log.i(LOG_TAG, "Shutting down the Android Agent.");
 
 		// SHUTDOWN MODULES
 		mHandler.removeCallbacksAndMessages(null);
 
 		for (Class<?> exModule : MODULES) {
-			AbstractAndroidModule module = instantiatedModules.get(exModule);
+			final AbstractAndroidModule module = instantiatedModules.get(exModule);
 			if (module != null) {
 				module.shutdownModule();
 			}
@@ -264,9 +290,9 @@ public class AndroidAgent {
 	 * @param activity
 	 *            the activity which is "started"
 	 */
-	public static synchronized void onStartActivity(Activity activity) {
-		String activityName = activity.getClass().getName();
-		String deviceId = DependencyManager.getAndroidDataCollector().getDeviceId();
+	public static synchronized void onStartActivity(final Activity activity) {
+		final String activityName = activity.getClass().getName();
+		final String deviceId = DependencyManager.getAndroidDataCollector().getDeviceId();
 
 		callbackManager.pushKiekerData(new MobileDeploymentRecord(deviceId, activityName));
 	}
@@ -278,9 +304,9 @@ public class AndroidAgent {
 	 * @param activity
 	 *            the activity which is "stopped"
 	 */
-	public static synchronized void onStopActivity(Activity activity) {
-		String activityName = activity.getClass().getName();
-		String deviceId = DependencyManager.getAndroidDataCollector().getDeviceId();
+	public static synchronized void onStopActivity(final Activity activity) {
+		final String activityName = activity.getClass().getName();
+		final String deviceId = DependencyManager.getAndroidDataCollector().getDeviceId();
 
 		callbackManager.pushKiekerData(new MobileUndeploymentRecord(deviceId, activityName));
 	}
@@ -297,11 +323,12 @@ public class AndroidAgent {
 	 *            The class which owns the method which has been called
 	 * @return entry id for determine corresponding sensor at the exitBody call
 	 */
-	public static synchronized long enterBody(String sensorClassName, String methodSignature, String owner) {
+	public static synchronized long enterBody(final String sensorClassName, final String methodSignature,
+			final String owner) {
 		try {
-			Class<?> clazz = Class.forName(sensorClassName);
-			Constructor<?> constructor = clazz.getConstructor();
-			ISensor nSensor = (ISensor) constructor.newInstance();
+			final Class<?> clazz = Class.forName(sensorClassName);
+			final Constructor<?> constructor = clazz.getConstructor();
+			final ISensor nSensor = (ISensor) constructor.newInstance();
 			nSensor.setOwner(owner); // BEFORE ALL OTHER
 			nSensor.setSignature(methodSignature);
 			nSensor.beforeBody();
@@ -335,9 +362,9 @@ public class AndroidAgent {
 	 * @param enterId
 	 *            the entry id for getting the responsible sensor instance
 	 */
-	public static synchronized void exitErrorBody(Throwable e, long enterId) {
+	public static synchronized void exitErrorBody(final Throwable e, final long enterId) {
 		if (enterId >= 0 && sensorMap.containsKey(enterId)) {
-			ISensor eSensor = sensorMap.get(enterId);
+			final ISensor eSensor = sensorMap.get(enterId);
 
 			// call methods
 			eSensor.exceptionThrown(e.getClass().getName());
@@ -354,9 +381,9 @@ public class AndroidAgent {
 	 * @param enterId
 	 *            the entry id for getting the responsible sensor instance
 	 */
-	public static synchronized void exitBody(long enterId) {
+	public static synchronized void exitBody(final long enterId) {
 		if (enterId >= 0 && sensorMap.containsKey(enterId)) {
-			ISensor eSensor = sensorMap.get(enterId);
+			final ISensor eSensor = sensorMap.get(enterId);
 
 			// call methods
 			eSensor.firstAfterBody();
@@ -364,8 +391,9 @@ public class AndroidAgent {
 
 			// clear
 			sensorMap.remove(enterId);
-			if (sensorMap.isEmpty())
+			if (sensorMap.isEmpty()) {
 				currentId = 0;
+			}
 		}
 	}
 
@@ -376,7 +404,7 @@ public class AndroidAgent {
 	 * @param url
 	 *            the url which is loaded by the webview
 	 */
-	public static void webViewLoad(String url) {
+	public static void webViewLoad(final String url) {
 		networkModule.webViewLoad(url, "GET");
 	}
 
@@ -389,7 +417,7 @@ public class AndroidAgent {
 	 * @param data
 	 *            the data which is sent by the post request
 	 */
-	public static void webViewLoadPost(String url, byte[] data) {
+	public static void webViewLoadPost(final String url, final byte[] data) {
 		networkModule.webViewLoad(url, "POST");
 	}
 
@@ -402,11 +430,17 @@ public class AndroidAgent {
 	 * @param params
 	 *            the parameters for the get request
 	 */
-	public static void webViewLoad(String url, Map<?, ?> params) {
+	public static void webViewLoad(final String url, final Map<?, ?> params) {
 		networkModule.webViewLoad(url, "GET");
 	}
 
-	public static void httpConnect(URLConnection connection) {
+	/**
+	 * This method is called by code which is inserted into the original
+	 * application when the application creates a {@link HttpURLConnection}.
+	 * 
+	 * @param connection
+	 */
+	public static void httpConnect(final URLConnection connection) {
 		networkModule.openConnection((HttpURLConnection) connection);
 	}
 
@@ -417,7 +451,7 @@ public class AndroidAgent {
 	 * @param connection
 	 *            a reference to the created connection
 	 */
-	public static void httpConnect(HttpURLConnection connection) {
+	public static void httpConnect(final HttpURLConnection connection) {
 		networkModule.openConnection((HttpURLConnection) connection);
 	}
 
@@ -433,7 +467,7 @@ public class AndroidAgent {
 	 *             when the {@link HttpURLConnection#getOutputStream()} method
 	 *             of the connection fails
 	 */
-	public static OutputStream httpOutputStream(HttpURLConnection connection) throws IOException {
+	public static OutputStream httpOutputStream(final HttpURLConnection connection) throws IOException {
 		return networkModule.getOutputStream((HttpURLConnection) connection);
 	}
 
@@ -449,7 +483,7 @@ public class AndroidAgent {
 	 *             when the {@link HttpURLConnection#getResponseCode()} method
 	 *             of the connection fails
 	 */
-	public static int httpResponseCode(HttpURLConnection connection) throws IOException {
+	public static int httpResponseCode(final HttpURLConnection connection) throws IOException {
 		return networkModule.getResponseCode((HttpURLConnection) connection);
 	}
 
@@ -460,7 +494,7 @@ public class AndroidAgent {
 	 * @param afterOperationEvent
 	 *            the record which should be queued
 	 */
-	public static void queueForInit(IMonitoringRecord afterOperationEvent) {
+	public static void queueForInit(final IMonitoringRecord afterOperationEvent) {
 		kiekerQueueInit.add(afterOperationEvent);
 	}
 
@@ -470,7 +504,7 @@ public class AndroidAgent {
 	 * @param data
 	 *            the record which should be queued
 	 */
-	public static void queueForInit(MobileDefaultData data) {
+	public static void queueForInit(final MobileDefaultData data) {
 		defaultQueueInit.add(data);
 	}
 
@@ -498,10 +532,10 @@ public class AndroidAgent {
 	 * @param module
 	 *            a reference to the module which contains methods to schedule
 	 */
-	private static void setupScheduledMethods(AbstractAndroidModule module) {
+	private static void setupScheduledMethods(final AbstractAndroidModule module) {
 		for (Method method : module.getClass().getMethods()) {
 			if (method.isAnnotationPresent(ExecutionProperty.class)) {
-				ExecutionProperty exProp = method.getAnnotation(ExecutionProperty.class);
+				final ExecutionProperty exProp = method.getAnnotation(ExecutionProperty.class);
 
 				// CREATE FINALS
 				final long iVal = exProp.interval();
@@ -509,7 +543,7 @@ public class AndroidAgent {
 				final AbstractAndroidModule receiver = module;
 				final String className = module.getClass().getName();
 
-				Runnable loopRunnable = new Runnable() {
+				final Runnable loopRunnable = new Runnable() {
 					@Override
 					public void run() {
 						try {
@@ -533,7 +567,7 @@ public class AndroidAgent {
 	 * @param recv
 	 *            the broadcast receiver
 	 */
-	private static void injectDependencies(AbstractBroadcastReceiver recv) {
+	private static void injectDependencies(final AbstractBroadcastReceiver recv) {
 		recv.setCallbackManager(DependencyManager.getCallbackManager());
 		recv.setAndroidDataCollector(DependencyManager.getAndroidDataCollector());
 	}
@@ -544,7 +578,7 @@ public class AndroidAgent {
 	 * @param androidModule
 	 *            the module
 	 */
-	private static void injectDependencies(AbstractAndroidModule androidModule) {
+	private static void injectDependencies(final AbstractAndroidModule androidModule) {
 		androidModule.setCallbackManager(DependencyManager.getCallbackManager());
 		androidModule.setAndroidDataCollector(DependencyManager.getAndroidDataCollector());
 	}

@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.core;
 
 import java.io.File;
@@ -63,7 +78,7 @@ public class APKToolProxy {
 	 * @param inputAPK
 	 *            input application
 	 */
-	public APKToolProxy(File inputAPK) {
+	public APKToolProxy(final File inputAPK) {
 		this.input = inputAPK;
 		this.folderName = null;
 		this.packageName = null;
@@ -72,15 +87,15 @@ public class APKToolProxy {
 	/**
 	 * Decodes the application to a specified folder.
 	 * 
-	 * @param folderName
+	 * @param fName
 	 *            the folder where the application files can be stored
 	 *            temporarily.
 	 * @return true if success - false otherwise
 	 */
-	public boolean decodeAPK(String folderName) {
-		this.folderName = folderName;
+	public boolean decodeAPK(final String fName) {
+		this.folderName = fName;
 		// apktool d bar.apk -o baz
-		ProcessBuilder pb = new ProcessBuilder("java", "-jar", LIB_PATH, "d", input.getAbsolutePath(), "-o",
+		final ProcessBuilder pb = new ProcessBuilder("java", "-jar", LIB_PATH, "d", input.getAbsolutePath(), "-o",
 				folderName);
 
 		try {
@@ -101,36 +116,38 @@ public class APKToolProxy {
 	 *            the file where the adjusted manifest can be stored
 	 * @return true if success - false otherwise
 	 */
-	public boolean adjustManifest(List<String> rights, File modifiedManifest) {
-		if (folderName == null)
+	public boolean adjustManifest(final List<String> rights, final File modifiedManifest) {
+		if (folderName == null) {
 			return false;
+		}
 
 		// read all rights
-		File manifestFile = new File(folderName + "/" + MANIFEST_FILE);
-		if (!manifestFile.exists())
+		final File manifestFile = new File(folderName + "/" + MANIFEST_FILE);
+		if (!manifestFile.exists()) {
 			return false;
+		}
 
-		Set<String> exRights = new HashSet<String>();
+		final Set<String> exRights = new HashSet<String>();
 
 		// PARSING XML
-		Document dom;
+		final Document dom;
 		// Make an instance of the DocumentBuilderFactory
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
 		try {
-			DocumentBuilder db = dbf.newDocumentBuilder();
+			final DocumentBuilder db = dbf.newDocumentBuilder();
 
 			dom = db.parse(manifestFile);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			return false;
 		}
 
-		Node manifestNode = dom.getElementsByTagName("manifest").item(0);
+		final Node manifestNode = dom.getElementsByTagName("manifest").item(0);
 		this.packageName = manifestNode.getAttributes().getNamedItem("package").getTextContent();
-		NodeList permissionNodes = manifestNode.getChildNodes();
+		final NodeList permissionNodes = manifestNode.getChildNodes();
 
 		for (int k = 0; k < permissionNodes.getLength(); k++) {
-			Node permNode = permissionNodes.item(k);
+			final Node permNode = permissionNodes.item(k);
 			if (permNode.getNodeName().equals("uses-permission")) {
 				exRights.add(permNode.getAttributes().getNamedItem("android:name").getTextContent());
 			}
@@ -139,7 +156,7 @@ public class APKToolProxy {
 		// determine which to add
 		for (String right : rights) {
 			if (!exRights.contains(right)) {
-				Element nNode = dom.createElement("uses-permission");
+				final Element nNode = dom.createElement("uses-permission");
 				nNode.setAttribute("android:name", right);
 				manifestNode.appendChild(nNode);
 			}
@@ -147,10 +164,10 @@ public class APKToolProxy {
 
 		// write content back to file
 		try {
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(dom);
-			StreamResult result = new StreamResult(manifestFile);
+			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			final Transformer transformer = transformerFactory.newTransformer();
+			final DOMSource source = new DOMSource(dom);
+			final StreamResult result = new StreamResult(manifestFile);
 			transformer.transform(source, result);
 		} catch (TransformerException e) {
 			return false;
@@ -158,8 +175,8 @@ public class APKToolProxy {
 
 		// RECOMPILE
 		// apktool b bar -o new_bar.apk
-		File rebuildFile = new File(folderName + "/rebuild.apk");
-		ProcessBuilder pb = new ProcessBuilder("java", "-jar", LIB_PATH, "b", folderName, "-o",
+		final File rebuildFile = new File(folderName + "/rebuild.apk");
+		final ProcessBuilder pb = new ProcessBuilder("java", "-jar", LIB_PATH, "b", folderName, "-o",
 				rebuildFile.getAbsolutePath());
 
 		pb.redirectOutput(Redirect.INHERIT);
@@ -174,7 +191,7 @@ public class APKToolProxy {
 
 		// UNZIP IT
 		try {
-			ZipFile rebuildZip = new ZipFile(rebuildFile);
+			final ZipFile rebuildZip = new ZipFile(rebuildFile);
 			rebuildZip.extractFile(MANIFEST_FILE, folderName + "/" + "manifest_new");
 			Files.copy(new File(folderName + "/" + "manifest_new" + "/" + MANIFEST_FILE).toPath(),
 					modifiedManifest.toPath());

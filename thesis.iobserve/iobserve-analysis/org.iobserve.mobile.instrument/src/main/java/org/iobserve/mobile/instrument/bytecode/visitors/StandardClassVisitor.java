@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.bytecode.visitors;
 
 import java.util.HashSet;
@@ -85,7 +100,7 @@ public class StandardClassVisitor extends ClassVisitor {
 	 * @param config
 	 *            the instrumentation config
 	 */
-	public StandardClassVisitor(int api, ClassVisitor cv, InstrumentationConfiguration config) {
+	public StandardClassVisitor(final int api, final ClassVisitor cv, final InstrumentationConfiguration config) {
 		super(api, cv);
 		this.config = config;
 		this.initInstrumenter = new ActivitiyBytecodeInstrumenter(config);
@@ -96,7 +111,8 @@ public class StandardClassVisitor extends ClassVisitor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+	public void visit(final int version, final int access, final String name, final String signature,
+			final String superName, final String[] interfaces) {
 		super.visit(version, access & (~Opcodes.ACC_FINAL), name, signature, superName, interfaces);
 
 		this.className = name;
@@ -104,7 +120,7 @@ public class StandardClassVisitor extends ClassVisitor {
 		this.classFromApplication = name.startsWith(config.getApplicationPackage()); // monitor
 
 		if (this.superName != null) {
-			Type superType = Type.getType(this.superName);
+			final Type superType = Type.getType(this.superName);
 			this.classWithInit = matchesActivityClass(superType.getInternalName()) && !matchesActivityClass(name);
 		}
 	}
@@ -121,7 +137,8 @@ public class StandardClassVisitor extends ClassVisitor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+	public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature,
+			final String[] exceptions) {
 		MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
 		mv = new DefaultMethodCodeVisitor(config, this, api, mv, access, name, desc);
 
@@ -149,7 +166,7 @@ public class StandardClassVisitor extends ClassVisitor {
 	 * @param written
 	 *            the written to set
 	 */
-	public void setWritten(boolean written) {
+	public void setWritten(final boolean written) {
 		this.written = written;
 	}
 
@@ -164,7 +181,7 @@ public class StandardClassVisitor extends ClassVisitor {
 	 * @param className
 	 *            the className to set
 	 */
-	public void setClassName(String className) {
+	public void setClassName(final String className) {
 		this.className = className;
 	}
 
@@ -176,8 +193,8 @@ public class StandardClassVisitor extends ClassVisitor {
 	 *            internal class representation
 	 * @return true if it is an activity class - false otherwise
 	 */
-	private boolean matchesActivityClass(String icn) {
-		return icn.equals("android/app/Activity") || icn.equals("android/support/v7/app/AppCompatActivity");
+	private boolean matchesActivityClass(final String icn) {
+		return "android/app/Activity".equals(icn) || "android/support/v7/app/AppCompatActivity".equals(icn);
 	}
 
 	/**
@@ -191,11 +208,12 @@ public class StandardClassVisitor extends ClassVisitor {
 	 *            set of instrumentation points
 	 * @return the point which matches or null if there is none
 	 */
-	private InstrumentationPoint matchesInstrumentationPoint(String methodName, String desc,
-			Set<InstrumentationPoint> set) {
+	private InstrumentationPoint matchesInstrumentationPoint(final String methodName, final String desc,
+			final Set<InstrumentationPoint> set) {
 		for (InstrumentationPoint point : set) {
-			if (point.getMethodName().equalsIgnoreCase(methodName) && point.getDescription().equals(desc))
+			if (point.getMethodName().equalsIgnoreCase(methodName) && point.getDescription().equals(desc)) {
 				return point;
+			}
 		}
 		return null;
 	}

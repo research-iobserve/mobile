@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.analysis.impl;
 
 import java.util.Arrays;
@@ -15,17 +30,34 @@ import org.iobserve.mobile.analysis.PalladioInstance;
 
 import privacy_ext.CommunicationLinkPrivacy;
 
+/**
+ * Creates a new protocol analyzer instance which checks the connection protocol
+ * for links.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 public class ProtocolAnalyzer extends AbstractPalladioAnalyzer<CommunicationLinkPrivacy> {
 
 	private static final Set<String> SECURE_PROTOCOLS_MOBILE = new HashSet<>(Arrays.asList(new String[] { "lte" }));
 	private static final Set<String> SECURE_PROTOCOLS_WIFI = new HashSet<>(
 			Arrays.asList(new String[] { "wpa", "wpa2" }));
 
+	/**
+	 * Creates a new instance.
+	 */
+	public ProtocolAnalyzer() {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected ConstraintViolation isViolation(CommunicationLinkPrivacy value) {
-		MobileConnectionState cState = new MobileConnectionState(value);
+	protected ConstraintViolation isViolation(final CommunicationLinkPrivacy value) {
+		final MobileConnectionState cState = new MobileConnectionState(value);
 		if (cState.getConnectionType() == MobileConnectionType.WLAN) {
-			MobileWifiConnectionInfo info = (MobileWifiConnectionInfo) cState.getConnectionInfo();
+			final MobileWifiConnectionInfo info = (MobileWifiConnectionInfo) cState.getConnectionInfo();
 			if (SECURE_PROTOCOLS_WIFI.contains(info.getProtocol())) {
 				return null;
 			} else {
@@ -33,7 +65,7 @@ public class ProtocolAnalyzer extends AbstractPalladioAnalyzer<CommunicationLink
 						"Protocol '" + info.getProtocol() + "' is not listed as a secure wifi protocol type.");
 			}
 		} else if (cState.getConnectionType() == MobileConnectionType.MOBILE) {
-			MobileMobileConnectionInfo info = (MobileMobileConnectionInfo) cState.getConnectionInfo();
+			final MobileMobileConnectionInfo info = (MobileMobileConnectionInfo) cState.getConnectionInfo();
 			if (SECURE_PROTOCOLS_MOBILE.contains(info.getProtocol())) {
 				return null;
 			} else {
@@ -46,8 +78,11 @@ public class ProtocolAnalyzer extends AbstractPalladioAnalyzer<CommunicationLink
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected List<CommunicationLinkPrivacy> extract(PalladioInstance instance) {
+	protected List<CommunicationLinkPrivacy> extract(final PalladioInstance instance) {
 		return this.getPrivacyLinks(instance);
 	}
 

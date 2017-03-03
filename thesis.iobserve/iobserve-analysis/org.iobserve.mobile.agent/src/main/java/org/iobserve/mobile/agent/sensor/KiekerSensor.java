@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.sensor;
 
 import java.security.SecureRandom;
@@ -6,14 +21,14 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.iobserve.mobile.agent.callback.CallbackManager;
-import org.iobserve.mobile.agent.core.AndroidAgent;
-import org.iobserve.mobile.agent.util.DependencyManager;
-
 import kieker.common.record.flow.trace.TraceMetadata;
 import kieker.common.record.flow.trace.operation.AfterOperationEvent;
 import kieker.common.record.flow.trace.operation.AfterOperationFailedEvent;
 import kieker.common.record.flow.trace.operation.BeforeOperationEvent;
+
+import org.iobserve.mobile.agent.callback.CallbackManager;
+import org.iobserve.mobile.agent.core.AndroidAgent;
+import org.iobserve.mobile.agent.util.DependencyManager;
 
 /**
  * Sensor for dealing with operations executed before and after method
@@ -28,12 +43,12 @@ import kieker.common.record.flow.trace.operation.BeforeOperationEvent;
  */
 public class KiekerSensor implements ISensor {
 	/**
-	 * Link to the {@link TraceRegistry}
+	 * Link to the {@link TraceRegistry}.
 	 */
 	private static final TraceRegistry TRACEREGISTRY = TraceRegistry.INSTANCE;
 
 	/**
-	 * Reference to the {@link CallbackManager}
+	 * Reference to the {@link CallbackManager}.
 	 */
 	private CallbackManager callbackManager = DependencyManager.getCallbackManager();
 
@@ -87,7 +102,7 @@ public class KiekerSensor implements ISensor {
 
 		traceId = trace.getTraceId();
 
-		BeforeOperationEvent event = new BeforeOperationEvent(System.nanoTime(), traceId, trace.getNextOrderId(),
+		final BeforeOperationEvent event = new BeforeOperationEvent(System.nanoTime(), traceId, trace.getNextOrderId(),
 				signature, clazz);
 		if (callbackManager == null) {
 			AndroidAgent.queueForInit(event);
@@ -100,12 +115,12 @@ public class KiekerSensor implements ISensor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void exceptionThrown(String caused) {
+	public void exceptionThrown(final String caused) {
 		if (newTrace) {
 			TRACEREGISTRY.unregisterTrace();
 		}
 
-		AfterOperationFailedEvent event = new AfterOperationFailedEvent(System.nanoTime(), traceId,
+		final AfterOperationFailedEvent event = new AfterOperationFailedEvent(System.nanoTime(), traceId,
 				trace.getNextOrderId(), signature, clazz, caused);
 		if (callbackManager == null) {
 			AndroidAgent.queueForInit(event);
@@ -123,7 +138,7 @@ public class KiekerSensor implements ISensor {
 			TRACEREGISTRY.unregisterTrace();
 		}
 
-		AfterOperationEvent event = new AfterOperationEvent(System.nanoTime(), traceId, trace.getNextOrderId(),
+		final AfterOperationEvent event = new AfterOperationEvent(System.nanoTime(), traceId, trace.getNextOrderId(),
 				signature, clazz);
 		if (callbackManager == null) {
 			AndroidAgent.queueForInit(event);
@@ -143,7 +158,7 @@ public class KiekerSensor implements ISensor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setOwner(String owner) {
+	public void setOwner(final String owner) {
 		clazz = formatClazz(owner);
 	}
 
@@ -151,7 +166,7 @@ public class KiekerSensor implements ISensor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setSignature(String methodSignature) {
+	public void setSignature(final String methodSignature) {
 		signature = formatOperation(methodSignature);
 	}
 
@@ -163,7 +178,7 @@ public class KiekerSensor implements ISensor {
 	 *            internal representation of the class
 	 * @return original class name
 	 */
-	private String formatClazz(String clazz) {
+	private String formatClazz(final String clazz) {
 		return clazz.replaceAll("/", ".");
 	}
 
@@ -175,9 +190,10 @@ public class KiekerSensor implements ISensor {
 	 * @return reformatted operation in nearly original form
 	 */
 	private String formatOperation(String operation) {
-		String[] opSplit = operation.split("\\)");
-		if (opSplit.length == 2)
+		final String[] opSplit = operation.split("\\)");
+		if (opSplit.length == 2) {
 			operation = opSplit[0] + ")"; // remove return type
+		}
 		return clazz + "." + operation.replaceAll(";", "").replaceAll("/", ".").replaceAll("L", "");
 	}
 

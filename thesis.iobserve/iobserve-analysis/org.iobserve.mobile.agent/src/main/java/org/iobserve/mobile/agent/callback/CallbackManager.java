@@ -1,7 +1,24 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.callback;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import kieker.common.record.IMonitoringRecord;
 
 import org.iobserve.mobile.agent.callback.strategies.AbstractCallbackStrategy;
 import org.iobserve.mobile.agent.core.ExternalConfiguration;
@@ -12,7 +29,6 @@ import org.iobserve.shared.callback.data.MobileDefaultData;
 import org.iobserve.shared.callback.kieker.PlainKieker;
 
 import android.util.Log;
-import kieker.common.record.IMonitoringRecord;
 
 /**
  * Component which handles the connection to the server which persists the
@@ -39,7 +55,8 @@ public class CallbackManager {
 	private boolean sessActive;
 
 	/**
-	 * Contains all data which isn't sent already because there is no connection
+	 * Contains all data which isn't sent already because there is no
+	 * connection.
 	 */
 	private List<MobileDefaultData> sessQueue;
 
@@ -58,7 +75,7 @@ public class CallbackManager {
 	 * @param data
 	 *            data which should be transferred to the server
 	 */
-	public void pushData(MobileDefaultData data) {
+	public void pushData(final MobileDefaultData data) {
 		if (!sessActive) {
 			this.sessQueue.add(data);
 		} else {
@@ -72,7 +89,7 @@ public class CallbackManager {
 	 * @param record
 	 *            the Kieker record which should be transferred to the server
 	 */
-	public void pushKiekerData(IMonitoringRecord record) {
+	public void pushKiekerData(final IMonitoringRecord record) {
 		this.pushData(new PlainKieker(record));
 	}
 
@@ -82,11 +99,11 @@ public class CallbackManager {
 	 * @param response
 	 *            hello request which should be sent to the servers
 	 */
-	public void pushHelloMessage(HelloRequest response) {
-		MobileCallbackData data = new MobileCallbackData();
+	public void pushHelloMessage(final HelloRequest response) {
+		final MobileCallbackData data = new MobileCallbackData();
 		data.setSessionId(null);
 
-		List<MobileDefaultData> childs = new ArrayList<MobileDefaultData>();
+		final List<MobileDefaultData> childs = new ArrayList<MobileDefaultData>();
 		childs.add(response);
 
 		data.setChildData(childs);
@@ -119,7 +136,7 @@ public class CallbackManager {
 	 * @param id
 	 *            session id
 	 */
-	public void applySessionId(String id) {
+	public void applySessionId(final String id) {
 		if (!sessActive) {
 			Log.i(LOG_TAG, "Created session with id '" + id + "' for communicating with the CMR.");
 

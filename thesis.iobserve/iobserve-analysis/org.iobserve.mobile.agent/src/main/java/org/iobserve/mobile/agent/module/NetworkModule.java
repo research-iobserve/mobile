@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.module;
 
 import java.io.IOException;
@@ -36,15 +51,21 @@ public class NetworkModule extends AbstractAndroidModule {
 	private Map<HttpURLConnection, ConnectionState> connectionStateMap;
 
 	/**
+	 * Creates a new default instance.
+	 */
+	public NetworkModule() {
+	}
+
+	/**
 	 * Executed when a connection is opened. This creates a new entry in the
 	 * state map for the connection.
 	 * 
 	 * @param conn
 	 *            the connection which has been created
 	 */
-	public void openConnection(HttpURLConnection conn) {
+	public void openConnection(final HttpURLConnection conn) {
 		if (!this.connectionStateMap.containsKey(conn)) {
-			ConnectionState connState = new ConnectionState();
+			final ConnectionState connState = new ConnectionState();
 			connState.update(ConnectionState.ConnectionPoint.CONNECT);
 			this.connectionStateMap.put(conn, connState);
 		}
@@ -61,9 +82,9 @@ public class NetworkModule extends AbstractAndroidModule {
 	 *             thrown when {@link HttpURLConnection#getResponseCode()}
 	 *             throws an exception
 	 */
-	public int getResponseCode(HttpURLConnection conn) throws IOException {
+	public int getResponseCode(final HttpURLConnection conn) throws IOException {
 		if (connectionStateMap.containsKey(conn)) {
-			int respCode = conn.getResponseCode();
+			final int respCode = conn.getResponseCode();
 			connectionStateMap.get(conn).update(ConnectionState.ConnectionPoint.RESPONSECODE);
 			return respCode;
 		} else {
@@ -82,9 +103,9 @@ public class NetworkModule extends AbstractAndroidModule {
 	 *             thrown when {@link HttpURLConnection#getOutputStream()}}
 	 *             throws an exception
 	 */
-	public OutputStream getOutputStream(HttpURLConnection conn) throws IOException {
+	public OutputStream getOutputStream(final HttpURLConnection conn) throws IOException {
 		if (connectionStateMap.containsKey(conn)) {
-			OutputStream out = conn.getOutputStream();
+			final OutputStream out = conn.getOutputStream();
 			connectionStateMap.get(conn).update(ConnectionState.ConnectionPoint.OUTPUT);
 			return out;
 		} else {
@@ -101,8 +122,8 @@ public class NetworkModule extends AbstractAndroidModule {
 	 * @param method
 	 *            the method of the request (either GET or POST)
 	 */
-	public void webViewLoad(String url, String method) {
-		NetRequestResponse netRequest = new NetRequestResponse();
+	public void webViewLoad(final String url, final String method) {
+		final NetRequestResponse netRequest = new NetRequestResponse();
 
 		netRequest.setDeviceId(androidDataCollector.getDeviceId());
 		netRequest.setDuration(0);
@@ -117,7 +138,7 @@ public class NetworkModule extends AbstractAndroidModule {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void initModule(Context ctx) {
+	public void initModule(final Context ctx) {
 		connectionStateMap = new HashMap<HttpURLConnection, ConnectionState>();
 	}
 
@@ -134,24 +155,24 @@ public class NetworkModule extends AbstractAndroidModule {
 	 */
 	@ExecutionProperty(interval = 60000L)
 	public void collectData() {
-		List<HttpURLConnection> removedConns = new ArrayList<HttpURLConnection>();
+		final List<HttpURLConnection> removedConns = new ArrayList<HttpURLConnection>();
 
 		for (HttpURLConnection conn : connectionStateMap.keySet()) {
-			ConnectionState state = connectionStateMap.get(conn);
+			final ConnectionState state = connectionStateMap.get(conn);
 			if (state.getLastUpdatedDiff() >= COLLECT_AFTER) {
 				if (state.probablyFinished()) {
-					long startStamp = state.getPointTimestamp(ConnectionState.ConnectionPoint.CONNECT);
+					final long startStamp = state.getPointTimestamp(ConnectionState.ConnectionPoint.CONNECT);
 					// long outputStamp =
 					// state.getPointTimestamp(ConnectionState.ConnectionPoint.OUTPUT);
-					long responseStamp = state.getPointTimestamp(ConnectionState.ConnectionPoint.RESPONSECODE);
+					final long responseStamp = state.getPointTimestamp(ConnectionState.ConnectionPoint.RESPONSECODE);
 
 					try {
-						int responseCode = conn.getResponseCode();
-						String url = conn.getURL().toString();
-						String method = conn.getRequestMethod();
+						final int responseCode = conn.getResponseCode();
+						final String url = conn.getURL().toString();
+						final String method = conn.getRequestMethod();
 
 						// LOG IT
-						NetRequestResponse response = new NetRequestResponse();
+						final NetRequestResponse response = new NetRequestResponse();
 						response.setDuration(responseStamp - startStamp);
 						response.setMethod(method);
 						response.setUrl(url);

@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.broadcast;
 
 import java.util.BitSet;
@@ -24,7 +39,7 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 	 * The action types which this receiver can process.
 	 */
 	private static final String[] ACTIONS = new String[] { "android.net.conn.CONNECTIVITY_CHANGE",
-			"android.net.wifi.WIFI_STATE_CHANGED" };
+			"android.net.wifi.WIFI_STATE_CHANGED", };
 
 	/**
 	 * The id of the device.
@@ -32,30 +47,36 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 	private String deviceId;
 
 	/**
+	 * Default instance creation.
+	 */
+	public NetworkBroadcastReceiver() {
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onReceive(Context context, Intent intent) {
+	public void onReceive(final Context context, final Intent intent) {
 		if (deviceId == null) {
 			deviceId = androidDataCollector.getDeviceId();
 		}
 
-		NetworkInfo currentNetwork = androidDataCollector.getNetworkInfo(true); // force
-																				// reload
+		final NetworkInfo currentNetwork = androidDataCollector.getNetworkInfo(true); // force
+		// reload
 		if (currentNetwork != null && currentNetwork.isConnected()) {
 			// connected
-			boolean wifi = currentNetwork.getType() == ConnectivityManager.TYPE_WIFI;
-			boolean mobile = currentNetwork.getType() == ConnectivityManager.TYPE_MOBILE;
+			final boolean wifi = currentNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+			final boolean mobile = currentNetwork.getType() == ConnectivityManager.TYPE_MOBILE;
 
 			// WIFI PART
 			if (wifi) {
-				WifiInfo wifiInfo = androidDataCollector.getWifiInfo(true);
-				WifiConfiguration currentConfig = androidDataCollector.getWifiConfiguration(false, true);
+				final WifiInfo wifiInfo = androidDataCollector.getWifiInfo(true);
+				final WifiConfiguration currentConfig = androidDataCollector.getWifiConfiguration(false, true);
 
 				if (wifiInfo != null && currentConfig != null) {
-					String wlanSSID = currentConfig.SSID;
-					String wlanBSSID = currentConfig.BSSID;
-					String protocolName = getProtocolName(currentConfig);
+					final String wlanSSID = currentConfig.SSID;
+					final String wlanBSSID = currentConfig.BSSID;
+					final String protocolName = getProtocolName(currentConfig);
 
 					this.pushData(new NetInfoResponse(deviceId, wifi, mobile, protocolName, "", wlanSSID, wlanBSSID));
 				}
@@ -63,8 +84,8 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 
 			// MOBILE PART
 			if (mobile) {
-				String provider = androidDataCollector.getNetworkCarrierName();
-				String protocolType = this.getProtocolName(currentNetwork.getSubtype());
+				final String provider = androidDataCollector.getNetworkCarrierName();
+				final String protocolType = this.getProtocolName(currentNetwork.getSubtype());
 
 				this.pushData(new NetInfoResponse(deviceId, wifi, mobile, protocolType, provider, "", ""));
 			}
@@ -90,8 +111,8 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 	 *            the wifi configuration
 	 * @return the protocol which is used as a string
 	 */
-	private String getProtocolName(WifiConfiguration config) {
-		BitSet allowedKeyMng = config.allowedKeyManagement;
+	private String getProtocolName(final WifiConfiguration config) {
+		final BitSet allowedKeyMng = config.allowedKeyManagement;
 
 		if (allowedKeyMng.get(WifiConfiguration.KeyMgmt.WPA_PSK)) {
 			// DIFFER WPA AND WPA2
@@ -114,13 +135,13 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 
 	/**
 	 * Gets the name of the protocol from a sub-type id which is derived from
-	 * the mobile network connection
+	 * the mobile network connection.
 	 * 
 	 * @param subtype
 	 *            the sub-type id from a mobile network
 	 * @return name of the protocol as string
 	 */
-	private String getProtocolName(int subtype) {
+	private String getProtocolName(final int subtype) {
 		switch (subtype) {
 		case TelephonyManager.NETWORK_TYPE_1xRTT:
 			return "1xrtt"; // ~ 50-100 kbps

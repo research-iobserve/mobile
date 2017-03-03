@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.module;
 
 import org.iobserve.mobile.agent.callback.CallbackManager;
@@ -13,7 +28,7 @@ import android.content.Context;
  * @author Robert Heinrich
  *
  */
-abstract public class AbstractAndroidModule {
+public abstract class AbstractAndroidModule {
 
 	/**
 	 * Link to the {@link AndroidDataCollector} component.
@@ -39,32 +54,32 @@ abstract public class AbstractAndroidModule {
 	public abstract void shutdownModule();
 
 	/**
-	 * Sets the {@link AndroidDataCollector}}
+	 * Sets the {@link AndroidDataCollector}}.
 	 * 
 	 * @param androidDataCollector
 	 *            the data collector to set
 	 */
-	public void setAndroidDataCollector(AndroidDataCollector androidDataCollector) {
+	public void setAndroidDataCollector(final AndroidDataCollector androidDataCollector) {
 		this.androidDataCollector = androidDataCollector;
 	}
 
 	/**
-	 * Sets the {@link CallbackManager}
+	 * Sets the {@link CallbackManager}.
 	 * 
 	 * @param callbackManager
 	 *            the callback manager to set
 	 */
-	public void setCallbackManager(CallbackManager callbackManager) {
+	public void setCallbackManager(final CallbackManager callbackManager) {
 		this.callbackManager = callbackManager;
 	}
 
 	/**
-	 * Pushes data to the {@link CallbackManager}
+	 * Pushes data to the {@link CallbackManager}.
 	 * 
 	 * @param data
 	 *            data which should be passed to the callback manager
 	 */
-	protected void pushData(MobileDefaultData data) {
+	protected void pushData(final MobileDefaultData data) {
 		callbackManager.pushData(data);
 	}
 }

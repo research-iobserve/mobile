@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.bytecode;
 
 import java.lang.reflect.Method;
@@ -73,7 +88,7 @@ public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {
 	 *            name of the sensor class which is responsible for processing
 	 *            the instrumented method call
 	 */
-	public SensorBytecodeInstrumenter(String sensClass) {
+	public SensorBytecodeInstrumenter(final String sensClass) {
 		this.sensor = sensClass;
 
 		try {
@@ -95,7 +110,8 @@ public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onMethodEnter(String owner, String name, String desc, AdviceAdapter parent, MethodVisitor mv) {
+	public void onMethodEnter(final String owner, final String name, final String desc, final AdviceAdapter parent,
+			final MethodVisitor mv) {
 		// add sensor call
 		mv.visitLdcInsn(sensor);
 		mv.visitLdcInsn(name + desc);
@@ -110,8 +126,8 @@ public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onMethodExit(int opcode, String owner, String name, String desc, AdviceAdapter parent,
-			MethodVisitor mv) {
+	public void onMethodExit(final int opcode, final String owner, final String name, final String desc,
+			final AdviceAdapter parent, final MethodVisitor mv) {
 		if (opcode == Opcodes.ATHROW) {
 			mv.visitInsn(Opcodes.DUP);
 			mv.visitVarInsn(Opcodes.LLOAD, index);

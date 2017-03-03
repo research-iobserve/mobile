@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.analysis.cli;
 
 import java.io.File;
@@ -25,11 +40,34 @@ import org.iobserve.mobile.analysis.AbstractPalladioAnalyzer;
 import org.iobserve.mobile.analysis.ConstraintViolation;
 import org.iobserve.mobile.analysis.PalladioInstance;
 
-public class AnalysisStart {
+/**
+ * Command Line Interface class for performing an analysis for a certain PCM
+ * instance.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
+public final class AnalysisStart {
 
+	/**
+	 * Pattern for constraint checker arguments.
+	 */
 	private static final Pattern CONSTRAINT_PATTERN = Pattern.compile("\\[(.*?)\\]");
 
-	public static void main(String[] args) {
+	/**
+	 * No instance creation allowed.
+	 */
+	private AnalysisStart() {
+	}
+
+	/**
+	 * Starts the analysis from given command line arguments.
+	 * 
+	 * @param args
+	 *            command line arguments
+	 */
+	public static void main(final String[] args) {
 		final CommandLineParser parser = new DefaultParser();
 
 		CommandLine commandLine;
@@ -66,27 +104,27 @@ public class AnalysisStart {
 						instance.usageModel = usageModelProvider.getModel();
 						instance.repository = repositoryModelProvider.getModel();
 
-						List<ConstraintViolation> violations = new ArrayList<>();
-						Matcher constraintMatcher = CONSTRAINT_PATTERN.matcher(constraintOption);
+						final List<ConstraintViolation> violations = new ArrayList<>();
+						final Matcher constraintMatcher = CONSTRAINT_PATTERN.matcher(constraintOption);
 						if (constraintMatcher.find()) {
-							String[] classes = constraintMatcher.group(1).split(",");
+							final String[] classes = constraintMatcher.group(1).split(",");
 							for (String clazz : classes) {
-								String[] argSplit = clazz.split("\\(");
+								final String[] argSplit = clazz.split("\\(");
 
 								if (argSplit.length == 2) {
-									String[] argv = argSplit[1].substring(0, argSplit[1].length() - 1).split(";");
-									Class<?>[] types = new Class<?>[argv.length];
+									final String[] argv = argSplit[1].substring(0, argSplit[1].length() - 1).split(";");
+									final Class<?>[] types = new Class<?>[argv.length];
 									for (int i = 0; i < types.length; i++) {
 										types[i] = String.class;
 									}
 
 									try {
-										Class<?> resolved = Class.forName(argSplit[0]);
-										Constructor<?> constructor = resolved.getConstructor(types);
+										final Class<?> resolved = Class.forName(argSplit[0]);
+										final Constructor<?> constructor = resolved.getConstructor(types);
 
-										Object obj = constructor.newInstance((Object[]) argv);
+										final Object obj = constructor.newInstance((Object[]) argv);
 										if (AbstractPalladioAnalyzer.class.isAssignableFrom(obj.getClass())) {
-											AbstractPalladioAnalyzer<?> alz = (AbstractPalladioAnalyzer<?>) obj;
+											final AbstractPalladioAnalyzer<?> alz = (AbstractPalladioAnalyzer<?>) obj;
 											violations.addAll(alz.analyze(instance));
 										}
 									} catch (ClassNotFoundException | NoSuchMethodException | SecurityException
@@ -97,12 +135,12 @@ public class AnalysisStart {
 								} else {
 									// TODO fix code duplication
 									try {
-										Class<?> resolved = Class.forName(argSplit[0]);
-										Constructor<?> constructor = resolved.getConstructor();
+										final Class<?> resolved = Class.forName(argSplit[0]);
+										final Constructor<?> constructor = resolved.getConstructor();
 
-										Object obj = constructor.newInstance();
+										final Object obj = constructor.newInstance();
 										if (AbstractPalladioAnalyzer.class.isAssignableFrom(obj.getClass())) {
-											AbstractPalladioAnalyzer<?> alz = (AbstractPalladioAnalyzer<?>) obj;
+											final AbstractPalladioAnalyzer<?> alz = (AbstractPalladioAnalyzer<?>) obj;
 											violations.addAll(alz.analyze(instance));
 										}
 									} catch (ClassNotFoundException | NoSuchMethodException | SecurityException
@@ -129,6 +167,11 @@ public class AnalysisStart {
 
 	}
 
+	/**
+	 * Creates the options for the CLI.
+	 * 
+	 * @return options for the CLI
+	 */
 	private static Options createOptions() {
 		final Options options = new Options();
 
@@ -140,6 +183,11 @@ public class AnalysisStart {
 		return options;
 	}
 
+	/**
+	 * Creates the help options for the CLI.
+	 * 
+	 * @return help options for the CLI
+	 */
 	private static Options createHelpOptions() {
 		final Options options = new Options();
 

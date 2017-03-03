@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.core;
 
 import java.io.File;
@@ -14,7 +29,7 @@ import org.apache.logging.log4j.Logger;
  * @author Robert Heinrich
  *
  */
-public class Dex2JarProxy {
+public final class Dex2JarProxy {
 
 	/** Logger. */
 	private static final Logger LOG = LogManager.getLogger(Dex2JarProxy.class);
@@ -35,6 +50,12 @@ public class Dex2JarProxy {
 	private static final String DEX2JAR_BATCH = "d2j-dex2jar.bat";
 
 	/**
+	 * No instance creation allowed because static tooling class.
+	 */
+	private Dex2JarProxy() {
+	}
+
+	/**
 	 * Creates a jar file from a dex file.
 	 * 
 	 * @param dex
@@ -43,9 +64,10 @@ public class Dex2JarProxy {
 	 *            the path where to store the jar
 	 * @return true if success - false otherwise
 	 */
-	public static boolean createJarFromDex(File dex, File output) {
-		if (!dex.exists() || output.exists())
+	public static boolean createJarFromDex(final File dex, final File output) {
+		if (!dex.exists() || output.exists()) {
 			return false;
+		}
 
 		return executeTool(DEX2JAR_BATCH, DEX2JAR_SH, dex, output);
 	}
@@ -59,9 +81,10 @@ public class Dex2JarProxy {
 	 *            the path where to store the dex
 	 * @return true if success - false otherwise
 	 */
-	public static boolean createDexFromJar(File jar, File dex) {
-		if (!jar.exists() || dex.exists())
+	public static boolean createDexFromJar(final File jar, final File dex) {
+		if (!jar.exists() || dex.exists()) {
 			return false;
+		}
 
 		return executeTool(JAR2DEX_BATCH, JAR2DEX_SH, jar, dex);
 	}
@@ -79,7 +102,7 @@ public class Dex2JarProxy {
 	 *            output file
 	 * @return true if sucess - false otherwise
 	 */
-	private static boolean executeTool(String windows, String unix, File input, File output) {
+	private static boolean executeTool(final String windows, final String unix, final File input, final File output) {
 		ProcessBuilder pb = null;
 		if (SystemUtils.IS_OS_WINDOWS) {
 			// use the batch

@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.callback;
 
 import java.io.BufferedReader;
@@ -33,7 +48,7 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 	/**
 	 * JSON object mapper for serializing and de-serializing JSON strings.
 	 */
-	private static final ObjectMapper objectMapper = new ObjectMapper();
+	private static final ObjectMapper OBJECTMAPPER = new ObjectMapper();
 
 	/**
 	 * The REST interface URL.
@@ -41,7 +56,7 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 	private String callbackUrl;
 
 	/**
-	 * Reference to the {@link CallbackManager}
+	 * Reference to the {@link CallbackManager}.
 	 */
 	private CallbackManager callbackManager = DependencyManager.getCallbackManager();
 
@@ -51,7 +66,7 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 	 * @param url
 	 *            REST interface URL
 	 */
-	public CallbackTask(String url) {
+	public CallbackTask(final String url) {
 		this.callbackUrl = url;
 	}
 
@@ -59,7 +74,7 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String doInBackground(String... params) {
+	protected String doInBackground(final String... params) {
 		if (params.length == 1) {
 			return postRequest(callbackUrl, params[0]);
 		} else {
@@ -71,10 +86,10 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void onPostExecute(String result) {
+	protected void onPostExecute(final String result) {
 		if (result != null && !result.isEmpty()) {
 			try {
-				HelloResponse resp = objectMapper.readValue(result, HelloResponse.class);
+				final HelloResponse resp = OBJECTMAPPER.readValue(result, HelloResponse.class);
 				if (resp.getSessionId() != null && resp.getSessionId().length() > 0) {
 					callbackManager.applySessionId(resp.getSessionId());
 				}
@@ -94,20 +109,20 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 	 *            the data
 	 * @return the response from the server
 	 */
-	private String postRequest(String rawUrl, String data) {
+	private String postRequest(final String rawUrl, final String data) {
 		Log.i(LOG_TAG, "Sending back beacon to '" + rawUrl + "'.");
 		try {
-			URL url = new URL(rawUrl);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			final URL url = new URL(rawUrl);
+			final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("Content-Type", "application/json");
 
-			OutputStream os = conn.getOutputStream();
+			final OutputStream os = conn.getOutputStream();
 			os.write(data.getBytes());
 			os.flush();
 
-			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+			final BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
 			String output;
 			String all = null;

@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.core;
 
 import java.io.BufferedWriter;
@@ -40,13 +55,14 @@ public class JarSigner {
 	 * @throws IOException
 	 *             if there occured a problem while executing the jarsigner tool
 	 */
-	public void signJar(File jarFile, String keyStore, String alias, String pass) throws IOException {
-		ProcessBuilder processBuilder = new ProcessBuilder("jarsigner", "-sigalg", "SHA1withRSA", "-digestalg", "SHA1",
-				"-keystore", keyStore, jarFile.getAbsolutePath(), alias);
+	public void signJar(final File jarFile, final String keyStore, final String alias, final String pass)
+			throws IOException {
+		final ProcessBuilder processBuilder = new ProcessBuilder("jarsigner", "-sigalg", "SHA1withRSA", "-digestalg",
+				"SHA1", "-keystore", keyStore, jarFile.getAbsolutePath(), alias);
 
-		Process signJarProcess = processBuilder.start();
+		final Process signJarProcess = processBuilder.start();
 
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(signJarProcess.getOutputStream()));
+		final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(signJarProcess.getOutputStream()));
 
 		writer.write(pass, 0, pass.length());
 		writer.newLine();
@@ -76,7 +92,8 @@ public class JarSigner {
 	 * @throws IOException
 	 *             if there occured a problem while executing the jarsigner tool
 	 */
-	public void signJar(File jarFile, File keyStore, String alias, String pass) throws IOException {
+	public void signJar(final File jarFile, final File keyStore, final String alias, final String pass)
+			throws IOException {
 		signJar(jarFile, keyStore.getAbsolutePath(), alias, pass);
 	}
 

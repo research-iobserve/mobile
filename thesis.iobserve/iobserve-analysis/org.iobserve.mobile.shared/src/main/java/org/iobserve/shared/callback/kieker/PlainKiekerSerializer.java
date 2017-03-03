@@ -1,8 +1,24 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.shared.callback.kieker;
 
 import java.io.IOException;
 
 import kieker.common.record.IMonitoringRecord;
+
 import rocks.fasterxml.jackson.core.JsonGenerator;
 import rocks.fasterxml.jackson.databind.JsonNode;
 import rocks.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +39,7 @@ public class PlainKiekerSerializer extends StdSerializer<IMonitoringRecord> {
 	/**
 	 * Jackson object mapper to work with JSON.
 	 */
-	private static final ObjectMapper mapper = new ObjectMapper();
+	private static final ObjectMapper MAPPER = new ObjectMapper();
 
 	/**
 	 * Generated UID.
@@ -43,7 +59,7 @@ public class PlainKiekerSerializer extends StdSerializer<IMonitoringRecord> {
 	 * @param type
 	 *            the type
 	 */
-	public PlainKiekerSerializer(Class<IMonitoringRecord> type) {
+	public PlainKiekerSerializer(final Class<IMonitoringRecord> type) {
 		super(type);
 	}
 
@@ -51,9 +67,10 @@ public class PlainKiekerSerializer extends StdSerializer<IMonitoringRecord> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void serialize(IMonitoringRecord arg0, JsonGenerator arg1, SerializerProvider arg2) throws IOException {
-		JsonNode tree = (JsonNode) mapper.valueToTree(arg0);
-		ObjectNode objNode = (ObjectNode) tree;
+	public void serialize(final IMonitoringRecord arg0, final JsonGenerator arg1, final SerializerProvider arg2)
+			throws IOException {
+		final JsonNode tree = (JsonNode) MAPPER.valueToTree(arg0);
+		final ObjectNode objNode = (ObjectNode) tree;
 
 		objNode.put("type", arg0.getClass().getSimpleName());
 

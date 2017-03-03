@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.callback.strategies;
 
 import org.iobserve.shared.callback.data.MobileDefaultData;
@@ -59,7 +74,7 @@ public class IntervalStrategy extends AbstractCallbackStrategy {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public synchronized void addData(MobileDefaultData data) {
+	public synchronized void addData(final MobileDefaultData data) {
 		super.data.addChildData(data);
 		if (!alreadyRunning) {
 			mHandler.postDelayed(new Runnable() {
@@ -91,7 +106,7 @@ public class IntervalStrategy extends AbstractCallbackStrategy {
 	 * @param intervalLength
 	 *            the intervalLength to set
 	 */
-	public void setIntervalLength(long intervalLength) {
+	public void setIntervalLength(final long intervalLength) {
 		this.intervalLength = intervalLength;
 	}
 

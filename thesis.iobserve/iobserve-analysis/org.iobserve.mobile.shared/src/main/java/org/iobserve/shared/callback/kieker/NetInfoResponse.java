@@ -1,9 +1,24 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.shared.callback.kieker;
+
+import kieker.common.record.IMonitoringRecord;
 
 import org.iobserve.common.mobile.record.MobileNetworkEventRecord;
 import org.iobserve.shared.callback.data.MobileDefaultData;
-
-import kieker.common.record.IMonitoringRecord;
 
 /**
  * Monitoring record for the network connection information of a mobile device.
@@ -66,8 +81,8 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 	 * @param wlanBSSID
 	 *            wifi bssid
 	 */
-	public NetInfoResponse(String deviceId, boolean wifi, boolean mobile, String protcolName, String carrierName,
-			String wlanSSID, String wlanBSSID) {
+	public NetInfoResponse(final String deviceId, final boolean wifi, final boolean mobile, final String protcolName,
+			final String carrierName, final String wlanSSID, final String wlanBSSID) {
 		setWifi(wifi);
 		setMobile(mobile);
 		setSsid(wlanSSID);
@@ -102,7 +117,7 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 	 * @param wifi
 	 *            the wifi to set
 	 */
-	public void setWifi(boolean wifi) {
+	public void setWifi(final boolean wifi) {
 		this.wifi = wifi;
 	}
 
@@ -117,7 +132,7 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 	 * @param mobile
 	 *            the mobile to set
 	 */
-	public void setMobile(boolean mobile) {
+	public void setMobile(final boolean mobile) {
 		this.mobile = mobile;
 	}
 
@@ -132,7 +147,7 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 	 * @param protocolName
 	 *            the protocolName to set
 	 */
-	public void setProtocolName(String protocolName) {
+	public void setProtocolName(final String protocolName) {
 		this.protocolName = protocolName;
 	}
 
@@ -147,7 +162,7 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 	 * @param carrierName
 	 *            the carrierName to set
 	 */
-	public void setCarrierName(String carrierName) {
+	public void setCarrierName(final String carrierName) {
 		this.carrierName = carrierName;
 	}
 
@@ -162,7 +177,7 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 	 * @param ssid
 	 *            the ssid to set
 	 */
-	public void setSsid(String ssid) {
+	public void setSsid(final String ssid) {
 		this.ssid = ssid;
 	}
 
@@ -177,7 +192,7 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 	 * @param bssid
 	 *            the bssid to set
 	 */
-	public void setBssid(String bssid) {
+	public void setBssid(final String bssid) {
 		this.bssid = bssid;
 	}
 
@@ -192,7 +207,7 @@ public class NetInfoResponse extends MobileDefaultData implements IKiekerCompati
 	 * @param deviceId
 	 *            the deviceId to set
 	 */
-	public void setDeviceId(String deviceId) {
+	public void setDeviceId(final String deviceId) {
 		this.deviceId = deviceId;
 	}
 }

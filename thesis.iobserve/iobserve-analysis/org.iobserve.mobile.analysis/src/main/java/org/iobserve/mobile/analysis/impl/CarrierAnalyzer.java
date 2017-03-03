@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.analysis.impl;
 
 import java.io.IOException;
@@ -14,11 +29,28 @@ import org.iobserve.mobile.analysis.PalladioInstance;
 
 import privacy_ext.CommunicationLinkPrivacy;
 
+/**
+ * Analyzer for mobile connections which inspects the carrier of the links.
+ * 
+ * @author David Monschein
+ * @author Robert Heinrich
+ *
+ */
 public class CarrierAnalyzer extends AbstractPalladioAnalyzer<MobileMobileConnectionInfo> {
 
+	/**
+	 * List of carriers which are whitelisted.
+	 */
 	private Set<String> carrierList;
 
-	public CarrierAnalyzer(String carrList) {
+	/**
+	 * Creates a new instance with a file which provides a whitelist.
+	 * 
+	 * @param carrList
+	 *            path to a file which provides a whitelist of carriers
+	 *            line-wise
+	 */
+	public CarrierAnalyzer(final String carrList) {
 		try {
 			carrierList = this.provideFile(carrList);
 		} catch (IOException e) {
@@ -26,13 +58,16 @@ public class CarrierAnalyzer extends AbstractPalladioAnalyzer<MobileMobileConnec
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected List<MobileMobileConnectionInfo> extract(PalladioInstance instance) {
-		List<CommunicationLinkPrivacy> links = getPrivacyLinks(instance);
-		List<MobileMobileConnectionInfo> mobile = new ArrayList<>();
+	protected List<MobileMobileConnectionInfo> extract(final PalladioInstance instance) {
+		final List<CommunicationLinkPrivacy> links = getPrivacyLinks(instance);
+		final List<MobileMobileConnectionInfo> mobile = new ArrayList<>();
 
 		for (CommunicationLinkPrivacy link : links) {
-			MobileConnectionState state = new MobileConnectionState(link);
+			final MobileConnectionState state = new MobileConnectionState(link);
 			if (state.getConnectionType() == MobileConnectionType.MOBILE) {
 				mobile.add((MobileMobileConnectionInfo) state.getConnectionInfo());
 			}
@@ -41,8 +76,11 @@ public class CarrierAnalyzer extends AbstractPalladioAnalyzer<MobileMobileConnec
 		return mobile;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected ConstraintViolation isViolation(MobileMobileConnectionInfo value) {
+	protected ConstraintViolation isViolation(final MobileMobileConnectionInfo value) {
 		if (carrierList.contains(value.getCarrier())) {
 			return null;
 		} else {

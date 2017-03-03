@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.module.util;
 
 import java.net.HttpURLConnection;
@@ -50,7 +65,7 @@ public class ConnectionState {
 	 *            connection point
 	 * @return timestamp when the point was reached
 	 */
-	public long getPointTimestamp(ConnectionPoint point) {
+	public long getPointTimestamp(final ConnectionPoint point) {
 		if (reachedPointsTimestamps.containsKey(point)) {
 			return reachedPointsTimestamps.get(point);
 		} else {
@@ -64,9 +79,9 @@ public class ConnectionState {
 	 * @param point
 	 *            the point which has been reached.
 	 */
-	public void update(ConnectionPoint point) {
+	public void update(final ConnectionPoint point) {
 		if (point != null && reachedPointsMap.containsKey(point)) {
-			if (reachedPointsMap.get(point) == false) {
+			if (!reachedPointsMap.get(point)) {
 				reachedPointsTimestamps.put(point, System.currentTimeMillis());
 				reachedPointsMap.put(point, true);
 
@@ -95,7 +110,7 @@ public class ConnectionState {
 
 	/**
 	 * Gets the time between now and the time when the state was updated the
-	 * last time
+	 * last time.
 	 * 
 	 * @return the time when the state was updated the last time
 	 */

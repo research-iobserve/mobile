@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.callback.strategies;
 
 import org.iobserve.mobile.agent.callback.CallbackTask;
@@ -24,7 +39,7 @@ public abstract class AbstractCallbackStrategy {
 
 	/**
 	 * {@link MobileCallbackData} which holds the data which should be sent to
-	 * the server
+	 * the server.
 	 */
 	protected MobileCallbackData data;
 
@@ -58,7 +73,7 @@ public abstract class AbstractCallbackStrategy {
 	 * @param isHello
 	 *            whether it is a session creation message or not
 	 */
-	public void sendImmediately(MobileCallbackData data, boolean isHello) {
+	public void sendImmediately(final MobileCallbackData data, final boolean isHello) {
 		this.sendBeacon(data, isHello);
 		data.clear();
 	}
@@ -77,7 +92,7 @@ public abstract class AbstractCallbackStrategy {
 	 * @param id
 	 *            session id
 	 */
-	public void setSessId(String id) {
+	public void setSessId(final String id) {
 		this.data.setSessionId(id);
 	}
 
@@ -97,9 +112,9 @@ public abstract class AbstractCallbackStrategy {
 	 * @param helloReq
 	 *            whether it is a session creation message or not
 	 */
-	private void sendBeacon(MobileCallbackData data, boolean helloReq) {
+	private void sendBeacon(final MobileCallbackData data, final boolean helloReq) {
 		if (data != null && data.getChildData().size() > 0) {
-			String callbackUrl;
+			final String callbackUrl;
 			if (helloReq) {
 				callbackUrl = ExternalConfiguration.getHelloUrl();
 			} else {

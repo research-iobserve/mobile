@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.bytecode;
 
 import java.lang.reflect.Method;
@@ -120,7 +135,7 @@ public class NetworkBytecodeInstrumenter {
 	 * 
 	 * @param mv
 	 *            the belonging method code visitor
-	 * @param mv_internal
+	 * @param mvInternal
 	 *            the method visitor which is used internally
 	 * @param opcode
 	 *            the opcode
@@ -135,50 +150,50 @@ public class NetworkBytecodeInstrumenter {
 	 * @return true if it was a network action and it is instrumented now -
 	 *         false otherwise
 	 */
-	public boolean visit(DefaultMethodCodeVisitor mv, MethodVisitor mv_internal, int opcode, String owner, String name,
-			String desc, boolean itf) {
+	public boolean visit(final DefaultMethodCodeVisitor mv, final MethodVisitor mvInternal, final int opcode,
+			final String owner, final String name, final String desc, final boolean itf) {
 		// BYTECODE MAGIC
 		if (descReturnType(desc).equalsIgnoreCase(HTTPURLCONNECTION_TYPE.getDescriptor())) {
 			mv.increaseStack(1);
 			// write old
-			mv_internal.visitMethodInsn(opcode, owner, name, desc, itf);
+			mvInternal.visitMethodInsn(opcode, owner, name, desc, itf);
 			// DUP
 			mv.dup();
 			// write own
-			mv_internal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
+			mvInternal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 					httpConnectMethod.getName(), httpConnectType.getDescriptor(), false);
 		} else if (descReturnType(desc).equalsIgnoreCase(URLCONNECTION_TYPE.getDescriptor())) {
 			mv.increaseStack(1);
 			// write old
-			mv_internal.visitMethodInsn(opcode, owner, name, desc, itf);
+			mvInternal.visitMethodInsn(opcode, owner, name, desc, itf);
 			// DUP
 			mv.dup();
 			// write own
-			mv_internal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
+			mvInternal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 					httpConnectMethod2.getName(), httpConnectType2.getDescriptor(), false);
 		} else if (owner.equalsIgnoreCase(HTTPURLCONNECTION_TYPE.getInternalName())) {
-			if (name.equals("getOutputStream")) {
+			if ("getOutputStream".equals(name)) {
 				// write own
-				mv_internal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
+				mvInternal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 						getOutputStreamMethod.getName(), getOutputStreamType.getDescriptor(), false);
-			} else if (name.equals("getResponseCode")) {
+			} else if ("getResponseCode".equals(name)) {
 				// write own
-				mv_internal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
+				mvInternal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 						getResponseCodeMethod.getName(), getResponseCodeType.getDescriptor(), false);
 			} else {
 				return false;
 			}
 		} else if (owner.equalsIgnoreCase(ANDROIDWEBVIEW_TYPE.getInternalName())) {
-			if (name.equals("loadUrl")) {
+			if ("loadUrl".equals(name)) {
 				if (!desc.contains("java/util/Map")) {
 					mv.increaseStack(2);
 
 					mv.dup2();
 					// write old
-					mv_internal.visitMethodInsn(opcode, owner, name, desc, itf);
+					mvInternal.visitMethodInsn(opcode, owner, name, desc, itf);
 
 					// write own
-					mv_internal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
+					mvInternal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 							webViewLoadMethod.getName(), webViewLoadType.getDescriptor(), false);
 
 					mv.pop();
@@ -200,8 +215,8 @@ public class NetworkBytecodeInstrumenter {
 	 *            full description of a method
 	 * @return return type of that method
 	 */
-	private String descReturnType(String desc) {
-		String[] sp = desc.split("\\)");
+	private String descReturnType(final String desc) {
+		final String[] sp = desc.split("\\)");
 		return sp[1];
 	}
 

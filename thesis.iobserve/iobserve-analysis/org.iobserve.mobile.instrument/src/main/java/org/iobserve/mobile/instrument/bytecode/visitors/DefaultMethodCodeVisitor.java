@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.bytecode.visitors;
 
 import org.iobserve.mobile.instrument.config.InstrumentationConfiguration;
@@ -47,8 +62,8 @@ public class DefaultMethodCodeVisitor extends AdviceAdapter {
 	 * @param desc
 	 *            the description of the method
 	 */
-	protected DefaultMethodCodeVisitor(InstrumentationConfiguration config, StandardClassVisitor parent, int api,
-			MethodVisitor mv, int access, String name, String desc) {
+	protected DefaultMethodCodeVisitor(final InstrumentationConfiguration config, final StandardClassVisitor parent,
+			final int api, final MethodVisitor mv, final int access, final String name, final String desc) {
 		super(api, mv, access, name, desc);
 		this.configuration = config;
 		this.parent = parent;
@@ -59,7 +74,8 @@ public class DefaultMethodCodeVisitor extends AdviceAdapter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+	public void visitMethodInsn(final int opcode, final String owner, final String name, final String desc,
+			final boolean itf) {
 		if (configuration.matchesHttpInstrumentationPoint(owner, desc)) {
 			if (configuration.getNetworkBytecodeInstrumenter().visit(this, mv, opcode, owner, name, desc, itf)) {
 				parent.setWritten(true);
@@ -75,18 +91,18 @@ public class DefaultMethodCodeVisitor extends AdviceAdapter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void visitMaxs(int maxStack, int maxLocals) {
+	public void visitMaxs(final int maxStack, final int maxLocals) {
 		super.visitMaxs(maxStack + k, maxLocals);
 	}
 
 	/**
 	 * Increases the stack size by a given value.
 	 * 
-	 * @param k
+	 * @param kk
 	 *            the size which should be added to the max stack size
 	 */
-	public void increaseStack(int k) {
-		this.k += k;
+	public void increaseStack(final int kk) {
+		this.k += kk;
 	}
 
 }

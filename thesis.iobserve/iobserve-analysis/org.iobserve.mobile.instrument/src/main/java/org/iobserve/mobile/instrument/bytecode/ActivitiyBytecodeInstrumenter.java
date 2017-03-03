@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.bytecode;
 
 import java.lang.reflect.Method;
@@ -119,7 +134,7 @@ public class ActivitiyBytecodeInstrumenter implements IBytecodeInstrumenter {
 	 *            configuration which specifies the mapping between activity
 	 *            methods and agent methods.
 	 */
-	public ActivitiyBytecodeInstrumenter(InstrumentationConfiguration configuration) {
+	public ActivitiyBytecodeInstrumenter(final InstrumentationConfiguration configuration) {
 		this();
 		this.connectionConfig = configuration.getXmlConfiguration().getConnectionInfo();
 		this.activityPointMapping = new HashMap<String, String>();
@@ -134,9 +149,10 @@ public class ActivitiyBytecodeInstrumenter implements IBytecodeInstrumenter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onMethodEnter(String owner, String name, String desc, AdviceAdapter parent, MethodVisitor mv) {
-		if (name.equals("onCreate")) {
-			String belAgentPoint = activityPointMapping.get("onCreate");
+	public void onMethodEnter(final String owner, final String name, final String desc, final AdviceAdapter parent,
+			final MethodVisitor mv) {
+		if ("onCreate".equals(name)) {
+			final String belAgentPoint = activityPointMapping.get("onCreate");
 
 			// INSERT CONFIG CALLS
 			mv.visitLdcInsn(connectionConfig.getBeaconUrl());
@@ -151,15 +167,15 @@ public class ActivitiyBytecodeInstrumenter implements IBytecodeInstrumenter {
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(), belAgentPoint,
 					"(Landroid/app/Activity;)V", false);
-		} else if (name.equals("onDestroy")) {
-			String belAgentPoint = activityPointMapping.get("onDestroy");
+		} else if ("onDestroy".equals(name)) {
+			final String belAgentPoint = activityPointMapping.get("onDestroy");
 
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(), belAgentPoint, "()V", false);
-		} else if (name.equals("onStart")) {
+		} else if ("onStart".equals(name)) {
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 					onStartActivityMethod.getName(), onStartActivityType.getDescriptor(), false);
-		} else if (name.equals("onStop")) {
+		} else if ("onStop".equals(name)) {
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 					onStopActivityMethod.getName(), onStopActivityType.getDescriptor(), false);
@@ -170,8 +186,8 @@ public class ActivitiyBytecodeInstrumenter implements IBytecodeInstrumenter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onMethodExit(int opcode, String owner, String name, String desc, AdviceAdapter parent,
-			MethodVisitor mv) {
+	public void onMethodExit(final int opcode, final String owner, final String name, final String desc,
+			final AdviceAdapter parent, final MethodVisitor mv) {
 	}
 
 }

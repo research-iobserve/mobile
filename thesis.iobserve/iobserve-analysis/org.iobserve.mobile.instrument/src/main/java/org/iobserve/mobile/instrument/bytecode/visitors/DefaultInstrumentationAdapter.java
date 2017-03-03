@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.bytecode.visitors;
 
 import org.iobserve.mobile.instrument.bytecode.IBytecodeInstrumenter;
@@ -51,8 +66,8 @@ public class DefaultInstrumentationAdapter extends AdviceAdapter {
 	 * @param instrumenter
 	 *            instrumenter which performs code adjustments
 	 */
-	public DefaultInstrumentationAdapter(int api, String owner, int access, String name, String desc, MethodVisitor mv,
-			IBytecodeInstrumenter instrumenter) {
+	public DefaultInstrumentationAdapter(final int api, final String owner, final int access, final String name,
+			final String desc, final MethodVisitor mv, final IBytecodeInstrumenter instrumenter) {
 
 		super(api, mv, access, name, desc);
 		this.name = name;
@@ -75,7 +90,7 @@ public class DefaultInstrumentationAdapter extends AdviceAdapter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void onMethodExit(int opcode) {
+	protected void onMethodExit(final int opcode) {
 		super.onMethodExit(opcode);
 		instrumenter.onMethodExit(opcode, owner, name, desc, this, mv);
 	}
@@ -84,7 +99,7 @@ public class DefaultInstrumentationAdapter extends AdviceAdapter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void visitMaxs(int maxStack, int maxLocals) {
+	public void visitMaxs(final int maxStack, final int maxLocals) {
 		super.visitMaxs(maxStack + 3, maxLocals + 1); // to fit our needs
 	}
 

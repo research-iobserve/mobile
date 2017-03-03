@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.start;
 
 import java.io.File;
@@ -22,13 +37,19 @@ import net.lingala.zip4j.exception.ZipException;
  * @author Robert Heinrich
  *
  */
-public class InstrumenterTest {
+public final class InstrumenterTest {
 
 	/**
 	 * Whether we should open a prompt to select the application or use a
 	 * predefined application.
 	 */
-	private static final boolean selectApk = true;
+	private static final boolean SELECTAPK = true;
+
+	/**
+	 * No instance creation allowed because static main execution.
+	 */
+	private InstrumenterTest() {
+	}
 
 	/**
 	 * Executes the instrumentation.
@@ -48,10 +69,10 @@ public class InstrumenterTest {
 	 * @throws URISyntaxException
 	 *             caused by the instrumentation
 	 */
-	public static void main(String[] argv) throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
-			IOException, ZipException, URISyntaxException {
-		File toInstrument;
-		if (selectApk) {
+	public static void main(final String[] argv) throws KeyStoreException, NoSuchAlgorithmException,
+			CertificateException, IOException, ZipException, URISyntaxException {
+		final File toInstrument;
+		if (SELECTAPK) {
 			final JFileChooser fc = new JFileChooser();
 			fc.addChoosableFileFilter(new FileFilter() {
 				@Override
@@ -60,7 +81,7 @@ public class InstrumenterTest {
 				}
 
 				@Override
-				public boolean accept(File f) {
+				public boolean accept(final File f) {
 					if (f.isDirectory()) {
 						return true;
 					}
@@ -72,7 +93,7 @@ public class InstrumenterTest {
 				}
 			});
 			fc.setAcceptAllFileFilterUsed(false);
-			int returnVal = fc.showOpenDialog(null);
+			final int returnVal = fc.showOpenDialog(null);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				toInstrument = fc.getSelectedFile();
 			} else {
@@ -83,7 +104,7 @@ public class InstrumenterTest {
 		}
 
 		if (toInstrument.exists()) {
-			APKInstrumenter instr = new APKInstrumenter(true, new File("lib/release.keystore"), "androiddebugkey",
+			final APKInstrumenter instr = new APKInstrumenter(true, new File("lib/release.keystore"), "androiddebugkey",
 					"android");
 			instr.instrumentAPK(toInstrument, new File("instr-output.apk"));
 		} else {

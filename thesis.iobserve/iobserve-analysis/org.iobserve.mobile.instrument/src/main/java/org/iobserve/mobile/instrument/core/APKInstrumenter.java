@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.core;
 
 import java.io.File;
@@ -120,7 +135,7 @@ public class APKInstrumenter {
 	 * @param pass
 	 *            the password of the keystore
 	 */
-	public APKInstrumenter(boolean override, File keystore, String alias, String pass) {
+	public APKInstrumenter(final boolean override, final File keystore, final String alias, final String pass) {
 		this.setOverride(override);
 		this.setKeystore(keystore);
 		this.setAlias(alias);
@@ -148,16 +163,16 @@ public class APKInstrumenter {
 	 * @throws URISyntaxException
 	 *             URI syntax problem
 	 */
-	public boolean instrumentAPK(File input, File output) throws IOException, ZipException, KeyStoreException,
-			NoSuchAlgorithmException, CertificateException, URISyntaxException {
+	public boolean instrumentAPK(final File input, final File output) throws IOException, ZipException,
+			KeyStoreException, NoSuchAlgorithmException, CertificateException, URISyntaxException {
 		// CHECK IF INPUT EXISTS AND OUTPUT DOESNT
 		if (!input.exists() || (output.exists() && !override)) {
 			return false;
 		}
 
 		// LOAD CONFIGURATION
-		InstrumentationConfiguration instrConfig = new InstrumentationConfiguration();
-		File instrConfigFile = new File(APKInstrumenter.class.getResource("/config/default.xml").toURI());
+		final InstrumentationConfiguration instrConfig = new InstrumentationConfiguration();
+		final File instrConfigFile = new File(APKInstrumenter.class.getResource("/config/default.xml").toURI());
 		try {
 			instrConfig.parseConfigFile(instrConfigFile);
 		} catch (JAXBException e) {
@@ -177,60 +192,16 @@ public class APKInstrumenter {
 
 		// ZIP CURRENT AGENT VERSION
 		if (buildAgent) {
-			LOG.info("Bundling current agent version.");
-			File agentZipOld = AGENT_BUILD;
-			agentZipOld.delete();
-			FileUtils.deleteDirectory(AGENT_LIB_BUILD_TEMP);
-
-			ZipFile agentZipNew = new ZipFile(AGENT_BUILD);
-
-			// TO NOT ADD INCONSISTENT FOLDERS
-			FileUtils.copyDirectory(AGENT_SHARED, AGENT_CURRENT);
-			FileUtils.copyDirectory(AGENT_RECORDS_COMMON, AGENT_CURRENT);
-
-			File[] libs = AGENT_LIB_CURRENT.listFiles();
-			for (File lib : libs) {
-				if (lib.isFile() && !lib.getName().contains("org.iobserve.mobile.agent")) {
-					ZipFile zipF = new ZipFile(lib);
-					zipF.extractAll(AGENT_LIB_BUILD_TEMP.getAbsolutePath());
-				}
-			}
-
-			File toAdd = AGENT_LIB_BUILD_TEMP;
-			List<String> includedFolders = instrConfig.getXmlConfiguration().getAgentBuildConfiguration()
-					.getLibraryFolders();
-
-			for (String includedFolder : includedFolders) {
-				File[] toAddArray = new File(toAdd.getAbsolutePath() + "/" + includedFolder).listFiles();
-				if (toAddArray != null) {
-					File containingFolder = new File(AGENT_CURRENT.getAbsolutePath() + "/" + includedFolder);
-					if (!containingFolder.exists()) {
-						containingFolder.mkdir();
-					}
-					for (File ff : toAddArray) {
-						if (ff.isDirectory()) {
-							FileUtils.copyDirectoryToDirectory(ff, containingFolder);
-						} else {
-							FileUtils.copyFile(ff, new File(containingFolder.getAbsolutePath() + "/" + ff.getName()));
-						}
-					}
-				}
-			}
-
-			addFolderToZipNoParent(agentZipNew, AGENT_CURRENT);
-
-			LOG.info("Bundled agent with an actual size of " + round(agentZipNew.getFile().length() / MB_FACTOR)
-					+ "MB.");
+			buildAgentInner(instrConfig);
 		}
 
 		// ADD MANIFEST ADJUSTMENTS
-		// APKTOOL
 		if (adjustManifest) {
 			LOG.info("Decoding application with APKTool.");
 
-			APKToolProxy apkTool = new APKToolProxy(input);
-			boolean b1 = apkTool.decodeAPK("intermediate");
-			boolean b2 = apkTool.adjustManifest(neededRights, MODIFIED_MANIFEST);
+			final APKToolProxy apkTool = new APKToolProxy(input);
+			final boolean b1 = apkTool.decodeAPK("intermediate");
+			final boolean b2 = apkTool.adjustManifest(neededRights, MODIFIED_MANIFEST);
 
 			if (!b1 || !b2) {
 				adjustManifest = false;
@@ -254,72 +225,72 @@ public class APKInstrumenter {
 		}
 
 		// COPY INPUT TO OUTPUT
-		File tempOutputFolder = OUTPUT_TEMPO;
+		final File tempOutputFolder = OUTPUT_TEMPO;
 		tempOutputFolder.mkdir();
-		ZipFile tempInputZip = new ZipFile(input);
+		final ZipFile tempInputZip = new ZipFile(input);
 		tempInputZip.extractAll(tempOutputFolder.getAbsolutePath() + "/");
 
 		LOG.info("Created copy of original APK file.");
 
 		// TEMP WRITE DEX
-		File tempDex = TEMP_DEX_OLD;
+		final File tempDex = TEMP_DEX_OLD;
 		unzipDex(input, tempDex);
 
 		LOG.info("Searched and extracted dex files.");
 
 		// DEX 2 JAR
 		LOG.info("Executing dex2jar to transform DEX files to JAR files.");
-		File tempJar = new File("temp-jar.jar");
+		final File tempJar = new File("temp-jar.jar");
 		Dex2JarProxy.createJarFromDex(tempDex, tempJar);
 		LOG.info("Dex2jar finished transformation.");
 
 		// UNZIP JAR
-		File jarFilesContainer = OUTPUT_TEMP;
+		final File jarFilesContainer = OUTPUT_TEMP;
 		jarFilesContainer.mkdir();
 
-		ZipFile jarZip = new ZipFile(tempJar);
+		final ZipFile jarZip = new ZipFile(tempJar);
 		jarZip.extractAll(jarFilesContainer.getAbsolutePath() + "/");
 
 		LOG.info("Extracted JAR file for accessing class files.");
 
 		LOG.info("Started instrumentation of class files.");
-		ClassFileCollector cfColl = new ClassFileCollector(jarFilesContainer);
+		final ClassFileCollector cfColl = new ClassFileCollector(jarFilesContainer);
 		cfColl.collectClassFiles();
 
-		BytecodeInstrumentationManager manager = new BytecodeInstrumentationManager(cfColl.getClassFiles());
+		final BytecodeInstrumentationManager manager = new BytecodeInstrumentationManager(cfColl.getClassFiles());
 		manager.executeInstrumentation(instrConfig);
 		LOG.info("Successfully instrumented class files.");
 
 		// INJECT AGENT
 		LOG.info("Injecting agent files into rezipped JAR.");
-		ZipFile agentZipfile = new ZipFile(AGENT_BUILD);
+		final ZipFile agentZipfile = new ZipFile(AGENT_BUILD);
 		agentZipfile.extractAll(jarFilesContainer.getAbsolutePath() + "/");
 		LOG.info("Agent has been injected.");
 
 		// CREATE ZIP
 		LOG.info("Rebuilding JAR file from modified class files.");
-		File tempRezipFile = rebuildJar(jarFilesContainer);
+		final File tempRezipFile = rebuildJar(jarFilesContainer);
 		LOG.info("Finished building new JAR file.");
 
 		// JAR 2 DEX
-		File tempNewDex = TEMP_DEX_NEW;
+		final File tempNewDex = TEMP_DEX_NEW;
 		LOG.info("Executing jar2dex to transform new JAR file to DEX.");
 		Dex2JarProxy.createDexFromJar(tempRezipFile, tempNewDex);
 		LOG.info("jar2dex has been successfully executed.");
 
 		// EDIT OLD classes.dex and remove META INF
 		LOG.info("Removing old signature.");
-		File oldMeta = new File(tempOutputFolder.getAbsolutePath() + "/META-INF");
+		final File oldMeta = new File(tempOutputFolder.getAbsolutePath() + "/META-INF");
 		FileUtils.deleteDirectory(oldMeta);
 
-		File oClasses = new File(tempOutputFolder.getAbsolutePath() + "/classes.dex");
+		final File oClasses = new File(tempOutputFolder.getAbsolutePath() + "/classes.dex");
 		oClasses.delete();
 		Files.copy(tempNewDex.toPath(), oClasses.toPath());
 
 		// MODIFY MANIFEST
 		if (adjustManifest) {
 			LOG.info("Adjusting Android manifest.");
-			File oManifest = new File(tempOutputFolder.getAbsolutePath() + "/AndroidManifest.xml");
+			final File oManifest = new File(tempOutputFolder.getAbsolutePath() + "/AndroidManifest.xml");
 			oManifest.delete();
 			Files.copy(MODIFIED_MANIFEST.toPath(), oManifest.toPath());
 		}
@@ -330,7 +301,7 @@ public class APKInstrumenter {
 
 		// RESIGN
 		LOG.info("Resigning the output APK.");
-		JarSigner signer = new JarSigner();
+		final JarSigner signer = new JarSigner();
 		signer.signJar(output, getKeystore(), getAlias(), getPass());
 
 		// REMOVE ALL TEMP FILES
@@ -355,7 +326,7 @@ public class APKInstrumenter {
 	 * @param override
 	 *            the override to set
 	 */
-	public void setOverride(boolean override) {
+	public void setOverride(final boolean override) {
 		this.override = override;
 	}
 
@@ -370,7 +341,7 @@ public class APKInstrumenter {
 	 * @param keystore
 	 *            the keystore to set
 	 */
-	public void setKeystore(File keystore) {
+	public void setKeystore(final File keystore) {
 		this.keystore = keystore;
 	}
 
@@ -385,7 +356,7 @@ public class APKInstrumenter {
 	 * @param alias
 	 *            the alias to set
 	 */
-	public void setAlias(String alias) {
+	public void setAlias(final String alias) {
 		this.alias = alias;
 	}
 
@@ -400,7 +371,7 @@ public class APKInstrumenter {
 	 * @param pass
 	 *            the pass to set
 	 */
-	public void setPass(String pass) {
+	public void setPass(final String pass) {
 		this.pass = pass;
 	}
 
@@ -415,7 +386,7 @@ public class APKInstrumenter {
 	 * @param buildAgent
 	 *            the buildAgent to set
 	 */
-	public void setBuildAgent(boolean buildAgent) {
+	public void setBuildAgent(final boolean buildAgent) {
 		this.buildAgent = buildAgent;
 	}
 
@@ -430,7 +401,7 @@ public class APKInstrumenter {
 	 * @param cleanBefore
 	 *            the cleanBefore to set
 	 */
-	public void setCleanBefore(boolean cleanBefore) {
+	public void setCleanBefore(final boolean cleanBefore) {
 		this.cleanBefore = cleanBefore;
 	}
 
@@ -445,8 +416,64 @@ public class APKInstrumenter {
 	 * @param cleanAfter
 	 *            the cleanAfter to set
 	 */
-	public void setCleanAfter(boolean cleanAfter) {
+	public void setCleanAfter(final boolean cleanAfter) {
 		this.cleanAfter = cleanAfter;
+	}
+
+	/**
+	 * Builds the agent with all class files and libraries.
+	 * 
+	 * @param instrConfig
+	 *            the configuration of the instrumentation
+	 * @throws IOException
+	 *             if not all files could be resolved
+	 * @throws ZipException
+	 *             if zipping to agent build fails
+	 */
+	private void buildAgentInner(final InstrumentationConfiguration instrConfig) throws IOException, ZipException {
+		LOG.info("Bundling current agent version.");
+		final File agentZipOld = AGENT_BUILD;
+		agentZipOld.delete();
+		FileUtils.deleteDirectory(AGENT_LIB_BUILD_TEMP);
+
+		final ZipFile agentZipNew = new ZipFile(AGENT_BUILD);
+
+		// TO NOT ADD INCONSISTENT FOLDERS
+		FileUtils.copyDirectory(AGENT_SHARED, AGENT_CURRENT);
+		FileUtils.copyDirectory(AGENT_RECORDS_COMMON, AGENT_CURRENT);
+
+		final File[] libs = AGENT_LIB_CURRENT.listFiles();
+		for (File lib : libs) {
+			if (lib.isFile() && !lib.getName().contains("org.iobserve.mobile.agent")) {
+				final ZipFile zipF = new ZipFile(lib);
+				zipF.extractAll(AGENT_LIB_BUILD_TEMP.getAbsolutePath());
+			}
+		}
+
+		final File toAdd = AGENT_LIB_BUILD_TEMP;
+		final List<String> includedFolders = instrConfig.getXmlConfiguration().getAgentBuildConfiguration()
+				.getLibraryFolders();
+
+		for (String includedFolder : includedFolders) {
+			final File[] toAddArray = new File(toAdd.getAbsolutePath() + "/" + includedFolder).listFiles();
+			if (toAddArray != null) {
+				final File containingFolder = new File(AGENT_CURRENT.getAbsolutePath() + "/" + includedFolder);
+				if (!containingFolder.exists()) {
+					containingFolder.mkdir();
+				}
+				for (File ff : toAddArray) {
+					if (ff.isDirectory()) {
+						FileUtils.copyDirectoryToDirectory(ff, containingFolder);
+					} else {
+						FileUtils.copyFile(ff, new File(containingFolder.getAbsolutePath() + "/" + ff.getName()));
+					}
+				}
+			}
+		}
+
+		addFolderToZipNoParent(agentZipNew, AGENT_CURRENT);
+
+		LOG.info("Bundled agent with an actual size of " + round(agentZipNew.getFile().length() / MB_FACTOR) + "MB.");
 	}
 
 	/**
@@ -458,7 +485,7 @@ public class APKInstrumenter {
 	 * @throws ZipException
 	 *             if zip4j fails
 	 */
-	private File rebuildJar(File jarFilesContainer) throws ZipException {
+	private File rebuildJar(final File jarFilesContainer) throws ZipException {
 		this.rezipOutput(JAR_REZIP, jarFilesContainer);
 
 		return JAR_REZIP;
@@ -474,8 +501,8 @@ public class APKInstrumenter {
 	 * @throws ZipException
 	 *             if zip4j fails
 	 */
-	private void rezipOutput(File output, File tempOutputFolder) throws ZipException {
-		ZipFile zipOutput = new ZipFile(output);
+	private void rezipOutput(final File output, final File tempOutputFolder) throws ZipException {
+		final ZipFile zipOutput = new ZipFile(output);
 		addFolderToZipNoParent(zipOutput, tempOutputFolder);
 	}
 
@@ -489,8 +516,8 @@ public class APKInstrumenter {
 	 * @throws ZipException
 	 *             if there is an I/O problem
 	 */
-	private void addFolderToZipNoParent(ZipFile zip, File folder) throws ZipException {
-		ZipParameters parameters = new ZipParameters();
+	private void addFolderToZipNoParent(final ZipFile zip, final File folder) throws ZipException {
+		final ZipParameters parameters = new ZipParameters();
 		for (File fInner : folder.listFiles()) {
 			if (fInner.isDirectory()) {
 				zip.addFolder(fInner, parameters);
@@ -531,19 +558,19 @@ public class APKInstrumenter {
 	 * @throws IOException
 	 *             if there is an I/O problem
 	 */
-	private void unzipDex(File apk, File dex) throws ZipException, IOException {
+	private void unzipDex(final File apk, final File dex) throws ZipException, IOException {
 		if (apk.exists() && !dex.exists()) {
-			ZipFile parent = new ZipFile(apk);
+			final ZipFile parent = new ZipFile(apk);
 
 			@SuppressWarnings("unchecked")
-			List<FileHeader> headerList = parent.getFileHeaders();
+			final List<FileHeader> headerList = parent.getFileHeaders();
 
 			for (FileHeader header : headerList) {
 				if (header.getFileName().equals("classes.dex")) {
-					ZipInputStream in = parent.getInputStream(header);
-					FileOutputStream os = new FileOutputStream(dex);
+					final ZipInputStream in = parent.getInputStream(header);
+					final FileOutputStream os = new FileOutputStream(dex);
 					int readLen = -1;
-					byte[] buff = new byte[4096];
+					final byte[] buff = new byte[4096];
 					while ((readLen = in.read(buff)) != -1) {
 						os.write(buff, 0, readLen);
 					}
@@ -564,7 +591,7 @@ public class APKInstrumenter {
 	 * @throws IOException
 	 *             if one of the streams can't be closed
 	 */
-	private void closeStreams(ZipInputStream a, FileOutputStream b) throws IOException {
+	private void closeStreams(final ZipInputStream a, final FileOutputStream b) throws IOException {
 		if (a != null) {
 			a.close();
 		}
@@ -581,7 +608,7 @@ public class APKInstrumenter {
 	 *            input double
 	 * @return rounded double
 	 */
-	private double round(double a) {
+	private double round(final double a) {
 		return Math.round(a * 100d) / 100d;
 	}
 }

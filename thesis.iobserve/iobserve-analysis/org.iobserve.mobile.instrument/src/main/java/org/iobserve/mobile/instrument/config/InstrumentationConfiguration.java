@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.instrument.config;
 
 import java.io.File;
@@ -72,7 +87,7 @@ public class InstrumentationConfiguration {
 	 *            description of the method
 	 * @return true if it is a network call - false otherwise
 	 */
-	public boolean matchesHttpInstrumentationPoint(String owner, String desc) {
+	public boolean matchesHttpInstrumentationPoint(final String owner, final String desc) {
 		return owner.equalsIgnoreCase(HTTPURLCONNECTION_TYPE.getInternalName())
 				|| owner.equalsIgnoreCase(URL_TYPE.getInternalName())
 				|| descReturnType(desc).equalsIgnoreCase(HTTPURLCONNECTION_TYPE.getDescriptor())
@@ -87,12 +102,12 @@ public class InstrumentationConfiguration {
 	 * @throws JAXBException
 	 *             if the configuration couldn't be parsed
 	 */
-	public void parseConfigFile(File config) throws JAXBException {
+	public void parseConfigFile(final File config) throws JAXBException {
 		if (config.exists()) {
-			JAXBContext jc = JAXBContext.newInstance(RootConfigurationXml.class);
-			Unmarshaller unmarshaller = jc.createUnmarshaller();
+			final JAXBContext jc = JAXBContext.newInstance(RootConfigurationXml.class);
+			final Unmarshaller unmarshaller = jc.createUnmarshaller();
 
-			RootConfigurationXml sc = (RootConfigurationXml) unmarshaller.unmarshal(config);
+			final RootConfigurationXml sc = (RootConfigurationXml) unmarshaller.unmarshal(config);
 			this.xmlConfiguration = sc;
 		}
 	}
@@ -104,8 +119,8 @@ public class InstrumentationConfiguration {
 	 *            method description
 	 * @return extracted return type
 	 */
-	private String descReturnType(String desc) {
-		String[] sp = desc.split("\\)");
+	private String descReturnType(final String desc) {
+		final String[] sp = desc.split("\\)");
 		return sp[1];
 	}
 
@@ -128,12 +143,12 @@ public class InstrumentationConfiguration {
 	}
 
 	/**
-	 * Sets the application package name
+	 * Sets the application package name.
 	 * 
 	 * @param applicationPackage
 	 *            application package name
 	 */
-	public void setApplicationPackage(String applicationPackage) {
+	public void setApplicationPackage(final String applicationPackage) {
 		this.applicationPackage = applicationPackage.replaceAll("\\.", "/");
 	}
 

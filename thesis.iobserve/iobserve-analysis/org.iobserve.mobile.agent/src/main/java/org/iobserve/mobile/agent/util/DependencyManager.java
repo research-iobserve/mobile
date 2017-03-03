@@ -1,3 +1,18 @@
+/***************************************************************************
+ * Copyright (C) 2016 iObserve Project (https://www.iobserve-devops.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ***************************************************************************/
 package org.iobserve.mobile.agent.util;
 
 import org.iobserve.mobile.agent.callback.CallbackManager;
@@ -11,21 +26,27 @@ import org.iobserve.mobile.agent.core.AndroidDataCollector;
  * @author Robert Heinrich
  *
  */
-public class DependencyManager {
+public final class DependencyManager {
 	/**
-	 * Reference to the {@link CallbackManager}
+	 * Reference to the {@link CallbackManager}.
 	 */
 	private static CallbackManager callbackManager;
 
 	/**
-	 * Reference to the {@link AndroidDataCollector}
+	 * Reference to the {@link AndroidDataCollector}.
 	 */
 	private static AndroidDataCollector androidDataCollector;
 
 	/**
-	 * Reference to the {@link AbstractCallbackStrategy}
+	 * Reference to the {@link AbstractCallbackStrategy}.
 	 */
 	private static AbstractCallbackStrategy callbackStrategy;
+
+	/**
+	 * Helper class where no instance creation is allowed.
+	 */
+	private DependencyManager() {
+	}
 
 	/**
 	 * @return the callbackManager
@@ -38,7 +59,7 @@ public class DependencyManager {
 	 * @param callbackManager
 	 *            the callbackManager to set
 	 */
-	public static void setCallbackManager(CallbackManager callbackManager) {
+	public static void setCallbackManager(final CallbackManager callbackManager) {
 		DependencyManager.callbackManager = callbackManager;
 	}
 
@@ -53,7 +74,7 @@ public class DependencyManager {
 	 * @param androidDataCollector
 	 *            the androidDataCollector to set
 	 */
-	public static void setAndroidDataCollector(AndroidDataCollector androidDataCollector) {
+	public static void setAndroidDataCollector(final AndroidDataCollector androidDataCollector) {
 		DependencyManager.androidDataCollector = androidDataCollector;
 	}
 
@@ -68,7 +89,7 @@ public class DependencyManager {
 	 * @param callbackStrategy
 	 *            the callbackStrategy to set
 	 */
-	public static void setCallbackStrategy(AbstractCallbackStrategy callbackStrategy) {
+	public static void setCallbackStrategy(final AbstractCallbackStrategy callbackStrategy) {
 		DependencyManager.callbackStrategy = callbackStrategy;
 	}
 }
