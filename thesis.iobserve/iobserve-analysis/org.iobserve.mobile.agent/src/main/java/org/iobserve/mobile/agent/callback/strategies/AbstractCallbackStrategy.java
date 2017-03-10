@@ -54,10 +54,10 @@ public abstract class AbstractCallbackStrategy {
 	/**
 	 * Adds data to the data holder.
 	 * 
-	 * @param data
+	 * @param dat
 	 *            data which should be added
 	 */
-	public abstract void addData(MobileDefaultData data);
+	public abstract void addData(MobileDefaultData dat);
 
 	/**
 	 * Stops the callback strategy.
@@ -68,13 +68,13 @@ public abstract class AbstractCallbackStrategy {
 	 * Immediately sends a data object to the server with not respecting the
 	 * strategy.
 	 * 
-	 * @param data
+	 * @param dat
 	 *            data which should be sent immediately
-	 * @param isHello
+	 * @param izHello
 	 *            whether it is a session creation message or not
 	 */
-	public void sendImmediately(final MobileCallbackData data, final boolean isHello) {
-		this.sendBeacon(data, isHello);
+	public void sendImmediately(final MobileCallbackData dat, final boolean izHello) {
+		this.sendBeacon(dat, izHello);
 		data.clear();
 	}
 
@@ -107,12 +107,12 @@ public abstract class AbstractCallbackStrategy {
 	/**
 	 * Sends a specified beacon to the server.
 	 * 
-	 * @param data
+	 * @param dat
 	 *            beacon
 	 * @param helloReq
 	 *            whether it is a session creation message or not
 	 */
-	private void sendBeacon(final MobileCallbackData data, final boolean helloReq) {
+	private void sendBeacon(final MobileCallbackData dat, final boolean helloReq) {
 		if (data != null && data.getChildData().size() > 0) {
 			final String callbackUrl;
 			if (helloReq) {

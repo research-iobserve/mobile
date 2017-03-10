@@ -56,6 +56,11 @@ public final class AnalysisStart {
 	private static final Pattern CONSTRAINT_PATTERN = Pattern.compile("\\[(.*?)\\]");
 
 	/**
+	 * Contains the current command line object.
+	 */
+	private static CommandLine commandLine;
+
+	/**
 	 * No instance creation allowed.
 	 */
 	private AnalysisStart() {
@@ -70,7 +75,6 @@ public final class AnalysisStart {
 	public static void main(final String[] args) {
 		final CommandLineParser parser = new DefaultParser();
 
-		CommandLine commandLine;
 		try {
 			commandLine = parser.parse(AnalysisStart.createHelpOptions(), args);
 			if (commandLine.hasOption("h")) {
@@ -111,44 +115,7 @@ public final class AnalysisStart {
 							for (String clazz : classes) {
 								final String[] argSplit = clazz.split("\\(");
 
-								if (argSplit.length == 2) {
-									final String[] argv = argSplit[1].substring(0, argSplit[1].length() - 1).split(";");
-									final Class<?>[] types = new Class<?>[argv.length];
-									for (int i = 0; i < types.length; i++) {
-										types[i] = String.class;
-									}
-
-									try {
-										final Class<?> resolved = Class.forName(argSplit[0]);
-										final Constructor<?> constructor = resolved.getConstructor(types);
-
-										final Object obj = constructor.newInstance((Object[]) argv);
-										if (AbstractPalladioAnalyzer.class.isAssignableFrom(obj.getClass())) {
-											final AbstractPalladioAnalyzer<?> alz = (AbstractPalladioAnalyzer<?>) obj;
-											violations.addAll(alz.analyze(instance));
-										}
-									} catch (ClassNotFoundException | NoSuchMethodException | SecurityException
-											| InstantiationException | IllegalAccessException | IllegalArgumentException
-											| InvocationTargetException e) {
-										e.printStackTrace();
-									}
-								} else {
-									// TODO fix code duplication
-									try {
-										final Class<?> resolved = Class.forName(argSplit[0]);
-										final Constructor<?> constructor = resolved.getConstructor();
-
-										final Object obj = constructor.newInstance();
-										if (AbstractPalladioAnalyzer.class.isAssignableFrom(obj.getClass())) {
-											final AbstractPalladioAnalyzer<?> alz = (AbstractPalladioAnalyzer<?>) obj;
-											violations.addAll(alz.analyze(instance));
-										}
-									} catch (ClassNotFoundException | NoSuchMethodException | SecurityException
-											| InstantiationException | IllegalAccessException | IllegalArgumentException
-											| InvocationTargetException e) {
-										e.printStackTrace();
-									}
-								}
+								processClassArgument(instance, argSplit, violations);
 							}
 						}
 
@@ -165,6 +132,55 @@ public final class AnalysisStart {
 			formatter.printHelp("iobserve-analysis", AnalysisStart.createOptions());
 		}
 
+	}
+
+	/**
+	 * Instantiates an analyzer class and executes it.
+	 * 
+	 * @param instance
+	 *            the palladio instance which should be analyzed
+	 * @param argSplit
+	 *            the argument split into the class name and the parameters
+	 * @param violations
+	 *            the list which contains the violations
+	 */
+	private static void processClassArgument(final PalladioInstance instance, final String[] argSplit,
+			final List<ConstraintViolation> violations) {
+		if (argSplit.length == 2) {
+			final String[] argv = argSplit[1].substring(0, argSplit[1].length() - 1).split(";");
+			final Class<?>[] types = new Class<?>[argv.length];
+			for (int i = 0; i < types.length; i++) {
+				types[i] = String.class;
+			}
+
+			try {
+				final Class<?> resolved = Class.forName(argSplit[0]);
+				final Constructor<?> constructor = resolved.getConstructor(types);
+
+				final Object obj = constructor.newInstance((Object[]) argv);
+				if (AbstractPalladioAnalyzer.class.isAssignableFrom(obj.getClass())) {
+					final AbstractPalladioAnalyzer<?> alz = (AbstractPalladioAnalyzer<?>) obj;
+					violations.addAll(alz.analyze(instance));
+				}
+			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
+					| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				final Class<?> resolved = Class.forName(argSplit[0]);
+				final Constructor<?> constructor = resolved.getConstructor();
+
+				final Object obj = constructor.newInstance();
+				if (AbstractPalladioAnalyzer.class.isAssignableFrom(obj.getClass())) {
+					final AbstractPalladioAnalyzer<?> alz = (AbstractPalladioAnalyzer<?>) obj;
+					violations.addAll(alz.analyze(instance));
+				}
+			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
+					| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**

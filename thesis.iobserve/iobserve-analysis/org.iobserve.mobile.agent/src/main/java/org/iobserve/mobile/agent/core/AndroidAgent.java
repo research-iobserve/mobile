@@ -376,7 +376,7 @@ public final class AndroidAgent {
 
 	/**
 	 * This method is called by code which is inserted into the original
-	 * application and is executed when a instrumented methods returns
+	 * application and is executed when a instrumented methods returns.
 	 * 
 	 * @param enterId
 	 *            the entry id for getting the responsible sensor instance

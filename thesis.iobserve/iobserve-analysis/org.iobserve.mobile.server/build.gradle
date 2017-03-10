@@ -5,6 +5,7 @@ repositories {
 }
 
 dependencies {
+	compile project(':org.iobserve.common')
 	compile project(':org.iobserve.mobile.shared')
 
 	compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.0.M0'

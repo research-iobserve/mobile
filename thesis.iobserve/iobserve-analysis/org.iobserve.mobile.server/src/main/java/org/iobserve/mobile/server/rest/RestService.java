@@ -33,12 +33,13 @@ import kieker.monitoring.core.controller.IMonitoringController;
 import kieker.monitoring.core.controller.MonitoringController;
 import kieker.monitoring.writer.filesystem.SyncFsWriter;
 
+import org.iobserve.shared.callback.data.HelloRequest;
+import org.iobserve.shared.callback.data.HelloResponse;
+import org.iobserve.shared.callback.data.MobileCallbackData;
+import org.iobserve.shared.callback.data.MobileDefaultData;
+import org.iobserve.shared.callback.kieker.IKiekerCompatible;
+
 import rocks.fasterxml.jackson.databind.ObjectMapper;
-import rocks.inspectit.android.callback.data.HelloRequest;
-import rocks.inspectit.android.callback.data.HelloResponse;
-import rocks.inspectit.android.callback.data.MobileCallbackData;
-import rocks.inspectit.android.callback.data.MobileDefaultData;
-import rocks.inspectit.android.callback.kieker.IKiekerCompatible;
 
 /**
  * REST interface which is used from the agent to communicate with the

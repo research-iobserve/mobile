@@ -174,12 +174,12 @@ public class KiekerSensor implements ISensor {
 	 * Formats a class by converting the internal representation to the original
 	 * class name.
 	 * 
-	 * @param clazz
+	 * @param clazzz
 	 *            internal representation of the class
 	 * @return original class name
 	 */
-	private String formatClazz(final String clazz) {
-		return clazz.replaceAll("/", ".");
+	private String formatClazz(final String clazzz) {
+		return clazzz.replaceAll("/", ".");
 	}
 
 	/**
@@ -189,12 +189,13 @@ public class KiekerSensor implements ISensor {
 	 *            operation in the internal representation format
 	 * @return reformatted operation in nearly original form
 	 */
-	private String formatOperation(String operation) {
+	private String formatOperation(final String operation) {
 		final String[] opSplit = operation.split("\\)");
+		String op = operation;
 		if (opSplit.length == 2) {
-			operation = opSplit[0] + ")"; // remove return type
+			op = opSplit[0] + ")"; // remove return type
 		}
-		return clazz + "." + operation.replaceAll(";", "").replaceAll("/", ".").replaceAll("L", "");
+		return clazz + "." + op.replaceAll(";", "").replaceAll("/", ".").replaceAll("L", "");
 	}
 
 	/***************************************************************************

@@ -107,15 +107,16 @@ public class ClassFileCollector {
 	 *            current files
 	 * @return all collected class files
 	 */
-	private List<File> getAllClassFiles(final File parent, List<File> base) {
+	private List<File> getAllClassFiles(final File parent, final List<File> base) {
 		final File[] childs = parent.listFiles();
 		final File[] classfiles = parent.listFiles(FILTER);
 		for (File f : classfiles) {
 			base.add(f);
 		}
+		List<File> baseIterator = base;
 		for (File f : childs) {
 			if (f.isDirectory()) {
-				base = getAllClassFiles(f, base);
+				baseIterator = getAllClassFiles(f, baseIterator);
 			}
 		}
 

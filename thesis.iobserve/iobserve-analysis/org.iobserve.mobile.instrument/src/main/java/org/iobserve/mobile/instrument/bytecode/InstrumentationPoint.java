@@ -156,11 +156,11 @@ public class InstrumentationPoint {
 	}
 
 	/**
-	 * @param isSuper
+	 * @param izSuper
 	 *            the isSuper to set
 	 */
-	public void setSuper(final boolean isSuper) {
-		this.isSuper = isSuper;
+	public void setSuper(final boolean izSuper) {
+		this.isSuper = izSuper;
 	}
 
 	/**
@@ -171,11 +171,11 @@ public class InstrumentationPoint {
 	}
 
 	/**
-	 * @param isInterface
+	 * @param izInterface
 	 *            the isInterface to set
 	 */
-	public void setInterface(final boolean isInterface) {
-		this.isInterface = isInterface;
+	public void setInterface(final boolean izInterface) {
+		this.isInterface = izInterface;
 	}
 
 	/**
@@ -197,33 +197,44 @@ public class InstrumentationPoint {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		InstrumentationPoint other = (InstrumentationPoint) obj;
+		}
+		final InstrumentationPoint other = (InstrumentationPoint) obj;
 		if (className == null) {
-			if (other.className != null)
+			if (other.className != null) {
 				return false;
-		} else if (!className.equals(other.className))
+			}
+		} else if (!className.equals(other.className)) {
 			return false;
+		}
 		if (description == null) {
-			if (other.description != null)
+			if (other.description != null) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
-		if (isInterface != other.isInterface)
+		}
+		if (isInterface != other.isInterface) {
 			return false;
-		if (isSuper != other.isSuper)
+		}
+		if (isSuper != other.isSuper) {
 			return false;
+		}
 		if (methodName == null) {
-			if (other.methodName != null)
+			if (other.methodName != null) {
 				return false;
-		} else if (!methodName.equals(other.methodName))
+			}
+		} else if (!methodName.equals(other.methodName)) {
 			return false;
+		}
 		return true;
 	}
 

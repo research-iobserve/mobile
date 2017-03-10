@@ -112,11 +112,11 @@ public class StandardClassVisitor extends ClassVisitor {
 	 */
 	@Override
 	public void visit(final int version, final int access, final String name, final String signature,
-			final String superName, final String[] interfaces) {
+			final String supername, final String[] interfaces) {
 		super.visit(version, access & (~Opcodes.ACC_FINAL), name, signature, superName, interfaces);
 
 		this.className = name;
-		this.superName = superName;
+		this.superName = supername;
 		this.classFromApplication = name.startsWith(config.getApplicationPackage()); // monitor
 
 		if (this.superName != null) {

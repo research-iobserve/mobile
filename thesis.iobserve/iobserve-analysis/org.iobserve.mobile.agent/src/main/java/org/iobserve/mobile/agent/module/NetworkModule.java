@@ -162,8 +162,6 @@ public class NetworkModule extends AbstractAndroidModule {
 			if (state.getLastUpdatedDiff() >= COLLECT_AFTER) {
 				if (state.probablyFinished()) {
 					final long startStamp = state.getPointTimestamp(ConnectionState.ConnectionPoint.CONNECT);
-					// long outputStamp =
-					// state.getPointTimestamp(ConnectionState.ConnectionPoint.OUTPUT);
 					final long responseStamp = state.getPointTimestamp(ConnectionState.ConnectionPoint.RESPONSECODE);
 
 					try {
