@@ -24,11 +24,11 @@ import android.content.Context;
 /**
  * Abstract Android module which has an init and an exit point.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
-public abstract class AbstractAndroidModule {
+public abstract class AbstractMonitoringModule {
 
 	/**
 	 * Link to the {@link AndroidDataCollector} component.

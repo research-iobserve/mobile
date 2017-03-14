@@ -19,6 +19,7 @@ package org.iobserve.analysis.mobile;
  * Class which contains information about a mobile connection of a mobile
  * device.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  *
  */

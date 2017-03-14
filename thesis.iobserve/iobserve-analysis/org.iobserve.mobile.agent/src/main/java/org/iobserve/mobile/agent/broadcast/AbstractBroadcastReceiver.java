@@ -24,6 +24,7 @@ import android.content.BroadcastReceiver;
 /**
  * Abstract class for setting up a broadcast receiver for Android.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  *
  */

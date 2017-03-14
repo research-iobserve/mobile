@@ -21,6 +21,7 @@ import java.util.Map;
 /**
  * Enum for the different types of network connection.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  */
 public enum MobileConnectionType {

@@ -31,9 +31,9 @@ import teetime.framework.OutputPort;
  * TAllocation creates a new resource container if and only if there is no
  * corresponding container already available.
  *
- * @author David Monschein
  * @author Robert Heinrich
  * @author Alessandro Giusa
+ * @author David Monschein
  */
 public final class TAllocation extends AbstractConsumerStage<IDeploymentRecord> {
 

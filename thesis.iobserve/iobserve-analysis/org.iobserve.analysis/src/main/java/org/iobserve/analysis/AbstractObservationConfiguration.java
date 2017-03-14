@@ -96,7 +96,7 @@ public abstract class AbstractObservationConfiguration extends Configuration {
 				resourceEnvironmentModelProvider);
 		final TNetworkEvent tNetworkEvent = new TNetworkEvent(resourceEnvironmentModelProvider);
 		final TNetworkRequest tNetworkRequest = new TNetworkRequest(allocationModelProvider, systemModelProvider,
-				resourceEnvironmentModelProvider, repositoryModelProvider, correspondenceModel);
+				resourceEnvironmentModelProvider, correspondenceModel);
 
 		/** dispatch different monitoring data. */
 		this.connectPorts(this.recordSwitch.getDeploymentOutputPort(), tAllocation.getInputPort());

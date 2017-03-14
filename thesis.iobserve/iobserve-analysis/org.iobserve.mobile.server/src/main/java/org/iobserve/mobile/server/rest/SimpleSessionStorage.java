@@ -22,8 +22,8 @@ import java.util.UUID;
 /**
  * Implements a simple session storage with a {@link HashMap}.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  * @param <T>
  *            the type of the value which is assigned to a session

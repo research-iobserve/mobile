@@ -18,8 +18,8 @@ package org.iobserve.mobile.server.rest;
 /**
  * Interface for a simple session storage.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  * @param <T>
  *            the type of the value which is assigned to a session

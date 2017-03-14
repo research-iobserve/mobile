@@ -21,8 +21,6 @@ import java.util.Optional;
 
 import org.iobserve.analysis.model.AllocationModelBuilder;
 import org.iobserve.analysis.model.AllocationModelProvider;
-import org.iobserve.analysis.model.RepositoryModelBuilder;
-import org.iobserve.analysis.model.RepositoryModelProvider;
 import org.iobserve.analysis.model.ResourceEnvironmentModelBuilder;
 import org.iobserve.analysis.model.ResourceEnvironmentModelProvider;
 import org.iobserve.analysis.model.SystemModelBuilder;
@@ -31,9 +29,6 @@ import org.iobserve.analysis.model.correspondence.ICorrespondence;
 import org.iobserve.analysis.utils.Opt;
 import org.iobserve.common.mobile.record.MobileNetworkRequestEventRecord;
 import org.palladiosimulator.pcm.core.composition.AssemblyContext;
-import org.palladiosimulator.pcm.repository.BasicComponent;
-import org.palladiosimulator.pcm.repository.OperationInterface;
-import org.palladiosimulator.pcm.repository.Repository;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceContainer;
 import org.palladiosimulator.pcm.resourceenvironment.ResourceEnvironment;
 
@@ -45,8 +40,8 @@ import teetime.framework.AbstractConsumerStage;
  * Transformation which consumes {@link MobileNetworkRequestEventRecord} and
  * performs adjustments at the PCM models.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestEventRecord> {
@@ -57,12 +52,6 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 	 */
 	private static final boolean ADJUST_ALLOCATION = true;
 
-	/**
-	 * If this is true, when no correspondent PCM entity is found a basic
-	 * component is created with an interface.
-	 */
-	private static final boolean ADJUST_REPOSITORY = false;
-
 	/** logger. */
 	private static final Log LOG = LogFactory.getLog(RecordSwitch.class);
 
@@ -72,8 +61,6 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 	private final SystemModelProvider systemModelProvider;
 	/** reference to resource environment model provider. */
 	private final ResourceEnvironmentModelProvider resourceEnvironmentModelProvider;
-	/** reference to repository model provider. */
-	private final RepositoryModelProvider repositoryModelProvider;
 	/** reference to the correspondence model. */
 	private final ICorrespondence correspondenceModel;
 
@@ -86,19 +73,16 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 	 *            reference to system model provider
 	 * @param resourceEnvironmentModelProvider
 	 *            reference to resource environment model provider
-	 * @param repositoryModelProvider
-	 *            reference to repository model provider
 	 * @param correspondenceModel
 	 *            reference to the correspondence model
 	 */
 	public TNetworkRequest(final AllocationModelProvider allocationModelProvider,
 			final SystemModelProvider systemModelProvider,
 			final ResourceEnvironmentModelProvider resourceEnvironmentModelProvider,
-			final RepositoryModelProvider repositoryModelProvider, final ICorrespondence correspondenceModel) {
+			final ICorrespondence correspondenceModel) {
 		this.allocationModelProvider = allocationModelProvider;
 		this.systemModelProvider = systemModelProvider;
 		this.resourceEnvironmentModelProvider = resourceEnvironmentModelProvider;
-		this.repositoryModelProvider = repositoryModelProvider;
 		this.correspondenceModel = correspondenceModel;
 	}
 
@@ -134,13 +118,8 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 				String entityName = correspondent.getPcmEntityName();
 				adjustSystemAndAllocation(serverContainer, entityName, hostname);
 			}).elseApply(() -> {
-				if (ADJUST_REPOSITORY) {
-					String entityName = adjustRepositoryModel(hostname, path, record);
-					adjustSystemAndAllocation(serverContainer, entityName, hostname);
-				} else {
-					LOG.warn("Correspondent for server '" + hostname
-							+ "' not found and no adjustments of the repository are allowed.");
-				}
+				LOG.warn("Correspondent for server '" + hostname
+						+ "' not found and no adjustments of the repository are allowed.");
 			});
 		}
 	}
@@ -201,47 +180,6 @@ public class TNetworkRequest extends AbstractConsumerStage<MobileNetworkRequestE
 		this.systemModelProvider.save();
 
 		return assemblyContext;
-	}
-
-	/**
-	 * Adjusts the repository model for the service which is requested by the
-	 * application.
-	 * 
-	 * @param hostname
-	 *            hostname url or address
-	 * @param path
-	 *            the path
-	 * @param record
-	 *            the request record
-	 * @return the name of the belonging operation interface
-	 */
-	private String adjustRepositoryModel(final String hostname, final String path,
-			final MobileNetworkRequestEventRecord record) {
-		this.repositoryModelProvider.loadModel();
-		final Repository repo = this.repositoryModelProvider.getModel();
-
-		// adjusting
-		final String belongingInterfaceName = "I" + hostname.replaceAll("\\.", "_");
-		final OperationInterface belonging = RepositoryModelBuilder.createOperationInterfaceIfAbsent(repo,
-				belongingInterfaceName);
-
-		// search for operation
-		final String preparedPath = path.split("\\.")[0];
-		final String operationName = record.getMethod().toLowerCase() + preparedPath.replaceAll("\\/", "_");
-
-		RepositoryModelBuilder.createOperationSignatureIfAbsent(belonging, operationName);
-
-		// create basic component
-		final String belongingComponent = "Comp." + hostname;
-		final BasicComponent createdComponent = RepositoryModelBuilder.createBasicComponentIfAbsent(repo,
-				belongingComponent);
-
-		// Provides Role
-		RepositoryModelBuilder.createProvidesRoleIfAbsent(repo, createdComponent, belonging);
-
-		this.repositoryModelProvider.save();
-
-		return createdComponent.getEntityName();
 	}
 
 	/**

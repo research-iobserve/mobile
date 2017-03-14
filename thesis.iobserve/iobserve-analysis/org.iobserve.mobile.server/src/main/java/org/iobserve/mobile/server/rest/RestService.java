@@ -33,10 +33,10 @@ import kieker.monitoring.core.controller.IMonitoringController;
 import kieker.monitoring.core.controller.MonitoringController;
 import kieker.monitoring.writer.filesystem.SyncFsWriter;
 
-import org.iobserve.shared.callback.data.HelloRequest;
-import org.iobserve.shared.callback.data.HelloResponse;
 import org.iobserve.shared.callback.data.MobileCallbackData;
 import org.iobserve.shared.callback.data.MobileDefaultData;
+import org.iobserve.shared.callback.data.SessionCreationRequest;
+import org.iobserve.shared.callback.data.SessionCreationResponse;
 import org.iobserve.shared.callback.kieker.IKiekerCompatible;
 
 import rocks.fasterxml.jackson.databind.ObjectMapper;
@@ -47,8 +47,8 @@ import rocks.fasterxml.jackson.databind.ObjectMapper;
  * and if it is possible to convert them into Kieker records the server does so
  * and saves them into Kieker logs.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 @Path("/rest/mobile")
@@ -153,26 +153,26 @@ public class RestService {
 	}
 
 	/**
-	 * Processes a message which only contains a {@link HelloRequest}.
+	 * Processes a message which only contains a {@link SessionCreationRequest}.
 	 * 
 	 * @param data
 	 *            the message
-	 * @return generated result - either a JSON encoded {@link HelloResponse} or
-	 *         an error message
+	 * @return generated result - either a JSON encoded
+	 *         {@link SessionCreationResponse} or an error message
 	 */
 	private String processHello(final MobileCallbackData data) {
 		if (data.getSessionId() == null) {
-			if (data.getChildData().size() != 1 || !(data.getChildData().get(0) instanceof HelloRequest)) {
+			if (data.getChildData().size() != 1 || !(data.getChildData().get(0) instanceof SessionCreationRequest)) {
 				return "";
 			}
 
-			final String appName = ((HelloRequest) data.getChildData().get(0)).getAppName();
+			final String appName = ((SessionCreationRequest) data.getChildData().get(0)).getAppName();
 
 			if (!controllerMap.containsKey(appName)) {
 				createController(appName);
 			}
 
-			final HelloResponse resp = new HelloResponse();
+			final SessionCreationResponse resp = new SessionCreationResponse();
 			resp.setSessionId(sessionStorage.create(appName));
 
 			try {

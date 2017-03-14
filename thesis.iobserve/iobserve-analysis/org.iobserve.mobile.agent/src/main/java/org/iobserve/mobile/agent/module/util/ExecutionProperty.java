@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
  * Annotation for defining methods of a module which should be executed
  * periodically.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 @Retention(RetentionPolicy.RUNTIME)

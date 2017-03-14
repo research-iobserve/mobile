@@ -30,8 +30,8 @@ import rocks.fasterxml.jackson.databind.ser.std.StdSerializer;
  * Serializes a montiroing record at the agent side to be able to send it as a
  * JSON string.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class PlainKiekerSerializer extends StdSerializer<IMonitoringRecord> {

@@ -32,8 +32,8 @@ import privacy_ext.CommunicationLinkPrivacy;
 /**
  * Analyzer for mobile connections which inspects the carrier of the links.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class CarrierAnalyzer extends AbstractPalladioAnalyzer<MobileMobileConnectionInfo> {

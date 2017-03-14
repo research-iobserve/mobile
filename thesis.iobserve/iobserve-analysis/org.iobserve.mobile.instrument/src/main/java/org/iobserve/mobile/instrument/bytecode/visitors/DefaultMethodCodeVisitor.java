@@ -22,8 +22,8 @@ import org.objectweb.asm.commons.AdviceAdapter;
 /**
  * Default method code visitor which inspects every method call.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class DefaultMethodCodeVisitor extends AdviceAdapter {

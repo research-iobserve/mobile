@@ -21,8 +21,8 @@ import javax.xml.bind.annotation.XmlValue;
 /**
  * XML Mapping class for the instrumentation point configuration.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class InstrumentationPointConfigurationXml {

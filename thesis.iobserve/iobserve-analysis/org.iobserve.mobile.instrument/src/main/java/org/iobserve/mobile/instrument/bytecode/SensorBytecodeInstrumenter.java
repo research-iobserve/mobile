@@ -29,8 +29,8 @@ import org.objectweb.asm.commons.AdviceAdapter;
  * Class for instrumenting a certain method. It inserts a call at the start of
  * the method and a call at the end of the method body.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class SensorBytecodeInstrumenter implements IBytecodeInstrumenter {

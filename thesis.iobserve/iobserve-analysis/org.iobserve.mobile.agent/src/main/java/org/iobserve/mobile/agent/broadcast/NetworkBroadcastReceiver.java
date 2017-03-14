@@ -30,8 +30,8 @@ import android.telephony.TelephonyManager;
 /**
  * Concrete broadcast receiver for network events.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {

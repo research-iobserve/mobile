@@ -21,8 +21,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 /**
  * XML Mapping class for the agent connection info.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)

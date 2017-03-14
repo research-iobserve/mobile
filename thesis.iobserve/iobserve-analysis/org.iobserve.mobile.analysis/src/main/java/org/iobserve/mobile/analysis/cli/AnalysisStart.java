@@ -44,8 +44,8 @@ import org.iobserve.mobile.analysis.PalladioInstance;
  * Command Line Interface class for performing an analysis for a certain PCM
  * instance.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public final class AnalysisStart {

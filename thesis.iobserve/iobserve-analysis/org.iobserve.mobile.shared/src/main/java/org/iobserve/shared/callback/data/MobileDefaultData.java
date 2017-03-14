@@ -25,13 +25,14 @@ import rocks.fasterxml.jackson.annotation.JsonTypeInfo;
 /**
  * Parent class for mobile monitoring records.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({ @JsonSubTypes.Type(value = HelloRequest.class), @JsonSubTypes.Type(value = NetRequestResponse.class),
-		@JsonSubTypes.Type(value = NetInfoResponse.class), @JsonSubTypes.Type(value = PlainKieker.class) })
+@JsonSubTypes({ @JsonSubTypes.Type(value = SessionCreationRequest.class),
+		@JsonSubTypes.Type(value = NetRequestResponse.class), @JsonSubTypes.Type(value = NetInfoResponse.class),
+		@JsonSubTypes.Type(value = PlainKieker.class) })
 public class MobileDefaultData {
 	/**
 	 * Default instance creation.

@@ -28,8 +28,8 @@ import org.apache.logging.log4j.Logger;
  * installed on the machine.
  * 
  * @see http://docs.oracle.com/javase/6/docs/technotes/tools/windows/jarsigner.html
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class JarSigner {

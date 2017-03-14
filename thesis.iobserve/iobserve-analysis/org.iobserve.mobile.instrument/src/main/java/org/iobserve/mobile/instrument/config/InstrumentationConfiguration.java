@@ -23,7 +23,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.iobserve.mobile.agent.sensor.KiekerSensor;
+import org.iobserve.mobile.agent.sensor.TraceSensor;
 import org.iobserve.mobile.instrument.bytecode.NetworkBytecodeInstrumenter;
 import org.iobserve.mobile.instrument.config.xml.RootConfigurationXml;
 import org.objectweb.asm.Type;
@@ -33,13 +33,13 @@ import android.webkit.WebView;
 /**
  * Configuration class for the instrumentation process of Android applications.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class InstrumentationConfiguration {
-	/** Type for {@link KiekerSensor}. */
-	private static final String KIEKER_SENSOR = Type.getType(KiekerSensor.class).getClassName();
+	/** Type for {@link TraceSensor}. */
+	private static final String KIEKER_SENSOR = Type.getType(TraceSensor.class).getClassName();
 	// HTTP POINTS
 	/** Type for {@link HttpURLConnection}. */
 	private static final Type HTTPURLCONNECTION_TYPE = Type.getType(HttpURLConnection.class);
@@ -153,7 +153,7 @@ public class InstrumentationConfiguration {
 	}
 
 	/**
-	 * Gets the {@link KiekerSensor}.
+	 * Gets the {@link TraceSensor}.
 	 * 
 	 * @return the kieker sensor
 	 */

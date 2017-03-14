@@ -25,7 +25,7 @@ import java.net.URL;
 
 import org.iobserve.mobile.agent.core.ExternalConfiguration;
 import org.iobserve.mobile.agent.util.DependencyManager;
-import org.iobserve.shared.callback.data.HelloResponse;
+import org.iobserve.shared.callback.data.SessionCreationResponse;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -35,8 +35,8 @@ import rocks.fasterxml.jackson.databind.ObjectMapper;
  * Task which is responsible for sending data to the REST interface of the
  * server. This task runs asynchronously so it doesn't block the UI thread.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class CallbackTask extends AsyncTask<String, Void, String> {
@@ -89,7 +89,7 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 	protected void onPostExecute(final String result) {
 		if (result != null && !result.isEmpty()) {
 			try {
-				final HelloResponse resp = OBJECTMAPPER.readValue(result, HelloResponse.class);
+				final SessionCreationResponse resp = OBJECTMAPPER.readValue(result, SessionCreationResponse.class);
 				if (resp.getSessionId() != null && resp.getSessionId().length() > 0) {
 					callbackManager.applySessionId(resp.getSessionId());
 				}

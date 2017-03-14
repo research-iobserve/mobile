@@ -18,6 +18,7 @@ package org.iobserve.analysis.mobile;
 /**
  * Class holding information about a wireless connection.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  *
  */

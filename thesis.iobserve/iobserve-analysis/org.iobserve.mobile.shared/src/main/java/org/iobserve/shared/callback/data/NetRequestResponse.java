@@ -23,8 +23,8 @@ import org.iobserve.shared.callback.kieker.IKiekerCompatible;
 /**
  * Monitoring record class for network requests.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class NetRequestResponse extends MobileDefaultData implements IKiekerCompatible {

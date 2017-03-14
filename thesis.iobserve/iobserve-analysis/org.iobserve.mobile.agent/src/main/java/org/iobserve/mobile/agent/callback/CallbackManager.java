@@ -23,9 +23,9 @@ import kieker.common.record.IMonitoringRecord;
 import org.iobserve.mobile.agent.callback.strategies.AbstractCallbackStrategy;
 import org.iobserve.mobile.agent.core.ExternalConfiguration;
 import org.iobserve.mobile.agent.util.DependencyManager;
-import org.iobserve.shared.callback.data.HelloRequest;
 import org.iobserve.shared.callback.data.MobileCallbackData;
 import org.iobserve.shared.callback.data.MobileDefaultData;
+import org.iobserve.shared.callback.data.SessionCreationRequest;
 import org.iobserve.shared.callback.kieker.PlainKieker;
 
 import android.util.Log;
@@ -34,8 +34,8 @@ import android.util.Log;
  * Component which handles the connection to the server which persists the
  * monitoring data.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class CallbackManager {
@@ -99,7 +99,7 @@ public class CallbackManager {
 	 * @param response
 	 *            hello request which should be sent to the servers
 	 */
-	public void pushHelloMessage(final HelloRequest response) {
+	public void pushHelloMessage(final SessionCreationRequest response) {
 		final MobileCallbackData data = new MobileCallbackData();
 		data.setSessionId(null);
 

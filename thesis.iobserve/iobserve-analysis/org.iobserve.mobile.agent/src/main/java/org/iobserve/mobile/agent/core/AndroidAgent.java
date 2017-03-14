@@ -36,13 +36,13 @@ import org.iobserve.mobile.agent.broadcast.NetworkBroadcastReceiver;
 import org.iobserve.mobile.agent.callback.CallbackManager;
 import org.iobserve.mobile.agent.callback.strategies.AbstractCallbackStrategy;
 import org.iobserve.mobile.agent.callback.strategies.IntervalStrategy;
-import org.iobserve.mobile.agent.module.AbstractAndroidModule;
+import org.iobserve.mobile.agent.module.AbstractMonitoringModule;
 import org.iobserve.mobile.agent.module.NetworkModule;
 import org.iobserve.mobile.agent.module.util.ExecutionProperty;
 import org.iobserve.mobile.agent.sensor.ISensor;
 import org.iobserve.mobile.agent.util.DependencyManager;
-import org.iobserve.shared.callback.data.HelloRequest;
 import org.iobserve.shared.callback.data.MobileDefaultData;
+import org.iobserve.shared.callback.data.SessionCreationRequest;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -56,8 +56,8 @@ import android.webkit.WebView;
  * The main Android Agent class which is responsible for managing and scheduling
  * tasks.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  */
 public final class AndroidAgent {
 	/**
@@ -79,7 +79,7 @@ public final class AndroidAgent {
 	/**
 	 * Maps a certain module class to an instantiated module object.
 	 */
-	private static Map<Class<?>, AbstractAndroidModule> instantiatedModules = new HashMap<Class<?>, AbstractAndroidModule>();
+	private static Map<Class<?>, AbstractMonitoringModule> instantiatedModules = new HashMap<Class<?>, AbstractMonitoringModule>();
 
 	/**
 	 * Maps a entry id to a specific sensor.
@@ -182,7 +182,7 @@ public final class AndroidAgent {
 		DependencyManager.setCallbackManager(callbackManager);
 
 		// OPEN COMMUNICATION WITH CMR
-		final HelloRequest helloRequest = new HelloRequest();
+		final SessionCreationRequest helloRequest = new SessionCreationRequest();
 		helloRequest.setAppName(androidDataCollector.resolveAppName());
 		helloRequest.setDeviceId(androidDataCollector.getDeviceId());
 
@@ -191,7 +191,7 @@ public final class AndroidAgent {
 		// INITING MODULES
 		for (Class<?> exModule : MODULES) {
 			try {
-				final AbstractAndroidModule createdModule = (AbstractAndroidModule) exModule.newInstance();
+				final AbstractMonitoringModule createdModule = (AbstractMonitoringModule) exModule.newInstance();
 				instantiatedModules.put(exModule, createdModule);
 
 				injectDependencies(createdModule);
@@ -207,7 +207,7 @@ public final class AndroidAgent {
 		// INIT MODULE REOCCURING CALLS
 		Log.i(LOG_TAG, "Creating and initializing existing modules.");
 		for (Class<?> moduleEntry : MODULES) {
-			final AbstractAndroidModule module = instantiatedModules.get(moduleEntry);
+			final AbstractMonitoringModule module = instantiatedModules.get(moduleEntry);
 
 			if (module instanceof NetworkModule) {
 				networkModule = (NetworkModule) module;
@@ -262,7 +262,7 @@ public final class AndroidAgent {
 		mHandler.removeCallbacksAndMessages(null);
 
 		for (Class<?> exModule : MODULES) {
-			final AbstractAndroidModule module = instantiatedModules.get(exModule);
+			final AbstractMonitoringModule module = instantiatedModules.get(exModule);
 			if (module != null) {
 				module.shutdownModule();
 			}
@@ -532,7 +532,7 @@ public final class AndroidAgent {
 	 * @param module
 	 *            a reference to the module which contains methods to schedule
 	 */
-	private static void setupScheduledMethods(final AbstractAndroidModule module) {
+	private static void setupScheduledMethods(final AbstractMonitoringModule module) {
 		for (Method method : module.getClass().getMethods()) {
 			if (method.isAnnotationPresent(ExecutionProperty.class)) {
 				final ExecutionProperty exProp = method.getAnnotation(ExecutionProperty.class);
@@ -540,7 +540,7 @@ public final class AndroidAgent {
 				// CREATE FINALS
 				final long iVal = exProp.interval();
 				final Method invokedMethod = method;
-				final AbstractAndroidModule receiver = module;
+				final AbstractMonitoringModule receiver = module;
 				final String className = module.getClass().getName();
 
 				final Runnable loopRunnable = new Runnable() {
@@ -578,7 +578,7 @@ public final class AndroidAgent {
 	 * @param androidModule
 	 *            the module
 	 */
-	private static void injectDependencies(final AbstractAndroidModule androidModule) {
+	private static void injectDependencies(final AbstractMonitoringModule androidModule) {
 		androidModule.setCallbackManager(DependencyManager.getCallbackManager());
 		androidModule.setAndroidDataCollector(DependencyManager.getAndroidDataCollector());
 	}

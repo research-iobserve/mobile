@@ -32,8 +32,8 @@ import android.app.Activity;
 /**
  * {@link ClassVisitor} for instrumenting whole classes.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class StandardClassVisitor extends ClassVisitor {

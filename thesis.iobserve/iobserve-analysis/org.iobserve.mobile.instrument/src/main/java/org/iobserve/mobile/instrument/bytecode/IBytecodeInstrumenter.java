@@ -21,6 +21,7 @@ import org.objectweb.asm.commons.AdviceAdapter;
 /**
  * Interface which provides methods for instrumenting a method.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  *
  */

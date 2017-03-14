@@ -33,8 +33,8 @@ import android.webkit.WebView;
  * Class which is responsible for instrumenting calls which result in a network
  * activity.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class NetworkBytecodeInstrumenter {

@@ -18,6 +18,7 @@ package org.iobserve.mobile.instrument.bytecode;
 /**
  * Class which specifies a certain instrumentation point.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  *
  */

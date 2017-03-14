@@ -35,6 +35,7 @@ import android.telephony.TelephonyManager;
  * This class is a proxy for accessing Android device informations, because we
  * don't want all modules to collect data on their own.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  */
 public class AndroidDataCollector {

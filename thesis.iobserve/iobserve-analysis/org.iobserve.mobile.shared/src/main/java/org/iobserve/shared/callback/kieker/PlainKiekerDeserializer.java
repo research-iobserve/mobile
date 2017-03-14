@@ -35,8 +35,8 @@ import rocks.fasterxml.jackson.databind.JsonNode;
 /**
  * Used to deserialize a {@link PlainKieker} object at the server side.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class PlainKiekerDeserializer extends JsonDeserializer<IMonitoringRecord> {

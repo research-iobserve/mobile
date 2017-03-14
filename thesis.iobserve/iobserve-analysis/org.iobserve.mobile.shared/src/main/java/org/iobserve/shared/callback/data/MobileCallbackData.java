@@ -24,8 +24,8 @@ import rocks.fasterxml.jackson.annotation.JsonProperty;
  * Contains multiple monitoring records and the session id. This is the
  * data-type which is sent to the monitoring server.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class MobileCallbackData {

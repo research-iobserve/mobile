@@ -33,8 +33,8 @@ import net.lingala.zip4j.exception.ZipException;
 /**
  * Class which instruments a selected Android application.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public final class InstrumenterTest {

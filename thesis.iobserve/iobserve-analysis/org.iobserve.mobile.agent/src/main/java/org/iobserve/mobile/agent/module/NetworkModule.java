@@ -34,11 +34,11 @@ import android.webkit.WebView;
 /**
  * Special module which handles the instrumented network requests.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
-public class NetworkModule extends AbstractAndroidModule {
+public class NetworkModule extends AbstractMonitoringModule {
 	/**
 	 * Time after which the existing connections get collected and sent to the
 	 * monitoring server.

@@ -31,8 +31,8 @@ import privacy_ext.CommunicationLinkPrivacy;
 /**
  * Abstract class for analyzing a certain Palladio Component Model instance.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  * @param <T>
  *            Type of Palladio sub items which should be analyzed.

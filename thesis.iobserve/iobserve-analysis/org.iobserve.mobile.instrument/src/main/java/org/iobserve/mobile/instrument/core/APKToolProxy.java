@@ -48,8 +48,8 @@ import net.lingala.zip4j.exception.ZipException;
  * Proxy for the APK tool which allows us to modify the original manifest file.
  * 
  * @see https://ibotpeaches.github.io/Apktool/
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class APKToolProxy {

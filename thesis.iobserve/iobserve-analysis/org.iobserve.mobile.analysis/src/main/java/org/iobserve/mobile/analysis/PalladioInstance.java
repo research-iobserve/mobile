@@ -24,8 +24,8 @@ import org.palladiosimulator.pcm.usagemodel.UsageModel;
 /**
  * Data class for holding all parts of a single Palladio Component Model.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class PalladioInstance {

@@ -22,6 +22,7 @@ import privacy_ext.CommunicationLinkPrivacy;
 /**
  * Represents the current network connection of a mobile device.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  *
  */

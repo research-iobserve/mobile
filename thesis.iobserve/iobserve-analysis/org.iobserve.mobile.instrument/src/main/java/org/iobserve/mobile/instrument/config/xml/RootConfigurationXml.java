@@ -23,8 +23,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * XML root mapping class which holds the whole XML configuration.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 @XmlRootElement(name = "instrumenter-configuration")

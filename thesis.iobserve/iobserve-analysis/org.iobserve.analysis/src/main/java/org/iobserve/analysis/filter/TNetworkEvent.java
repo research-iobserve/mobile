@@ -39,6 +39,7 @@ import teetime.framework.OutputPort;
  * to mobile applications. It can handle the following records:
  * {@link MobileNetworkEventRecord} and {@link MobileNetworkRequestEventRecord}.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  */
 public class TNetworkEvent extends AbstractConsumerStage<NetworkEvent> {

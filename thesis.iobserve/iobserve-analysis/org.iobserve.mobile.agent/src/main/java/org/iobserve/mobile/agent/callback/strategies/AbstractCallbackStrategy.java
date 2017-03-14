@@ -27,8 +27,8 @@ import rocks.fasterxml.jackson.databind.ObjectMapper;
  * Abstract class which represents a strategy for handling the data which is
  * sent back to the server.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public abstract class AbstractCallbackStrategy {

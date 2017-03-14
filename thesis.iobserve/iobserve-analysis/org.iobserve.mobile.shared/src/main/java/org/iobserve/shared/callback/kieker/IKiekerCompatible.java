@@ -21,8 +21,8 @@ import kieker.common.record.IMonitoringRecord;
  * Interface indicating that a monitoring record can be converted into a Kieker
  * record.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public interface IKiekerCompatible {

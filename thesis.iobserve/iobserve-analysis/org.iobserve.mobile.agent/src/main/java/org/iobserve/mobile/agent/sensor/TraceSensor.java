@@ -37,11 +37,11 @@ import org.iobserve.mobile.agent.util.DependencyManager;
  * {@link TraceRegistry} and the original form is
  * {@link kieker.monitoring.core.registry.TraceRegistry}.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
-public class KiekerSensor implements ISensor {
+public class TraceSensor implements ISensor {
 	/**
 	 * Link to the {@link TraceRegistry}.
 	 */
@@ -81,7 +81,7 @@ public class KiekerSensor implements ISensor {
 	/**
 	 * Creates a new instance.
 	 */
-	public KiekerSensor() {
+	public TraceSensor() {
 	}
 
 	/**

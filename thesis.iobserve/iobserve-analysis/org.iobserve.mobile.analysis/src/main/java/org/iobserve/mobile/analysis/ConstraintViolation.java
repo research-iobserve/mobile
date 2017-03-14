@@ -18,8 +18,8 @@ package org.iobserve.mobile.analysis;
 /**
  * Class which represents the violation of a privacy constraint.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class ConstraintViolation {

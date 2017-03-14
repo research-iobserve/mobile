@@ -26,8 +26,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  * XML Mapping class for the Android application manifest transformation
  * configuration.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)

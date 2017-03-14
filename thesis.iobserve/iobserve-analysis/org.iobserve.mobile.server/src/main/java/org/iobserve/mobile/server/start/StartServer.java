@@ -23,8 +23,8 @@ import org.iobserve.mobile.server.rest.RestService;
 /**
  * Class with a main method that is used to start a monitoring server.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public final class StartServer {

@@ -22,8 +22,8 @@ import org.objectweb.asm.commons.AdviceAdapter;
 /**
  * Class which implements an advice adapter for visiting class methods.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class DefaultInstrumentationAdapter extends AdviceAdapter {

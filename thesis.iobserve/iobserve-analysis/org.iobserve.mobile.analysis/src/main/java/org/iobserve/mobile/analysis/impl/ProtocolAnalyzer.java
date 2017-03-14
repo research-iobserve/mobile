@@ -34,8 +34,8 @@ import privacy_ext.CommunicationLinkPrivacy;
  * Creates a new protocol analyzer instance which checks the connection protocol
  * for links.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class ProtocolAnalyzer extends AbstractPalladioAnalyzer<CommunicationLinkPrivacy> {

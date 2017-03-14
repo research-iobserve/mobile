@@ -22,8 +22,8 @@ import org.iobserve.shared.callback.data.MobileDefaultData;
  * every data object is sent alone to the server and therefore this strategy
  * produces a high overhead and is only suggested for debug purposes.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
- * @author RobertHeinrich
  *
  */
 public class ImmediatelyStrategy extends AbstractCallbackStrategy {

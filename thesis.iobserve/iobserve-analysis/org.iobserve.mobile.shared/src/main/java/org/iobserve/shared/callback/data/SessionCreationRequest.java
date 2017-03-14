@@ -16,38 +16,58 @@
 package org.iobserve.shared.callback.data;
 
 /**
- * Class representing an initial request response from the server for
- * establishing a session.
+ * Class holding information about a device which wants to connect to the
+ * server.
  * 
- * @author David Monschein
  * @author Robert Heinrich
- *
+ * @author David Monschein
+ * 
  */
-public class HelloResponse {
+public class SessionCreationRequest extends MobileDefaultData {
+
 	/**
-	 * The session id.
+	 * The name of the mobile application.
 	 */
-	private String sessionId;
+	private String appName;
+
+	/**
+	 * The device id.
+	 */
+	private String deviceId;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public HelloResponse() {
+	public SessionCreationRequest() {
 	}
 
 	/**
-	 * @return the sessionId
+	 * @return the appName
 	 */
-	public String getSessionId() {
-		return sessionId;
+	public String getAppName() {
+		return appName;
 	}
 
 	/**
-	 * @param sessionId
-	 *            the sessionId to set
+	 * @param appName
+	 *            the appName to set
 	 */
-	public void setSessionId(final String sessionId) {
-		this.sessionId = sessionId;
+	public void setAppName(final String appName) {
+		this.appName = appName;
 	}
 
+	/**
+	 * @return the deviceId
+	 */
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	/**
+	 * @param deviceId
+	 *            the deviceId to set
+	 */
+	public void setDeviceId(final String deviceId) {
+		this.deviceId = deviceId;
+	}
 }

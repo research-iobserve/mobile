@@ -25,8 +25,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 /**
  * XML Mapping class for the agent build options.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)

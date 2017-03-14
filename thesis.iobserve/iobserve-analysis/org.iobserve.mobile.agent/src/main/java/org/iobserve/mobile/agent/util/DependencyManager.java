@@ -22,8 +22,8 @@ import org.iobserve.mobile.agent.core.AndroidDataCollector;
 /**
  * Holds the main components of the agent.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public final class DependencyManager {

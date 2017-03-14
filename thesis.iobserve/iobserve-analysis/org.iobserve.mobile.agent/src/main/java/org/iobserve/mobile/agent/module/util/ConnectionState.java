@@ -22,8 +22,8 @@ import java.util.Map;
 /**
  * Represents the state of a {@link HttpURLConnection}.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class ConnectionState {

@@ -18,8 +18,8 @@ package org.iobserve.mobile.agent.sensor;
 /**
  * Interface for the sensor concept of the agent.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public interface ISensor {

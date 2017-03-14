@@ -18,6 +18,9 @@ package org.iobserve.mobile.agent.core;
 /**
  * The data in this class gets set external by code inserted into the original
  * application.
+ * 
+ * @author Robert Heinrich
+ * @author David Monschein
  */
 public final class ExternalConfiguration {
 

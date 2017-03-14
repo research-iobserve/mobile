@@ -24,8 +24,8 @@ import android.os.Handler;
  * afterwards sends a package which contains all data. This strategy is
  * recommended for production use.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class IntervalStrategy extends AbstractCallbackStrategy {

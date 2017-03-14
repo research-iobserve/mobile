@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlValue;
 /**
  * XML Mapping class for a single Android application permission.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)

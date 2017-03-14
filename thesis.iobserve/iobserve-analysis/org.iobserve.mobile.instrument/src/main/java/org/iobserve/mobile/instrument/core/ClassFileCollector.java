@@ -23,8 +23,8 @@ import java.util.List;
 /**
  * Help class which searches for all .class files in a folder recursive.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class ClassFileCollector {

@@ -23,8 +23,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 /**
  * XML Mapping class for the main instrumentation configuration.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class InstrumentationRootConfigurationXml {

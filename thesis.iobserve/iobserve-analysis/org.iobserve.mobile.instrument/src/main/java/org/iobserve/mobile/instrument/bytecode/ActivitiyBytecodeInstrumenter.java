@@ -37,8 +37,8 @@ import android.app.Activity;
  * Bytecode instrumenter which is responsible for instrumenting Android Activity
  * classes {@link Activity}.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class ActivitiyBytecodeInstrumenter implements IBytecodeInstrumenter {

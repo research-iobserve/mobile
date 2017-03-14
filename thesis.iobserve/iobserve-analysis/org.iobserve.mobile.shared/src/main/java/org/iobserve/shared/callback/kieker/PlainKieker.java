@@ -25,8 +25,8 @@ import rocks.fasterxml.jackson.databind.annotation.JsonSerialize;
 /**
  * Monitoring record which wraps a Kieker record.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class PlainKieker extends MobileDefaultData implements IKiekerCompatible {

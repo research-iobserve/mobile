@@ -43,8 +43,8 @@ import net.lingala.zip4j.model.ZipParameters;
  * Main class which schedules and performs the instrumentation of an Android
  * application.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class APKInstrumenter {

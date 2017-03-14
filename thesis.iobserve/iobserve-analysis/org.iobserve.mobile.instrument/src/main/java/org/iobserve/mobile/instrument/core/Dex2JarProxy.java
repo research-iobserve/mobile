@@ -25,8 +25,8 @@ import org.apache.logging.log4j.Logger;
 /**
  * Proxy class for using the dex2jar tooling.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public final class Dex2JarProxy {

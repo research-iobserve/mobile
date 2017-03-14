@@ -19,8 +19,8 @@ package org.iobserve.mobile.agent.util;
  * Class for the easy creation of values which will be cached for a specified
  * amount of time.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  * 
  * @param <T>
  *            Type of the value to store.

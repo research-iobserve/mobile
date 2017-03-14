@@ -32,8 +32,8 @@ import privacy_ext.CommunicationLinkPrivacy;
 /**
  * Class for analyzing all Wifi connections.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class WifiAnalyzer extends AbstractPalladioAnalyzer<MobileWifiConnectionInfo> {

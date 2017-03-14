@@ -32,6 +32,7 @@ import org.objectweb.asm.Opcodes;
 /**
  * Class, which helps to instrument Java bytecode.
  * 
+ * @author Robert Heinrich
  * @author David Monschein
  *
  */

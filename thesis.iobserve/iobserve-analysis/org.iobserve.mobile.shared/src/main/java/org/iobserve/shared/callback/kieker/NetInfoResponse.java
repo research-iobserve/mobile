@@ -23,8 +23,8 @@ import org.iobserve.shared.callback.data.MobileDefaultData;
 /**
  * Monitoring record for the network connection information of a mobile device.
  * 
- * @author David Monschein
  * @author Robert Heinrich
+ * @author David Monschein
  *
  */
 public class NetInfoResponse extends MobileDefaultData implements IKiekerCompatible {
