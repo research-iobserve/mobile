@@ -101,7 +101,7 @@ public class CallbackTask extends AsyncTask<String, Void, String> {
 	}
 
 	/**
-	 * Performs a post request to a given URL with given data
+	 * Performs a post request to a given URL with given data.
 	 * 
 	 * @param rawUrl
 	 *            the URL

@@ -25,6 +25,10 @@
 		</libraryFolders>
 	</agentBuild>
 	
+	<traceCollection>
+		<package>{application}.**</package>
+	</traceCollection>
+	
 	<instrumentation>
 		<mapping>
 			<point type="onCreate">initAgent</point>

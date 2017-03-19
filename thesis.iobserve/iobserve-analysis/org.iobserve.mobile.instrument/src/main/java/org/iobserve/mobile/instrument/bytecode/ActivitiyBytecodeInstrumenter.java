@@ -43,6 +43,18 @@ import android.app.Activity;
  */
 public class ActivitiyBytecodeInstrumenter implements IBytecodeInstrumenter {
 
+	/** String constant for method name for {@link Activity#onCreate}. */
+	private static final String ACTIVITY_ONCREATE = "onCreate";
+
+	/** String constant for method name of {@link Activity#onStart}. */
+	private static final String ACTIVITY_ONSTART = "onStart";
+
+	/** String constant for method name of {@link Activity#onDestroy}. */
+	private static final String ACTIVITY_ONDESTROY = "onDestroy";
+
+	/** String constant for method name of {@link Activity#onStop}. */
+	private static final String ACTIVITY_ONSTOP = "onStop";
+
 	/** Logger for this class. */
 	private static final Logger LOG = LogManager.getLogger(ActivitiyBytecodeInstrumenter.class);
 
@@ -151,7 +163,7 @@ public class ActivitiyBytecodeInstrumenter implements IBytecodeInstrumenter {
 	@Override
 	public void onMethodEnter(final String owner, final String name, final String desc, final AdviceAdapter parent,
 			final MethodVisitor mv) {
-		if ("onCreate".equals(name)) {
+		if (ACTIVITY_ONCREATE.equals(name)) {
 			final String belAgentPoint = activityPointMapping.get("onCreate");
 
 			// INSERT CONFIG CALLS
@@ -167,15 +179,15 @@ public class ActivitiyBytecodeInstrumenter implements IBytecodeInstrumenter {
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(), belAgentPoint,
 					"(Landroid/app/Activity;)V", false);
-		} else if ("onDestroy".equals(name)) {
+		} else if (ACTIVITY_ONDESTROY.equals(name)) {
 			final String belAgentPoint = activityPointMapping.get("onDestroy");
 
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(), belAgentPoint, "()V", false);
-		} else if ("onStart".equals(name)) {
+		} else if (ACTIVITY_ONSTART.equals(name)) {
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 					onStartActivityMethod.getName(), onStartActivityType.getDescriptor(), false);
-		} else if ("onStop".equals(name)) {
+		} else if (ACTIVITY_ONSTOP.equals(name)) {
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 					onStopActivityMethod.getName(), onStopActivityType.getDescriptor(), false);

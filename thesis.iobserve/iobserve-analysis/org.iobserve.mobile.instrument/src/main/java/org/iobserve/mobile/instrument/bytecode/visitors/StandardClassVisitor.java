@@ -88,7 +88,7 @@ public class StandardClassVisitor extends ClassVisitor {
 	private boolean classWithInit;
 
 	/** Flag whether the class is from the application or not. */
-	private boolean classFromApplication;
+	private boolean traceClass;
 
 	/**
 	 * Creates a new standard class visitor from a given {@link ClassVisitor}.
@@ -113,11 +113,11 @@ public class StandardClassVisitor extends ClassVisitor {
 	@Override
 	public void visit(final int version, final int access, final String name, final String signature,
 			final String supername, final String[] interfaces) {
-		super.visit(version, access & (~Opcodes.ACC_FINAL), name, signature, superName, interfaces);
+		super.visit(version, access & (~Opcodes.ACC_FINAL), name, signature, supername, interfaces);
 
 		this.className = name;
 		this.superName = supername;
-		this.classFromApplication = name.startsWith(config.getApplicationPackage()); // monitor
+		this.traceClass = config.isTraceRelevantClass(name); // monitor
 
 		if (this.superName != null) {
 			final Type superType = Type.getType(this.superName);
@@ -145,7 +145,7 @@ public class StandardClassVisitor extends ClassVisitor {
 		if (classWithInit && matchesInstrumentationPoint(name, desc, POINTS_INIT) != null) {
 			setWritten(true);
 			return new DefaultInstrumentationAdapter(Opcodes.ASM5, className, access, name, desc, mv, initInstrumenter);
-		} else if (this.classFromApplication) {
+		} else if (this.traceClass) {
 			setWritten(true);
 			return new DefaultInstrumentationAdapter(Opcodes.ASM5, className, access, name, desc, mv,
 					new SensorBytecodeInstrumenter(config.getKiekerSensor()));

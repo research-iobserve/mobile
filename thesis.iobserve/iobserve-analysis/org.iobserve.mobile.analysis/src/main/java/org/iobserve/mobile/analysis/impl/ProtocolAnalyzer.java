@@ -40,7 +40,8 @@ import privacy_ext.CommunicationLinkPrivacy;
  */
 public class ProtocolAnalyzer extends AbstractPalladioAnalyzer<CommunicationLinkPrivacy> {
 
-	private static final Set<String> SECURE_PROTOCOLS_MOBILE = new HashSet<>(Arrays.asList(new String[] { "lte" }));
+	private static final Set<String> SECURE_PROTOCOLS_MOBILE = new HashSet<>(
+			Arrays.asList(new String[] { "lte", "3g" }));
 	private static final Set<String> SECURE_PROTOCOLS_WIFI = new HashSet<>(
 			Arrays.asList(new String[] { "wpa", "wpa2" }));
 
@@ -58,7 +59,7 @@ public class ProtocolAnalyzer extends AbstractPalladioAnalyzer<CommunicationLink
 		final MobileConnectionState cState = new MobileConnectionState(value);
 		if (cState.getConnectionType() == MobileConnectionType.WLAN) {
 			final MobileWifiConnectionInfo info = (MobileWifiConnectionInfo) cState.getConnectionInfo();
-			if (SECURE_PROTOCOLS_WIFI.contains(info.getProtocol())) {
+			if (SECURE_PROTOCOLS_WIFI.contains(info.getProtocol().toLowerCase())) {
 				return null;
 			} else {
 				return new ConstraintViolation(
@@ -66,7 +67,7 @@ public class ProtocolAnalyzer extends AbstractPalladioAnalyzer<CommunicationLink
 			}
 		} else if (cState.getConnectionType() == MobileConnectionType.MOBILE) {
 			final MobileMobileConnectionInfo info = (MobileMobileConnectionInfo) cState.getConnectionInfo();
-			if (SECURE_PROTOCOLS_MOBILE.contains(info.getProtocol())) {
+			if (SECURE_PROTOCOLS_MOBILE.contains(info.getProtocol().toLowerCase())) {
 				return null;
 			} else {
 				return new ConstraintViolation(

@@ -56,6 +56,12 @@ public class RootConfigurationXml {
 	private AgentBuildConfigurationXml agentBuildConfiguration;
 
 	/**
+	 * Configuration for packages where traces should get collected.
+	 */
+	@XmlElement(name = "traceCollection")
+	private TraceCollectionConfiguration traceCollectionList;
+
+	/**
 	 * Creates a new instance.
 	 */
 	public RootConfigurationXml() {
@@ -87,6 +93,21 @@ public class RootConfigurationXml {
 	 */
 	public AgentBuildConfigurationXml getAgentBuildConfiguration() {
 		return agentBuildConfiguration;
+	}
+
+	/**
+	 * @return the traceCollectionList
+	 */
+	public TraceCollectionConfiguration getTraceCollectionList() {
+		return traceCollectionList;
+	}
+
+	/**
+	 * @param traceCollectionList
+	 *            the traceCollectionList to set
+	 */
+	public void setTraceCollectionList(final TraceCollectionConfiguration traceCollectionList) {
+		this.traceCollectionList = traceCollectionList;
 	}
 
 }

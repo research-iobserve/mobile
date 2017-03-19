@@ -43,7 +43,7 @@ public class NetworkModule extends AbstractMonitoringModule {
 	 * Time after which the existing connections get collected and sent to the
 	 * monitoring server.
 	 */
-	private static final long COLLECT_AFTER = 30000L;
+	private final long collectAfter;
 
 	/**
 	 * Maps a single connection to a specific connection state.
@@ -54,6 +54,18 @@ public class NetworkModule extends AbstractMonitoringModule {
 	 * Creates a new default instance.
 	 */
 	public NetworkModule() {
+		this(30000L);
+	}
+
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param collectionInterval
+	 *            Time after which the existing connections get collected and
+	 *            sent to the monitoring server.
+	 */
+	public NetworkModule(final long collectionInterval) {
+		this.collectAfter = collectionInterval;
 	}
 
 	/**
@@ -159,7 +171,7 @@ public class NetworkModule extends AbstractMonitoringModule {
 
 		for (HttpURLConnection conn : connectionStateMap.keySet()) {
 			final ConnectionState state = connectionStateMap.get(conn);
-			if (state.getLastUpdatedDiff() >= COLLECT_AFTER) {
+			if (state.getLastUpdatedDiff() >= collectAfter) {
 				if (state.probablyFinished()) {
 					final long startStamp = state.getPointTimestamp(ConnectionState.ConnectionPoint.CONNECT);
 					final long responseStamp = state.getPointTimestamp(ConnectionState.ConnectionPoint.RESPONSECODE);

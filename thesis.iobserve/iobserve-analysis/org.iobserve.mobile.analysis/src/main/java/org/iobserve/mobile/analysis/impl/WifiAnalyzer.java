@@ -95,7 +95,7 @@ public class WifiAnalyzer extends AbstractPalladioAnalyzer<MobileWifiConnectionI
 		}
 
 		// EVIL TWIN CHECK
-		if (value.getProtocol().toLowerCase().equals("none")) {
+		if (value.getProtocol().equalsIgnoreCase("none")) {
 			return new ConstraintViolation("Wifi connection with SSID '" + value.getSsid() + "' and BSSID '"
 					+ value.getBssid() + "' is probably victim of the evil twin attack.");
 		}

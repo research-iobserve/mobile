@@ -113,7 +113,7 @@ public abstract class AbstractCallbackStrategy {
 	 *            whether it is a session creation message or not
 	 */
 	private void sendBeacon(final MobileCallbackData dat, final boolean helloReq) {
-		if (data != null && data.getChildData().size() > 0) {
+		if (dat != null && dat.getChildData().size() > 0) {
 			final String callbackUrl;
 			if (helloReq) {
 				callbackUrl = ExternalConfiguration.getHelloUrl();
@@ -122,7 +122,7 @@ public abstract class AbstractCallbackStrategy {
 			}
 
 			try {
-				new CallbackTask(callbackUrl).execute(mapper.writeValueAsString(data));
+				new CallbackTask(callbackUrl).execute(mapper.writeValueAsString(dat));
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 			}

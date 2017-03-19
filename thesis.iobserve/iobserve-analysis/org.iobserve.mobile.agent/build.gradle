@@ -5,6 +5,7 @@ dependencies {
     compile group: 'com.google.android', name: 'android', version: '4.1.1.4'
     
     testCompile 'junit:junit:4.12'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
     
     compile project(':org.iobserve.mobile.shared')
 

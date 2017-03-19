@@ -39,6 +39,12 @@ import android.webkit.WebView;
  */
 public class NetworkBytecodeInstrumenter {
 
+	/** Method name for {@link HttpURLConnection#getOutputStream()}. */
+	private static final String METHOD_GETOUTPUTSTREAM = "getOutputStream";
+
+	/** Method name for {@link HttpURLConnection#getResponseCode()}. */
+	private static final String METHOD_GETRESPONSECODE = "getResponseCode";
+
 	/** Logger for this class. */
 	private static final Logger LOG = LogManager.getLogger(NetworkBytecodeInstrumenter.class);
 
@@ -172,11 +178,11 @@ public class NetworkBytecodeInstrumenter {
 			mvInternal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 					httpConnectMethod2.getName(), httpConnectType2.getDescriptor(), false);
 		} else if (owner.equalsIgnoreCase(HTTPURLCONNECTION_TYPE.getInternalName())) {
-			if ("getOutputStream".equals(name)) {
+			if (METHOD_GETOUTPUTSTREAM.equals(name)) {
 				// write own
 				mvInternal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 						getOutputStreamMethod.getName(), getOutputStreamType.getDescriptor(), false);
-			} else if ("getResponseCode".equals(name)) {
+			} else if (METHOD_GETRESPONSECODE.equals(name)) {
 				// write own
 				mvInternal.visitMethodInsn(Opcodes.INVOKESTATIC, ANDROIDAGENT_TYPE.getInternalName(),
 						getResponseCodeMethod.getName(), getResponseCodeType.getDescriptor(), false);

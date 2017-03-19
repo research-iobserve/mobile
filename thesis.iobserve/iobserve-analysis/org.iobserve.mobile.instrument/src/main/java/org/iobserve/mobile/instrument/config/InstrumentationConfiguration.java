@@ -38,6 +38,13 @@ import android.webkit.WebView;
  *
  */
 public class InstrumentationConfiguration {
+
+	/**
+	 * Pattern which is replaced with the application package for the
+	 * instrumentation rules.
+	 */
+	private static final String PATTERN_APPLICATION_PACKAGE = "{application}";
+
 	/** Type for {@link TraceSensor}. */
 	private static final String KIEKER_SENSOR = Type.getType(TraceSensor.class).getClassName();
 	// HTTP POINTS
@@ -92,6 +99,43 @@ public class InstrumentationConfiguration {
 				|| owner.equalsIgnoreCase(URL_TYPE.getInternalName())
 				|| descReturnType(desc).equalsIgnoreCase(HTTPURLCONNECTION_TYPE.getDescriptor())
 				|| owner.equalsIgnoreCase(WEBVIEW_TYPE.getInternalName());
+	}
+
+	/**
+	 * Checks whether within a single class traces should be collected or not.
+	 * 
+	 * @param clazzFull
+	 *            the name of the class
+	 * @return if the traces should get collected
+	 */
+	public boolean isTraceRelevantClass(final String clazzFull) {
+		for (String rule : xmlConfiguration.getTraceCollectionList().getPackages()) {
+			String ruleAdjust = rule;
+			if (rule.contains(PATTERN_APPLICATION_PACKAGE)) {
+				ruleAdjust = rule.replace(PATTERN_APPLICATION_PACKAGE, getApplicationPackage());
+			}
+
+			// CHECK IF RULE MATCHES
+			final String[] packageSplit1 = clazzFull.replaceAll("/", ".").split("\\.");
+			final String[] packageSplit2 = ruleAdjust.replaceAll("/", ".").split("\\.");
+
+			boolean match = true;
+			for (int i = 0; i < packageSplit1.length; i++) {
+				if (packageSplit2[i].equals("**") && match) {
+					return true;
+				} else if (!packageSplit2[i].equals("*")) {
+					if (!packageSplit1[i].equals(packageSplit2[i])) {
+						match = false;
+						break;
+					}
+				}
+			}
+
+			if (match) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

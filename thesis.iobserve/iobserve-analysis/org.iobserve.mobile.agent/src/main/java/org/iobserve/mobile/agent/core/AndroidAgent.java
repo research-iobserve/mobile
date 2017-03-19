@@ -438,7 +438,7 @@ public final class AndroidAgent {
 	 * This method is called by code which is inserted into the original
 	 * application when the application creates a {@link HttpURLConnection}.
 	 * 
-	 * @param connection
+	 * @param connection the connection
 	 */
 	public static void httpConnect(final URLConnection connection) {
 		networkModule.openConnection((HttpURLConnection) connection);
