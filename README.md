@@ -12,7 +12,7 @@ Setup
 3.  In Eclipse select Import -> Gradle -> Gradle Project
 4.  Now select the folder where you cloned the repository and finish the process.
 5.  Your workspace now should contain several new gradle projects.
-5.1 This already includes the adjusted iObserve projects.
+    1. This already includes the adjusted iObserve projects.
 6.  There will be still some errors so you need follow the next steps.
 7.  Create a new run configuration for Gradle and select enter the task "jarJar" and as working directory select the "org.iobserve.mobile.agent" project. Execute this configuration now.
 8.  Right-click on "iobserve-analysis" project and select Gradle -> Refresh Gradle Project. All errors should be gone now.
@@ -30,8 +30,8 @@ Using iObserve extension
 
 1. The usage of the extended iObserve version is very intuitive. It doesn't differ much from the usage of the common iObserve execution.
 2. You can see how to use iObserve here: [https://github.com/research-iobserve/iobserve-analysis/blob/master/doc/general/UsageGuide_iObserve.txt](https://github.com/research-iobserve/iobserve-analysis/blob/master/doc/general/UsageGuide_iObserve.txt) and you only have to select the path with the recorded monitoring logs within the server project.
-2.1. It is necessary that you have existing PCM models for your application.
-2.2. Furthermore you need to have a correspondence model which contains mappings for PCM entities so iObserve can automatically detect which method call belongs to which PCM entity.
+    1. It is necessary that you have existing PCM models for your application.
+    2. Furthermore you need to have a correspondence model which contains mappings for PCM entities so iObserve can automatically detect which method call belongs to which PCM entity.
 3. After running iObserve, you get an updated PCM model which can be further analyzed.
 
 Note: The instrumentation uses a default keystore to resign the application after modifying it. If you use this in production you have to exchange the default keystore with your actually used keystore.
