@@ -87,6 +87,11 @@ public final class AndroidAgent {
 	private static Map<Long, ISensor> sensorMap = new HashMap<>();
 
 	/**
+	 * Maps a class name to a class object.
+	 */
+	private static Map<String, Class<?>> sensorClassMapping = new HashMap<>();
+
+	/**
 	 * List of created broadcast receivers.
 	 */
 	private static List<BroadcastReceiver> createdReceivers = new ArrayList<BroadcastReceiver>();
@@ -326,9 +331,16 @@ public final class AndroidAgent {
 	public static synchronized long enterBody(final String sensorClassName, final String methodSignature,
 			final String owner) {
 		try {
-			final Class<?> clazz = Class.forName(sensorClassName);
-			final Constructor<?> constructor = clazz.getConstructor();
-			final ISensor nSensor = (ISensor) constructor.newInstance();
+			final ISensor nSensor;
+			if (sensorClassMapping.containsKey(sensorClassName)) {
+				nSensor = (ISensor) sensorClassMapping.get(sensorClassName).newInstance();
+			} else {
+				final Class<?> clazz = Class.forName(sensorClassName);
+				final Constructor<?> constructor = clazz.getConstructor();
+				sensorClassMapping.put(sensorClassName, clazz);
+
+				nSensor = (ISensor) constructor.newInstance();
+			}
 			nSensor.setOwner(owner); // BEFORE ALL OTHER
 			nSensor.setSignature(methodSignature);
 			nSensor.beforeBody();
@@ -438,7 +450,8 @@ public final class AndroidAgent {
 	 * This method is called by code which is inserted into the original
 	 * application when the application creates a {@link HttpURLConnection}.
 	 * 
-	 * @param connection the connection
+	 * @param connection
+	 *            the connection
 	 */
 	public static void httpConnect(final URLConnection connection) {
 		networkModule.openConnection((HttpURLConnection) connection);
