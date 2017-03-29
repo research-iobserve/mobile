@@ -26,7 +26,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.telephony.TelephonyManager;
-import android.util.TimingLogger;
 
 /**
  * Concrete broadcast receiver for network events.
@@ -58,8 +57,6 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(final Context context, final Intent intent) {
-		final TimingLogger timingLogger = new TimingLogger("NetworkBroadcastReceiver", "onReceive");
-
 		if (deviceId == null) {
 			deviceId = androidDataCollector.getDeviceId();
 		}
@@ -97,8 +94,6 @@ public class NetworkBroadcastReceiver extends AbstractBroadcastReceiver {
 			// no connection (anymore)
 			this.pushData(new NetInfoResponse(deviceId, false, false, null, null, null, null));
 		}
-
-		timingLogger.dumpToLog();
 	}
 
 	/**

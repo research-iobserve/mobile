@@ -21,14 +21,16 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.iobserve.mobile.agent.callback.CallbackManager;
+import org.iobserve.mobile.agent.core.AndroidAgent;
+import org.iobserve.mobile.agent.util.DependencyManager;
+
+import android.util.LongSparseArray;
+import kieker.common.record.IMonitoringRecord;
 import kieker.common.record.flow.trace.TraceMetadata;
 import kieker.common.record.flow.trace.operation.AfterOperationEvent;
 import kieker.common.record.flow.trace.operation.AfterOperationFailedEvent;
 import kieker.common.record.flow.trace.operation.BeforeOperationEvent;
-
-import org.iobserve.mobile.agent.callback.CallbackManager;
-import org.iobserve.mobile.agent.core.AndroidAgent;
-import org.iobserve.mobile.agent.util.DependencyManager;
 
 /**
  * Sensor for dealing with operations executed before and after method
@@ -55,147 +57,139 @@ public class TraceSensor implements ISensor {
 	/**
 	 * Name of the class.
 	 */
-	private String clazz;
+	private LongSparseArray<String> clazz;
 
 	/**
 	 * Signature of the method.
 	 */
-	private String signature;
+	private LongSparseArray<String> signature;
 
 	// INNER
 	/**
 	 * Whether it is a new trace or not.
 	 */
-	private boolean newTrace;
+	private LongSparseArray<Boolean> newTrace;
 
 	/**
 	 * The id of the trace.
 	 */
-	private long traceId;
+	private LongSparseArray<Long> traceId;
 
 	/**
 	 * Trace meta data Kieker record.
 	 */
-	private TraceMetadata trace;
+	private LongSparseArray<TraceMetadata> trace;
 
 	/**
 	 * Creates a new instance.
 	 */
 	public TraceSensor() {
+		clazz = new LongSparseArray<String>();
+		signature = new LongSparseArray<String>();
+		newTrace = new LongSparseArray<Boolean>();
+		traceId = new LongSparseArray<Long>();
+		trace = new LongSparseArray<TraceMetadata>();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void beforeBody() {
-		trace = TRACEREGISTRY.getTrace();
-		newTrace = trace == null;
-		if (newTrace) {
-			trace = TRACEREGISTRY.registerTrace();
-			if (callbackManager == null) {
-				AndroidAgent.queueForInit(trace);
-			} else {
-				callbackManager.pushKiekerData(trace);
-			}
-		}
+	public void beforeBody(long id) {
+		TraceMetadata traceMeta = TRACEREGISTRY.getTrace();
 
-		traceId = trace.getTraceId();
-
-		final BeforeOperationEvent event = new BeforeOperationEvent(System.nanoTime(), traceId, trace.getNextOrderId(),
-				signature, clazz);
-		if (callbackManager == null) {
-			AndroidAgent.queueForInit(event);
-		} else {
-			callbackManager.pushKiekerData(event);
+		boolean nTrace = traceMeta == null;
+		newTrace.put(id, nTrace);
+		if (nTrace) {
+			traceMeta = TRACEREGISTRY.registerTrace();
+			pushEvent(traceMeta);
 		}
+		trace.put(id, traceMeta);
+
+		long traceIdCache = traceMeta.getTraceId();
+		traceId.put(id, traceIdCache);
+
+		final BeforeOperationEvent event = new BeforeOperationEvent(System.nanoTime(), traceIdCache,
+				traceMeta.getNextOrderId(), signature.get(id), clazz.get(id));
+		pushEvent(event);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void exceptionThrown(final String caused) {
-		if (newTrace) {
+	public void exceptionThrown(long id, final String caused) {
+		if (newTrace.get(id)) {
 			TRACEREGISTRY.unregisterTrace();
 		}
 
-		final AfterOperationFailedEvent event = new AfterOperationFailedEvent(System.nanoTime(), traceId,
-				trace.getNextOrderId(), signature, clazz, caused);
-		if (callbackManager == null) {
-			AndroidAgent.queueForInit(event);
-		} else {
-			callbackManager.pushKiekerData(event);
-		}
+		final AfterOperationFailedEvent event = new AfterOperationFailedEvent(System.nanoTime(), traceId.get(id),
+				trace.get(id).getNextOrderId(), signature.get(id), clazz.get(id), caused);
+		pushEvent(event);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void firstAfterBody() {
-		if (newTrace) {
+	public void firstAfterBody(long id) {
+		if (newTrace.get(id)) {
 			TRACEREGISTRY.unregisterTrace();
 		}
 
-		final AfterOperationEvent event = new AfterOperationEvent(System.nanoTime(), traceId, trace.getNextOrderId(),
-				signature, clazz);
+		final AfterOperationEvent event = new AfterOperationEvent(System.nanoTime(), traceId.get(id),
+				trace.get(id).getNextOrderId(), signature.get(id), clazz.get(id));
+		pushEvent(event);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void secondAfterBody(long id) {
+		clazz.remove(id);
+		signature.remove(id);
+		trace.remove(id);
+		traceId.remove(id);
+		newTrace.remove(id);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setOwner(long id, final String owner) {
+		clazz.put(id, owner);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setSignature(long id, final String methodSignature) {
+		signature.put(id, methodSignature);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setCallbackManager(CallbackManager callbackManager) {
+		this.callbackManager = callbackManager;
+	}
+
+	/**
+	 * Executes the callback of the event in another thread.
+	 * 
+	 * @param event
+	 *            the event which should be sent to the monitoring server.
+	 */
+	private void pushEvent(final IMonitoringRecord event) {
 		if (callbackManager == null) {
 			AndroidAgent.queueForInit(event);
 		} else {
 			callbackManager.pushKiekerData(event);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void secondAfterBody() {
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setOwner(final String owner) {
-		clazz = formatClazz(owner);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setSignature(final String methodSignature) {
-		signature = formatOperation(methodSignature);
-	}
-
-	/**
-	 * Formats a class by converting the internal representation to the original
-	 * class name.
-	 * 
-	 * @param clazzz
-	 *            internal representation of the class
-	 * @return original class name
-	 */
-	private String formatClazz(final String clazzz) {
-		return clazzz.replaceAll("/", ".");
-	}
-
-	/**
-	 * Formats a operation given in the internal representation format.
-	 * 
-	 * @param operation
-	 *            operation in the internal representation format
-	 * @return reformatted operation in nearly original form
-	 */
-	private String formatOperation(final String operation) {
-		final String[] opSplit = operation.split("\\)");
-		String op = operation;
-		if (opSplit.length == 2) {
-			op = opSplit[0] + ")"; // remove return type
-		}
-		return clazz + "." + op.replaceAll(";", "").replaceAll("/", ".").replaceAll("L", "");
 	}
 
 	/***************************************************************************

@@ -17,7 +17,6 @@ package org.iobserve.mobile.agent.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -26,8 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import kieker.common.record.IMonitoringRecord;
 
 import org.iobserve.common.mobile.record.MobileDeploymentRecord;
 import org.iobserve.common.mobile.record.MobileUndeploymentRecord;
@@ -50,7 +47,9 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.util.Log;
+import android.util.LongSparseArray;
 import android.webkit.WebView;
+import kieker.common.record.IMonitoringRecord;
 
 /**
  * The main Android Agent class which is responsible for managing and scheduling
@@ -60,6 +59,10 @@ import android.webkit.WebView;
  * @author David Monschein
  */
 public final class AndroidAgent {
+	/**
+	 * Max size for stored records when there is no connection.
+	 */
+	private static final int MAX_QUEUE = 500;
 	/**
 	 * Resolve consistent log tag for the agent.
 	 */
@@ -84,12 +87,12 @@ public final class AndroidAgent {
 	/**
 	 * Maps a entry id to a specific sensor.
 	 */
-	private static Map<Long, ISensor> sensorMap = new HashMap<>();
+	private static LongSparseArray<ISensor> sensorMap = new LongSparseArray<>();
 
 	/**
 	 * Maps a class name to a class object.
 	 */
-	private static Map<String, Class<?>> sensorClassMapping = new HashMap<>();
+	private static Map<String, ISensor> sensorClassMapping = new HashMap<>();
 
 	/**
 	 * List of created broadcast receivers.
@@ -180,7 +183,7 @@ public final class AndroidAgent {
 		DependencyManager.setAndroidDataCollector(androidDataCollector);
 
 		// INITING CALLBACK
-		final AbstractCallbackStrategy callbackStrategy = new IntervalStrategy(10000L);
+		final AbstractCallbackStrategy callbackStrategy = new IntervalStrategy(5000L);
 		DependencyManager.setCallbackStrategy(callbackStrategy);
 
 		callbackManager = new CallbackManager();
@@ -192,6 +195,9 @@ public final class AndroidAgent {
 		helloRequest.setDeviceId(androidDataCollector.getDeviceId());
 
 		callbackManager.pushHelloMessage(helloRequest);
+		for (String key : sensorClassMapping.keySet()) {
+			sensorClassMapping.get(key).setCallbackManager(callbackManager);
+		}
 
 		// INITING MODULES
 		for (Class<?> exModule : MODULES) {
@@ -330,38 +336,35 @@ public final class AndroidAgent {
 	 */
 	public static synchronized long enterBody(final String sensorClassName, final String methodSignature,
 			final String owner) {
-		try {
-			final ISensor nSensor;
-			if (sensorClassMapping.containsKey(sensorClassName)) {
-				nSensor = (ISensor) sensorClassMapping.get(sensorClassName).newInstance();
-			} else {
-				final Class<?> clazz = Class.forName(sensorClassName);
-				final Constructor<?> constructor = clazz.getConstructor();
-				sensorClassMapping.put(sensorClassName, clazz);
-
-				nSensor = (ISensor) constructor.newInstance();
+		final ISensor nSensor;
+		if (sensorClassMapping.containsKey(sensorClassName)) {
+			nSensor = (ISensor) sensorClassMapping.get(sensorClassName);
+		} else {
+			Class<?> clazz;
+			try {
+				clazz = Class.forName(sensorClassName);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Failed to create sensor instance.");
+				return -1;
 			}
-			nSensor.setOwner(owner); // BEFORE ALL OTHER
-			nSensor.setSignature(methodSignature);
-			nSensor.beforeBody();
-			sensorMap.put(currentId, nSensor);
-			return currentId++;
-		} catch (InstantiationException e) {
-			Log.e(LOG_TAG, "Failed to create sensor instance.");
-			return -1;
-		} catch (IllegalAccessException e) {
-			Log.e(LOG_TAG, "Failed to create sensor instance.");
-			return -1;
-		} catch (ClassNotFoundException e) {
-			Log.e(LOG_TAG, "Failed to create sensor instance.");
-			return -1;
-		} catch (NoSuchMethodException e) {
-			Log.e(LOG_TAG, "Failed to create sensor instance.");
-			return -1;
-		} catch (InvocationTargetException e) {
-			Log.e(LOG_TAG, "Failed to create sensor instance.");
-			return -1;
+
+			try {
+				nSensor = (ISensor) clazz.newInstance();
+				sensorClassMapping.put(sensorClassName, nSensor);
+			} catch (InstantiationException | IllegalAccessException e) {
+				Log.e(LOG_TAG, "Failed to create sensor instance.");
+				return -1;
+			}
 		}
+		nSensor.setOwner(currentId, owner); // BEFORE ALL OTHER
+		nSensor.setSignature(currentId, methodSignature);
+
+		nSensor.beforeBody(currentId);
+
+		sensorMap.put(currentId, nSensor);
+
+		return currentId++;
 	}
 
 	/**
@@ -375,11 +378,11 @@ public final class AndroidAgent {
 	 *            the entry id for getting the responsible sensor instance
 	 */
 	public static synchronized void exitErrorBody(final Throwable e, final long enterId) {
-		if (enterId >= 0 && sensorMap.containsKey(enterId)) {
+		if (enterId >= 0 && sensorMap.indexOfKey(enterId) < 0) {
 			final ISensor eSensor = sensorMap.get(enterId);
 
 			// call methods
-			eSensor.exceptionThrown(e.getClass().getName());
+			eSensor.exceptionThrown(enterId, e.getClass().getName());
 
 			// clear
 			sensorMap.remove(enterId);
@@ -394,16 +397,16 @@ public final class AndroidAgent {
 	 *            the entry id for getting the responsible sensor instance
 	 */
 	public static synchronized void exitBody(final long enterId) {
-		if (enterId >= 0 && sensorMap.containsKey(enterId)) {
+		if (enterId >= 0 && sensorMap.indexOfKey(enterId) < 0) {
 			final ISensor eSensor = sensorMap.get(enterId);
 
 			// call methods
-			eSensor.firstAfterBody();
-			eSensor.secondAfterBody();
+			eSensor.firstAfterBody(enterId);
+			eSensor.secondAfterBody(enterId);
 
 			// clear
 			sensorMap.remove(enterId);
-			if (sensorMap.isEmpty()) {
+			if (sensorMap.size() == 0) {
 				currentId = 0;
 			}
 		}
@@ -508,7 +511,9 @@ public final class AndroidAgent {
 	 *            the record which should be queued
 	 */
 	public static void queueForInit(final IMonitoringRecord afterOperationEvent) {
-		kiekerQueueInit.add(afterOperationEvent);
+		if (kiekerQueueInit.size() < MAX_QUEUE) {
+			kiekerQueueInit.add(afterOperationEvent);
+		}
 	}
 
 	/**
@@ -518,7 +523,9 @@ public final class AndroidAgent {
 	 *            the record which should be queued
 	 */
 	public static void queueForInit(final MobileDefaultData data) {
-		defaultQueueInit.add(data);
+		if (defaultQueueInit.size() < MAX_QUEUE) {
+			defaultQueueInit.add(data);
+		}
 	}
 
 	/**

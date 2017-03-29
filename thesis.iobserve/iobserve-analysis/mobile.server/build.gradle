@@ -5,7 +5,11 @@ repositories {
 }
 
 dependencies {
-	compile project(':common')
+	compile 'net.kieker-monitoring:kieker:1.12'
+
+	compile (project(':common')) {
+		exclude group: 'net.kieker-monitoring'
+	}
 	compile project(':mobile.shared')
 
 	compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.0.M0'
@@ -13,8 +17,6 @@ dependencies {
     compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.24'
     compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '2.24'
     compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-jetty-http', version: '2.24'
-    
-    compile 'net.kieker-monitoring:kieker:1.12'
 
     testCompile 'junit:junit:4.12'
 }

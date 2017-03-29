@@ -11,7 +11,9 @@ dependencies {
     
     testCompile 'junit:junit:4.12'
     
-    compile project(":common")
+    compile (project(':common')) {
+		exclude group: 'net.kieker-monitoring'
+	}
     
     jarJar 'com.fasterxml.jackson.core:jackson-annotations:2.8.4'
     jarJar 'com.fasterxml.jackson.core:jackson-core:2.8.4'

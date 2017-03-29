@@ -26,19 +26,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import kieker.common.configuration.Configuration;
-import kieker.common.record.IMonitoringRecord;
-import kieker.monitoring.core.configuration.ConfigurationFactory;
-import kieker.monitoring.core.controller.IMonitoringController;
-import kieker.monitoring.core.controller.MonitoringController;
-import kieker.monitoring.writer.filesystem.SyncFsWriter;
-
 import org.iobserve.shared.callback.data.MobileCallbackData;
 import org.iobserve.shared.callback.data.MobileDefaultData;
 import org.iobserve.shared.callback.data.SessionCreationRequest;
 import org.iobserve.shared.callback.data.SessionCreationResponse;
 import org.iobserve.shared.callback.kieker.IKiekerCompatible;
 
+import kieker.common.configuration.Configuration;
+import kieker.common.record.IMonitoringRecord;
+import kieker.monitoring.core.configuration.ConfigurationFactory;
+import kieker.monitoring.core.controller.IMonitoringController;
+import kieker.monitoring.core.controller.MonitoringController;
+import kieker.monitoring.writer.filesystem.SyncFsWriter;
 import rocks.fasterxml.jackson.databind.ObjectMapper;
 
 /**

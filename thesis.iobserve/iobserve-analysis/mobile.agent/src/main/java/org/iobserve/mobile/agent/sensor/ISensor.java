@@ -15,6 +15,8 @@
  ***************************************************************************/
 package org.iobserve.mobile.agent.sensor;
 
+import org.iobserve.mobile.agent.callback.CallbackManager;
+
 /**
  * Interface for the sensor concept of the agent.
  * 
@@ -26,7 +28,7 @@ public interface ISensor {
 	/**
 	 * Is executed before the original method gets executed.
 	 */
-	void beforeBody();
+	void beforeBody(long id);
 
 	/**
 	 * Gets executed if the real method throws an exception.
@@ -34,18 +36,18 @@ public interface ISensor {
 	 * @param clazz
 	 *            the class of the exception
 	 */
-	void exceptionThrown(String clazz);
+	void exceptionThrown(long id, String clazz);
 
 	/**
 	 * Gets executed after the original method was executed.
 	 */
-	void firstAfterBody();
+	void firstAfterBody(long id);
 
 	/**
 	 * Gets executed after the original method and the
 	 * {@link ISensor#firstAfterBody()} were executed.
 	 */
-	void secondAfterBody();
+	void secondAfterBody(long id);
 
 	/**
 	 * Sets the name of the class which owns the method.
@@ -53,7 +55,7 @@ public interface ISensor {
 	 * @param owner
 	 *            name of the class which owns the method
 	 */
-	void setOwner(String owner);
+	void setOwner(long id, String owner);
 
 	/**
 	 * Sets the signature of the method for which this sensor is responsible.
@@ -61,5 +63,13 @@ public interface ISensor {
 	 * @param methodSignature
 	 *            the signature of the method
 	 */
-	void setSignature(String methodSignature);
+	void setSignature(long id, String methodSignature);
+
+	/**
+	 * Sets the callback manager for the sensor.
+	 * 
+	 * @param callbackManager
+	 *            the {@link CallbackManager}
+	 */
+	void setCallbackManager(CallbackManager callbackManager);
 }

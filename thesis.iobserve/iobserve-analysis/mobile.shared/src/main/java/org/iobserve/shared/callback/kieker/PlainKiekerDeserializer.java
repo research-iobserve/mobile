@@ -17,15 +17,14 @@ package org.iobserve.shared.callback.kieker;
 
 import java.io.IOException;
 
+import org.iobserve.common.mobile.record.MobileDeploymentRecord;
+import org.iobserve.common.mobile.record.MobileUndeploymentRecord;
+
 import kieker.common.record.IMonitoringRecord;
 import kieker.common.record.flow.trace.TraceMetadata;
 import kieker.common.record.flow.trace.operation.AfterOperationEvent;
 import kieker.common.record.flow.trace.operation.AfterOperationFailedEvent;
 import kieker.common.record.flow.trace.operation.BeforeOperationEvent;
-
-import org.iobserve.common.mobile.record.MobileDeploymentRecord;
-import org.iobserve.common.mobile.record.MobileUndeploymentRecord;
-
 import rocks.fasterxml.jackson.core.JsonParser;
 import rocks.fasterxml.jackson.core.JsonProcessingException;
 import rocks.fasterxml.jackson.databind.DeserializationContext;
@@ -60,16 +59,16 @@ public class PlainKiekerDeserializer extends JsonDeserializer<IMonitoringRecord>
 		if ("BeforeOperationEvent".equals(type)) {
 			final long timestamp = node.get("timestamp").asLong();
 			final long traceId = node.get("traceId").asLong();
-			final String clazzSig = node.get("classSignature").asText();
-			final String operationSig = node.get("operationSignature").asText();
+			final String clazzSig = formatClazz(node.get("classSignature").asText());
+			final String operationSig = formatOperation(clazzSig, node.get("operationSignature").asText());
 			final int orderIndex = node.get("orderIndex").asInt();
 
 			return new BeforeOperationEvent(timestamp, traceId, orderIndex, operationSig, clazzSig);
 		} else if ("AfterOperationFailedEvent".equals(type)) {
 			final long timestamp = node.get("timestamp").asLong();
 			final long traceId = node.get("traceId").asLong();
-			final String clazzSig = node.get("classSignature").asText();
-			final String operationSig = node.get("operationSignature").asText();
+			final String clazzSig = formatClazz(node.get("classSignature").asText());
+			final String operationSig = formatOperation(clazzSig, node.get("operationSignature").asText());
 			final int orderIndex = node.get("orderIndex").asInt();
 			final String cause = node.get("cause").asText();
 
@@ -77,8 +76,8 @@ public class PlainKiekerDeserializer extends JsonDeserializer<IMonitoringRecord>
 		} else if ("AfterOperationEvent".equals(type)) {
 			final long timestamp = node.get("timestamp").asLong();
 			final long traceId = node.get("traceId").asLong();
-			final String clazzSig = node.get("classSignature").asText();
-			final String operationSig = node.get("operationSignature").asText();
+			final String clazzSig = formatClazz(node.get("classSignature").asText());
+			final String operationSig = formatOperation(clazzSig, node.get("operationSignature").asText());
 			final int orderIndex = node.get("orderIndex").asInt();
 
 			return new AfterOperationEvent(timestamp, traceId, orderIndex, operationSig, clazzSig);
@@ -104,6 +103,34 @@ public class PlainKiekerDeserializer extends JsonDeserializer<IMonitoringRecord>
 		}
 
 		return null;
+	}
+
+	/**
+	 * Formats a class by converting the internal representation to the original
+	 * class name.
+	 * 
+	 * @param clazzz
+	 *            internal representation of the class
+	 * @return original class name
+	 */
+	private String formatClazz(final String clazzz) {
+		return clazzz.replaceAll("/", ".");
+	}
+
+	/**
+	 * Formats a operation given in the internal representation format.
+	 * 
+	 * @param operation
+	 *            operation in the internal representation format
+	 * @return reformatted operation in nearly original form
+	 */
+	private String formatOperation(final String clazz, final String operation) {
+		final String[] opSplit = operation.split("\\)");
+		String op = operation;
+		if (opSplit.length == 2) {
+			op = opSplit[0] + ")"; // remove return type
+		}
+		return clazz + "." + op.replaceAll(";", "").replaceAll("/", ".").replaceAll("L", "");
 	}
 
 }

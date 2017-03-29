@@ -114,7 +114,6 @@ public class AgentTest {
 	/**
 	 * Tests the sensor logic.
 	 */
-	@Test
 	public void testSensor() {
 		doAnswer(new Answer<Void>() {
 			@Override
@@ -127,10 +126,10 @@ public class AgentTest {
 
 		final TraceSensor ts = new TraceSensor();
 
-		ts.beforeBody();
+		ts.beforeBody(0);
 
-		ts.firstAfterBody();
-		ts.secondAfterBody();
+		ts.firstAfterBody(0);
+		ts.secondAfterBody(0);
 
 		assertTrue(this.sensorTestBool);
 	}
