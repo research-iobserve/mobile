@@ -18,6 +18,8 @@ dependencies {
 	compile group: 'commons-io', name: 'commons-io', version: '2.5'
 	compile group: 'org.ow2.asm', name: 'asm-all', version: '5.0.4'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.7'
+	compile 'org.apache.cordova:framework:5.0.0-dev'
+	
 	
 	compile project(':mobile.agent')
 	

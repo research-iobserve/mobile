@@ -21,6 +21,7 @@ import java.util.Set;
 import org.iobserve.mobile.instrument.bytecode.ActivitiyBytecodeInstrumenter;
 import org.iobserve.mobile.instrument.bytecode.InstrumentationPoint;
 import org.iobserve.mobile.instrument.bytecode.SensorBytecodeInstrumenter;
+import org.iobserve.mobile.instrument.bytecode.SystemWebViewInstrumenter;
 import org.iobserve.mobile.instrument.config.InstrumentationConfiguration;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -72,6 +73,9 @@ public class StandardClassVisitor extends ClassVisitor {
 	/** Bytecode instrumenter for {@link Activity} class. */
 	private final ActivitiyBytecodeInstrumenter initInstrumenter;
 
+	/** Bytecode instrumenter for apache cordova. */
+	private final SystemWebViewInstrumenter systemWebViewInstrumenter;
+
 	/** Configuration for the instrumentation. */
 	private InstrumentationConfiguration config;
 
@@ -90,6 +94,9 @@ public class StandardClassVisitor extends ClassVisitor {
 	/** Flag whether the class is from the application or not. */
 	private boolean traceClass;
 
+	/** Flag whether the class is the cordova system web view client or not. */
+	private boolean systemWebViewClient;
+
 	/**
 	 * Creates a new standard class visitor from a given {@link ClassVisitor}.
 	 * 
@@ -104,6 +111,7 @@ public class StandardClassVisitor extends ClassVisitor {
 		super(api, cv);
 		this.config = config;
 		this.initInstrumenter = new ActivitiyBytecodeInstrumenter(config);
+		this.systemWebViewInstrumenter = new SystemWebViewInstrumenter();
 		this.written = false;
 	}
 
@@ -118,6 +126,7 @@ public class StandardClassVisitor extends ClassVisitor {
 		this.className = name;
 		this.superName = supername;
 		this.traceClass = config.isTraceRelevantClass(name); // monitor
+		this.systemWebViewClient = name.equals("org/apache/cordova/engine/SystemWebViewClient");
 
 		if (this.superName != null) {
 			final Type superType = Type.getType(this.superName);
@@ -145,6 +154,10 @@ public class StandardClassVisitor extends ClassVisitor {
 		if (classWithInit && matchesInstrumentationPoint(name, desc, POINTS_INIT) != null) {
 			setWritten(true);
 			return new DefaultInstrumentationAdapter(Opcodes.ASM5, className, access, name, desc, mv, initInstrumenter);
+		} else if (this.systemWebViewClient) {
+			setWritten(true);
+			return new DefaultInstrumentationAdapter(Opcodes.ASM5, className, access, name, desc, mv,
+					systemWebViewInstrumenter);
 		} else if (this.traceClass) {
 			setWritten(true);
 			return new DefaultInstrumentationAdapter(Opcodes.ASM5, className, access, name, desc, mv,

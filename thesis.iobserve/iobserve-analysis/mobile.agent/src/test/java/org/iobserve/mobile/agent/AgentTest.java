@@ -72,6 +72,10 @@ public class AgentTest {
 	public AgentTest() {
 	}
 
+	@Test
+	public void emptyTest() {
+	}
+
 	/**
 	 * Test for the network monitoring module.
 	 * 
@@ -79,7 +83,6 @@ public class AgentTest {
 	 *             only happens if the google url is invalid and this is
 	 *             unlikely
 	 */
-	@Test
 	public void testNetworkModule() throws MalformedURLException {
 		final NetworkModule module = new NetworkModule(0);
 		module.initModule(mockedActivity);
